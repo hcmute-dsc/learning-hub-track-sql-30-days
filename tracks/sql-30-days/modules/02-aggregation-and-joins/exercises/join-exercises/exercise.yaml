@@ -1,0 +1,16 @@
+uid: "add6f615-45a5-5c28-86be-29f482c0b594"
+slug: "join-exercises"
+title: "Bài tập: Kết hợp nhiều bảng với JOIN"
+type: "self_check"
+difficulty: "medium"
+lesson: "join"
+tags:
+  - "sql"
+authors:
+  - "github:TienNHM"
+license: "MIT"
+spec:
+  checklist:
+    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
+    - "Kết quả của mình khớp với kết quả trong đáp án"
+    - "Đọc lại phần lý thuyết của những bài làm sai"

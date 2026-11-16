@@ -1,0 +1,16 @@
+uid: "4a8e88f5-7edc-55d0-bbd5-743fdc9d45f5"
+slug: "query-performance-exercises"
+title: "Bài tập: Đọc kế hoạch thực thi với EXPLAIN"
+type: "self_check"
+difficulty: "medium"
+lesson: "query-performance"
+tags:
+  - "sql"
+authors:
+  - "github:TienNHM"
+license: "MIT"
+spec:
+  checklist:
+    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
+    - "Kết quả của mình khớp với kết quả trong đáp án"
+    - "Đọc lại phần lý thuyết của những bài làm sai"

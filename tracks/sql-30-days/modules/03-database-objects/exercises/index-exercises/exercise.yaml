@@ -1,0 +1,16 @@
+uid: "f71d7df8-6fed-5ca9-83da-fd55c7885434"
+slug: "index-exercises"
+title: "Bài tập: Chỉ mục (index)"
+type: "self_check"
+difficulty: "medium"
+lesson: "index"
+tags:
+  - "sql"
+authors:
+  - "github:TienNHM"
+license: "MIT"
+spec:
+  checklist:
+    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
+    - "Kết quả của mình khớp với kết quả trong đáp án"
+    - "Đọc lại phần lý thuyết của những bài làm sai"

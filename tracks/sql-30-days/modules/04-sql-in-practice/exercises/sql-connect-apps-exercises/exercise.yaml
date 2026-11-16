@@ -1,0 +1,16 @@
+uid: "119abf55-a63d-55e0-b44c-2a8ceb3eacdb"
+slug: "sql-connect-apps-exercises"
+title: "Bài tập: Kết nối SQL từ ứng dụng"
+type: "self_check"
+difficulty: "hard"
+lesson: "sql-connect-apps"
+tags:
+  - "sql"
+authors:
+  - "github:TienNHM"
+license: "MIT"
+spec:
+  checklist:
+    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
+    - "Kết quả của mình khớp với kết quả trong đáp án"
+    - "Đọc lại phần lý thuyết của những bài làm sai"

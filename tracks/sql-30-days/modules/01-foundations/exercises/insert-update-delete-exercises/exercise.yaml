@@ -1,0 +1,16 @@
+uid: "19f61e7f-688a-58c7-88de-6daea521d3a6"
+slug: "insert-update-delete-exercises"
+title: "Bài tập: Thêm, sửa, xóa dữ liệu (INSERT, UPDATE, DELETE)"
+type: "self_check"
+difficulty: "easy"
+lesson: "insert-update-delete"
+tags:
+  - "sql"
+authors:
+  - "github:TienNHM"
+license: "MIT"
+spec:
+  checklist:
+    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
+    - "Kết quả của mình khớp với kết quả trong đáp án"
+    - "Đọc lại phần lý thuyết của những bài làm sai"

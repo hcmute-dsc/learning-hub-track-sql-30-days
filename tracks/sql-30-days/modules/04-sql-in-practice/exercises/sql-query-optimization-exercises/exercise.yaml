@@ -1,0 +1,16 @@
+uid: "8e05f5bb-c2fb-5bd1-a2ae-a6a14914a411"
+slug: "sql-query-optimization-exercises"
+title: "Bài tập: Tối ưu truy vấn"
+type: "self_check"
+difficulty: "hard"
+lesson: "sql-query-optimization"
+tags:
+  - "sql"
+authors:
+  - "github:TienNHM"
+license: "MIT"
+spec:
+  checklist:
+    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
+    - "Kết quả của mình khớp với kết quả trong đáp án"
+    - "Đọc lại phần lý thuyết của những bài làm sai"

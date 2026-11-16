@@ -1,0 +1,16 @@
+uid: "d5e59a08-13de-5ad4-8aa9-f9b76a99f71c"
+slug: "transactions-acid-exercises"
+title: "Bài tập: Transaction và ACID"
+type: "self_check"
+difficulty: "medium"
+lesson: "transactions-acid"
+tags:
+  - "sql"
+authors:
+  - "github:TienNHM"
+license: "MIT"
+spec:
+  checklist:
+    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
+    - "Kết quả của mình khớp với kết quả trong đáp án"
+    - "Đọc lại phần lý thuyết của những bài làm sai"

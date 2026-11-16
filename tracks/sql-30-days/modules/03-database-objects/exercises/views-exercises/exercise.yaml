@@ -1,0 +1,16 @@
+uid: "dacc9ef1-17b2-5357-bde5-028834855197"
+slug: "views-exercises"
+title: "Bài tập: View và materialized view"
+type: "self_check"
+difficulty: "medium"
+lesson: "views"
+tags:
+  - "sql"
+authors:
+  - "github:TienNHM"
+license: "MIT"
+spec:
+  checklist:
+    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
+    - "Kết quả của mình khớp với kết quả trong đáp án"
+    - "Đọc lại phần lý thuyết của những bài làm sai"

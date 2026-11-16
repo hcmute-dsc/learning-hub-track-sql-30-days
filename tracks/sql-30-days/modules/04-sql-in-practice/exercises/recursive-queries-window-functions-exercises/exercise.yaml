@@ -1,0 +1,16 @@
+uid: "967b88a8-5c73-51f6-b838-ca04b180f97a"
+slug: "recursive-queries-window-functions-exercises"
+title: "Bài tập: Window function và truy vấn đệ quy"
+type: "self_check"
+difficulty: "hard"
+lesson: "recursive-queries-window-functions"
+tags:
+  - "sql"
+authors:
+  - "github:TienNHM"
+license: "MIT"
+spec:
+  checklist:
+    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
+    - "Kết quả của mình khớp với kết quả trong đáp án"
+    - "Đọc lại phần lý thuyết của những bài làm sai"

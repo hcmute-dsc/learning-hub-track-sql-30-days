@@ -1,0 +1,16 @@
+uid: "2a1e7148-96a1-5acc-92c3-2ed2fe70f193"
+slug: "select-where-exercises"
+title: "Bài tập: SELECT và WHERE, truy vấn và lọc dữ liệu"
+type: "self_check"
+difficulty: "easy"
+lesson: "select-where"
+tags:
+  - "sql"
+authors:
+  - "github:TienNHM"
+license: "MIT"
+spec:
+  checklist:
+    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
+    - "Kết quả của mình khớp với kết quả trong đáp án"
+    - "Đọc lại phần lý thuyết của những bài làm sai"

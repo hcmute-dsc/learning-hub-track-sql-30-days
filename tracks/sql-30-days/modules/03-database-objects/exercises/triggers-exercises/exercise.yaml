@@ -1,0 +1,16 @@
+uid: "d155db9e-9e5e-5cf0-a799-fa0f68f45387"
+slug: "triggers-exercises"
+title: "Bài tập: Trigger"
+type: "self_check"
+difficulty: "medium"
+lesson: "triggers"
+tags:
+  - "sql"
+authors:
+  - "github:TienNHM"
+license: "MIT"
+spec:
+  checklist:
+    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
+    - "Kết quả của mình khớp với kết quả trong đáp án"
+    - "Đọc lại phần lý thuyết của những bài làm sai"

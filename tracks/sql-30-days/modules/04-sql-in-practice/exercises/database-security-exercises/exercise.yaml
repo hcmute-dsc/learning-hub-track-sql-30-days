@@ -1,0 +1,16 @@
+uid: "a8efe26c-c2c8-5794-ab7b-c0a5e6edfe91"
+slug: "database-security-exercises"
+title: "Bài tập: Bảo mật cơ sở dữ liệu"
+type: "self_check"
+difficulty: "hard"
+lesson: "database-security"
+tags:
+  - "sql"
+authors:
+  - "github:TienNHM"
+license: "MIT"
+spec:
+  checklist:
+    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
+    - "Kết quả của mình khớp với kết quả trong đáp án"
+    - "Đọc lại phần lý thuyết của những bài làm sai"

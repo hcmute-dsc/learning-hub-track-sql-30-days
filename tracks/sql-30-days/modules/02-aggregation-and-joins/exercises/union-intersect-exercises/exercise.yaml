@@ -1,0 +1,16 @@
+uid: "7234ddc5-3c82-535f-b620-e7c90675610f"
+slug: "union-intersect-exercises"
+title: "Bài tập: UNION, INTERSECT và EXCEPT"
+type: "self_check"
+difficulty: "medium"
+lesson: "union-intersect"
+tags:
+  - "sql"
+authors:
+  - "github:TienNHM"
+license: "MIT"
+spec:
+  checklist:
+    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
+    - "Kết quả của mình khớp với kết quả trong đáp án"
+    - "Đọc lại phần lý thuyết của những bài làm sai"

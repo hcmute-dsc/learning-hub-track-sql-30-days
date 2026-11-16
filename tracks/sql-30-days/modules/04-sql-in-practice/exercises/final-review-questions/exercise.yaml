@@ -1,0 +1,16 @@
+uid: "d2446a9e-83c2-59d5-adb7-303f39addd38"
+slug: "final-review-questions"
+title: "Câu hỏi ôn tập cuối khóa"
+type: "self_check"
+difficulty: "hard"
+lesson: "summary"
+tags:
+  - "sql"
+authors:
+  - "github:TienNHM"
+license: "MIT"
+spec:
+  checklist:
+    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
+    - "Kết quả của mình khớp với kết quả trong đáp án"
+    - "Đọc lại phần lý thuyết của những bài làm sai"

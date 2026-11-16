@@ -1,0 +1,16 @@
+uid: "b08f78ff-c326-543b-93c5-389542307eca"
+slug: "import-export-data-exercises"
+title: "Bài tập: Nhập và xuất dữ liệu với CSV"
+type: "self_check"
+difficulty: "hard"
+lesson: "import-export-data"
+tags:
+  - "sql"
+authors:
+  - "github:TienNHM"
+license: "MIT"
+spec:
+  checklist:
+    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
+    - "Kết quả của mình khớp với kết quả trong đáp án"
+    - "Đọc lại phần lý thuyết của những bài làm sai"

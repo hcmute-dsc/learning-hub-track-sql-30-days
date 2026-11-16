@@ -1,0 +1,16 @@
+uid: "a406c863-a05e-5210-90ba-ebb2b8547d33"
+slug: "big-data-exercises"
+title: "Bài tập: SQL và dữ liệu lớn"
+type: "self_check"
+difficulty: "hard"
+lesson: "big-data"
+tags:
+  - "sql"
+authors:
+  - "github:TienNHM"
+license: "MIT"
+spec:
+  checklist:
+    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
+    - "Kết quả của mình khớp với kết quả trong đáp án"
+    - "Đọc lại phần lý thuyết của những bài làm sai"

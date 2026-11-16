@@ -1,0 +1,16 @@
+uid: "007fd0ff-4cab-5bd6-ab35-169ae9094f4c"
+slug: "case-when-exercises"
+title: "Bài tập: CASE và tổng hợp có điều kiện"
+type: "self_check"
+difficulty: "medium"
+lesson: "case-when"
+tags:
+  - "sql"
+authors:
+  - "github:TienNHM"
+license: "MIT"
+spec:
+  checklist:
+    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
+    - "Kết quả của mình khớp với kết quả trong đáp án"
+    - "Đọc lại phần lý thuyết của những bài làm sai"

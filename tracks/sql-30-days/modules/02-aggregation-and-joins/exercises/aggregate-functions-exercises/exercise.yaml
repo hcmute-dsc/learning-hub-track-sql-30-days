@@ -1,0 +1,16 @@
+uid: "b2ed53f2-64a6-5bdb-ac8c-ee26fa4a6f0c"
+slug: "aggregate-functions-exercises"
+title: "Bài tập: Hàm tổng hợp (COUNT, SUM, AVG, MIN, MAX)"
+type: "self_check"
+difficulty: "medium"
+lesson: "aggregate-functions"
+tags:
+  - "sql"
+authors:
+  - "github:TienNHM"
+license: "MIT"
+spec:
+  checklist:
+    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
+    - "Kết quả của mình khớp với kết quả trong đáp án"
+    - "Đọc lại phần lý thuyết của những bài làm sai"

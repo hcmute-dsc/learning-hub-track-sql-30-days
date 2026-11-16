@@ -1,0 +1,16 @@
+uid: "d286dc00-bfee-5a5d-bd5b-0fed138ce319"
+slug: "subquery-exercises"
+title: "Bài tập: Truy vấn con (subquery) và CTE"
+type: "self_check"
+difficulty: "medium"
+lesson: "subquery"
+tags:
+  - "sql"
+authors:
+  - "github:TienNHM"
+license: "MIT"
+spec:
+  checklist:
+    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
+    - "Kết quả của mình khớp với kết quả trong đáp án"
+    - "Đọc lại phần lý thuyết của những bài làm sai"

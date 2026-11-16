@@ -1,0 +1,34 @@
+uid: "1b5cf7e7-fc28-5df4-ac51-c40c88aa39c2"
+slug: "final-project"
+title: "Dự án cuối khóa"
+type: "project"
+difficulty: "hard"
+lesson: "summary"
+tags:
+  - "sql"
+authors:
+  - "github:TienNHM"
+license: "MIT"
+spec:
+  deliverable: "github_repo_or_pr"
+  rubric:
+    - criterion: "ERD và chuẩn hóa"
+      weight: 15
+    - criterion: "Schema và ràng buộc"
+      weight: 15
+    - criterion: "Dữ liệu mẫu"
+      weight: 5
+    - criterion: "Truy vấn báo cáo"
+      weight: 20
+    - criterion: "Transaction"
+      weight: 8
+    - criterion: "View"
+      weight: 5
+    - criterion: "Function/procedure và trigger"
+      weight: 8
+    - criterion: "Hiệu năng"
+      weight: 9
+    - criterion: "API tham số hóa"
+      weight: 10
+    - criterion: "Bảo mật và sao lưu"
+      weight: 5

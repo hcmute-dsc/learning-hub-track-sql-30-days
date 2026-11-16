@@ -1,0 +1,16 @@
+uid: "ac2d3b35-8ec0-50fc-b922-56fac4f6ace7"
+slug: "sql-json-practice-exercises"
+title: "Bài tập: Làm việc với JSON và JSONB"
+type: "self_check"
+difficulty: "hard"
+lesson: "sql-json-practice"
+tags:
+  - "sql"
+authors:
+  - "github:TienNHM"
+license: "MIT"
+spec:
+  checklist:
+    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
+    - "Kết quả của mình khớp với kết quả trong đáp án"
+    - "Đọc lại phần lý thuyết của những bài làm sai"

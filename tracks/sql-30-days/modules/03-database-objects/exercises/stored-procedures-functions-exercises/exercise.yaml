@@ -1,0 +1,16 @@
+uid: "adc31b9f-3e55-596f-ab39-aa5da6346060"
+slug: "stored-procedures-functions-exercises"
+title: "Bài tập: Function và Stored Procedure"
+type: "self_check"
+difficulty: "medium"
+lesson: "stored-procedures-functions"
+tags:
+  - "sql"
+authors:
+  - "github:TienNHM"
+license: "MIT"
+spec:
+  checklist:
+    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
+    - "Kết quả của mình khớp với kết quả trong đáp án"
+    - "Đọc lại phần lý thuyết của những bài làm sai"

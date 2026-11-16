@@ -1,0 +1,16 @@
+uid: "a9caf6b4-890c-5d9e-b406-f33ec0de9ad0"
+slug: "group-by-having-exercises"
+title: "Bài tập: Nhóm dữ liệu với GROUP BY và HAVING"
+type: "self_check"
+difficulty: "medium"
+lesson: "group-by-having"
+tags:
+  - "sql"
+authors:
+  - "github:TienNHM"
+license: "MIT"
+spec:
+  checklist:
+    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
+    - "Kết quả của mình khớp với kết quả trong đáp án"
+    - "Đọc lại phần lý thuyết của những bài làm sai"

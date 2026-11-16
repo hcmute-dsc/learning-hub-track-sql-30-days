@@ -1,0 +1,16 @@
+uid: "d575c45b-300f-54de-8880-a758d2cbde97"
+slug: "order-by-limit-exercises"
+title: "Bài tập: ORDER BY và LIMIT, sắp xếp và phân trang"
+type: "self_check"
+difficulty: "easy"
+lesson: "order-by-limit"
+tags:
+  - "sql"
+authors:
+  - "github:TienNHM"
+license: "MIT"
+spec:
+  checklist:
+    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
+    - "Kết quả của mình khớp với kết quả trong đáp án"
+    - "Đọc lại phần lý thuyết của những bài làm sai"

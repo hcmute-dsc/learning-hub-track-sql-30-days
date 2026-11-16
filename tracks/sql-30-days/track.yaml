@@ -1,0 +1,27 @@
+uid: "d3ce3d05-7734-5e83-bebd-1411458600da"
+slug: "sql-30-days"
+title: "30 ngày học SQL"
+summary: "Lộ trình học SQL trong 30 ngày với PostgreSQL 16 và bộ dữ liệu DSC Shop: từ SELECT cơ bản tới index, transaction, window function, tối ưu truy vấn và bảo mật."
+language: "vi"
+level: "beginner"
+estimatedHours: 60
+tags:
+  - "sql"
+  - "postgresql"
+  - "database"
+outcomes:
+  - "Viết truy vấn SELECT, JOIN, GROUP BY, subquery và window function đúng kết quả"
+  - "Thiết kế schema có ràng buộc, index và transaction phù hợp"
+  - "Đọc kế hoạch thực thi, tối ưu truy vấn và bảo vệ database khỏi SQL injection"
+maintainers:
+  - "github:TienNHM"
+license: "MIT"
+position: 10
+source:
+  repo: "hcmute-dsc/sql-challenge"
+  commit: "6ae7152cb6cd8e236de50ed0662df4ce0542418a"
+modules:
+  - "01-foundations"
+  - "02-aggregation-and-joins"
+  - "03-database-objects"
+  - "04-sql-in-practice"

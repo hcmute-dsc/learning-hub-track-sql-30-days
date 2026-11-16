@@ -1,0 +1,16 @@
+uid: "a05be839-6969-5965-a34d-9d092ba0d11c"
+slug: "sql-nosql-exercises"
+title: "Bài tập: SQL và NoSQL"
+type: "self_check"
+difficulty: "hard"
+lesson: "sql-nosql"
+tags:
+  - "sql"
+authors:
+  - "github:TienNHM"
+license: "MIT"
+spec:
+  checklist:
+    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
+    - "Kết quả của mình khớp với kết quả trong đáp án"
+    - "Đọc lại phần lý thuyết của những bài làm sai"
