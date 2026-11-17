@@ -39,7 +39,7 @@ Khác với trang tính, database **kiểm tra** dữ liệu trước khi ghi: k
 
 ### Khu vực nháp cho bài hôm nay
 
-Để không làm hỏng các bảng của cửa hàng, mọi bảng bạn tạo hôm nay nằm trong một schema riêng tên `nhap`. Chạy khối này mỗi lần mở phiên `psql` mới:
+Để không làm hỏng các bảng của cửa hàng, mọi bảng bạn tạo hôm nay nằm trong một schema riêng tên `nhap`. Chạy khối này **một lần** khi bắt đầu bài:
 
 ```sql
 DROP SCHEMA IF EXISTS nhap CASCADE;
@@ -47,7 +47,7 @@ CREATE SCHEMA nhap;
 SET search_path = nhap, shop, public;
 ```
 
-`SET search_path = nhap, shop, public` nghĩa là: khi gặp tên bảng không ghi schema, tìm trong `nhap` trước, rồi `shop`, rồi `public`. Vì vậy `CREATE TABLE vouchers` sẽ tạo `nhap.vouchers`, còn `customers` vẫn tìm ra `shop.customers`. `SET` chỉ có hiệu lực trong phiên hiện tại; thoát `psql` rồi vào lại thì chạy lại dòng `SET` (bỏ hai dòng đầu nếu muốn giữ các bảng nháp đã tạo). Cuối bài có lệnh dọn dẹp.
+`SET search_path = nhap, shop, public` nghĩa là: khi gặp tên bảng không ghi schema, tìm trong `nhap` trước, rồi `shop`, rồi `public`. Vì vậy `CREATE TABLE vouchers` sẽ tạo `nhap.vouchers`, còn `customers` vẫn tìm ra `shop.customers`. `SET` chỉ có hiệu lực trong phiên hiện tại; thoát `psql` rồi vào lại thì chỉ chạy lại dòng `SET search_path = nhap, shop, public;` (đừng chạy lại `DROP SCHEMA`, sẽ mất các bảng nháp đã tạo). Cuối bài có lệnh dọn dẹp.
 
 ## Kiểu dữ liệu trong PostgreSQL
 

@@ -124,7 +124,7 @@ AS $$
     SELECT COALESCE(ROUND(SUM(oi.quantity * oi.unit_price * (1 - oi.discount))), 0)
     FROM orders o
     JOIN order_items oi ON oi.order_id = o.order_id
-    WHERE o.status <> 'cancelled'
+    WHERE o.status NOT IN ('pending', 'cancelled')
       AND o.order_date >= make_date(p_year, p_month, 1)
       AND o.order_date <  make_date(p_year, p_month, 1) + INTERVAL '1 month';
 $$;
@@ -165,7 +165,7 @@ $$;
 
 > `BEGIN ... END` ở đây chỉ là khối lệnh của PL/pgSQL, **không** mở transaction như `BEGIN;` ở Ngày 16.
 
-Ví dụ: xếp hạng khách theo tổng chi tiêu (không tính đơn đã hủy). Từ 50 triệu là Vàng, từ 20 triệu là Bạc, có mua là Đồng, chưa mua là Mới.
+Ví dụ: xếp hạng khách theo tổng chi tiêu (theo quy ước doanh thu của khóa học: không tính đơn `pending` chưa thanh toán và đơn `cancelled` đã hủy). Từ 50 triệu là Vàng, từ 20 triệu là Bạc, có mua là Đồng, chưa mua là Mới.
 
 ```sql
 CREATE OR REPLACE FUNCTION customer_tier(p_customer_id INT)
@@ -185,7 +185,7 @@ BEGIN
     FROM orders o
     JOIN order_items oi ON oi.order_id = o.order_id
     WHERE o.customer_id = p_customer_id
-      AND o.status <> 'cancelled';
+      AND o.status NOT IN ('pending', 'cancelled');
 
     IF v_spent >= 50000000 THEN
         RETURN 'Vàng';
@@ -281,7 +281,7 @@ AS $$
     FROM order_items oi
     JOIN orders o ON o.order_id = oi.order_id
     WHERE oi.product_id = p_product_id
-      AND o.status <> 'cancelled';
+      AND o.status NOT IN ('pending', 'cancelled');
 $$;
 
 SELECT * FROM product_sales(16);

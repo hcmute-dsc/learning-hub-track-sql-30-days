@@ -78,7 +78,15 @@ Hướng dẫn đầy đủ (kể cả xử lý sự cố, nạp dữ liệu l�
 Docker chạy PostgreSQL trong một "container" tách biệt, không đụng tới máy bạn, và dữ liệu mẫu được nạp tự động.
 
 1. Cài [Docker Desktop](https://www.docker.com/products/docker-desktop/) và mở nó lên.
-2. Tải repo khóa học về (`git clone` hoặc tải ZIP), mở terminal ở thư mục gốc của repo.
+2. Tải khóa học về và mở terminal ở thư mục `tracks/sql-30-days` (nơi có file `docker-compose.yml`):
+
+```sh
+git clone https://github.com/hcmute-dsc/learning-hub-content.git
+cd learning-hub-content/tracks/sql-30-days
+```
+
+Mọi lệnh `docker compose ...` và đường dẫn `setup/...` trong khóa học đều chạy từ thư mục này.
+
 3. Chạy:
 
 ```sh
@@ -103,7 +111,7 @@ docker compose ps
 Nếu máy không chạy được Docker:
 
 1. Tải và cài PostgreSQL 16 trở lên từ <https://www.postgresql.org/download/>. Trên Windows, trình cài đặt hỏi mật khẩu cho user `postgres`: hãy ghi nhớ nó. Nhớ chọn cài kèm "Command Line Tools" để có `psql`.
-2. Ở thư mục gốc của repo, tạo database và nạp dữ liệu:
+2. Tải khóa học về như bước 2 của Cách 1, rồi ở thư mục `tracks/sql-30-days`, tạo database và nạp dữ liệu:
 
 ```sh
 createdb -U postgres sql_challenge

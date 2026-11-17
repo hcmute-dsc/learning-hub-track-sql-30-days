@@ -35,11 +35,15 @@ Khi cú pháp PostgreSQL khác hẳn MySQL hoặc SQL Server (ví dụ `LIMIT` v
 
 Làm phần này trước Ngày 1. Hướng dẫn đầy đủ nằm ở [setup/README.md](../../../setup/README.md); tóm tắt như sau.
 
-**Cách 1: Docker (khuyến nghị).** Cài [Docker Desktop](https://www.docker.com/products/docker-desktop/), rồi ở thư mục gốc của repo chạy:
+**Cách 1: Docker (khuyến nghị).** Cài [Docker Desktop](https://www.docker.com/products/docker-desktop/), tải khóa học về và vào thư mục `tracks/sql-30-days` (nơi có `docker-compose.yml`), rồi chạy:
 
 ```sh
+git clone https://github.com/hcmute-dsc/learning-hub-content.git
+cd learning-hub-content/tracks/sql-30-days
 docker compose up -d
 ```
+
+Mọi lệnh `docker compose ...` và đường dẫn `setup/...` trong khóa học đều chạy từ thư mục `tracks/sql-30-days` này.
 
 Bạn có PostgreSQL 16 ở `localhost:5432` (user `postgres`, mật khẩu `postgres`, database `sql_challenge`) đã nạp sẵn dữ liệu DSC Shop, và giao diện web Adminer ở <http://localhost:8080>.
 

@@ -1,5 +1,7 @@
 > Làm trên bộ dữ liệu DSC Shop. Tự viết và chạy truy vấn trước, sau đó mới mở **Đáp án** để so kết quả.
 
+> Khác với Ngày 15 và Ngày 20, các plan trong bài ôn tập được đo với cấu hình mặc định, **có** chạy song song (nút `Gather`, `Parallel Seq Scan`). Nếu phiên psql của bạn còn `SET max_parallel_workers_per_gather = 0` từ bài trước, hãy chạy `RESET max_parallel_workers_per_gather;` trước khi làm.
+
 ## Câu hỏi kiểm tra khái niệm
 
 Tự trả lời trước khi mở đáp án.
@@ -60,7 +62,7 @@ Function trả về một giá trị (hoặc một bảng với `RETURNS TABLE`)
 Không nhanh hơn: view thường chỉ là câu `SELECT` được đặt tên, mỗi lần đọc vẫn quét cả triệu đơn. Muốn nhanh thì dùng materialized view (đọc dưới 1 ms trong phép đo ở Ngày 19), đổi lại số liệu chỉ mới tới lần `REFRESH` gần nhất, và mỗi lần `REFRESH` tốn công chạy lại truy vấn gốc.
 </details>
 
-**Câu 8.** Trong output của `EXPLAIN ANALYZE`, dòng `Seq Scan on orders (cost=0.00..13405.33 rows=4014 ...) (actual time=... rows=3287 loops=3)` cho bạn biết những gì? Khi `rows` ước lượng lệch rất xa `actual rows`, bạn làm gì đầu tiên?
+**Câu 8.** Trong output của `EXPLAIN ANALYZE`, dòng `Parallel Seq Scan on orders (cost=0.00..13405.33 rows=4014 ...) (actual time=... rows=3287 loops=3)` cho bạn biết những gì? Khi `rows` ước lượng lệch rất xa `actual rows`, bạn làm gì đầu tiên?
 
 <details>
 <summary>Đáp án</summary>

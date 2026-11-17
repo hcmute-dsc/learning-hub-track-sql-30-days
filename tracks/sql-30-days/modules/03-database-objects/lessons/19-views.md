@@ -507,7 +507,7 @@ INSERT INTO orders (customer_id, order_date, status, channel, shipping_city)
 VALUES (16, '2026-10-16 10:00+07', 'paid', 'online', 'Cần Thơ');
 
 INSERT INTO order_items (order_id, product_id, quantity, unit_price)
-VALUES ((SELECT MAX(order_id) FROM orders), 17, 1, 2490000);
+VALUES (currval('orders_order_id_seq'), 17, 1, 2490000);
 
 -- View thường thấy ngay đơn mới
 SELECT COUNT(*) AS order_count, SUM(total_amount) AS revenue

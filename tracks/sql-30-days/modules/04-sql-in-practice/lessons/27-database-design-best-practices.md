@@ -565,7 +565,7 @@ Nguyên tắc chung: hệ thống giao dịch (OLTP) giữ chuẩn hóa, phần 
 | Khóa thay thế `INT IDENTITY` + `UNIQUE` trên `sku`, `email` | Khóa chính ổn định, khóa tự nhiên vẫn không trùng (mục 4.1) |
 | `products.attributes` là `JSONB` | Thông số mỗi loại sản phẩm mỗi khác (laptop có CPU, cáp thì không). Cột đa trị này là ngoại lệ có chủ đích với 1NF, chỉ dùng cho dữ liệu không cần ràng buộc chặt (Ngày 22) |
 | `NUMERIC(12,0)` cho tiền, `TIMESTAMPTZ` cho thời điểm | Không sai số làm tròn; thời điểm không phụ thuộc múi giờ máy chủ (Ngày 2) |
-| Index trên mọi cột khóa ngoại | PostgreSQL không tự tạo index cho khóa ngoại; JOIN và xóa dòng cha cần nó (Ngày 15) |
+| Index trên các khóa ngoại hay JOIN hoặc có dòng cha bị xóa: `orders.customer_id`, `order_items.product_id`, `payments.order_id`, `products.category_id` (`order_items.order_id` đã nằm đầu khóa chính ghép) | PostgreSQL không tự tạo index cho khóa ngoại; JOIN và xóa dòng cha cần nó (Ngày 15). Ba khóa ngoại `categories.parent_id`, `employees.manager_id`, `orders.employee_id` **chưa có** index: các bảng này chỉ vài chục dòng nên quét toàn bảng vẫn rẻ. Với dữ liệu thật lớn nên thêm, đây là một bài luyện tốt |
 
 Điểm chưa tốt (cố ý để luyện tập): `customers.city` là chữ nhập tay nên có `TP. Hồ Chí Minh`, `TP.HCM`, `đà nẵng`. Đây là vấn đề chất lượng dữ liệu chứ không phải vi phạm dạng chuẩn. Nếu cần báo cáo theo thành phố chính xác, thêm bảng `cities` và cho `customers.city_id` trỏ tới, hoặc ít nhất làm sạch trước khi lưu (Ngày 5).
 
@@ -575,7 +575,7 @@ Nguyên tắc chung: hệ thống giao dịch (OLTP) giữ chuẩn hóa, phần 
 
 **Chọn kiểu dữ liệu theo ý nghĩa.** Tiền dùng `NUMERIC`, không dùng `FLOAT`. Thời điểm dùng `TIMESTAMPTZ`. Không lưu dữ liệu dẫn xuất dễ cũ: lưu `birth_date`, tính tuổi khi cần bằng `AGE()`, đừng lưu cột `age`.
 
-**Dùng NULL đúng nghĩa.** `NOT NULL` cho cột bắt buộc (tên khách, ngày đặt); cho phép NULL khi giá trị có thể thực sự chưa biết (email, ngày sinh). **Đừng thay NULL bằng giá trị giả** như `0`, `''`, `'1900-01-01'`: `AVG(birth_date)` hay `COUNT(email)` sẽ tính cả giá trị giả và cho kết quả sai. NULL không làm truy vấn chậm, B-tree của PostgreSQL vẫn index được NULL; cái cần nhớ là các bẫy logic của NULL (`= NULL`, `NOT IN` khi có NULL, Ngày 3 và 11). `DEFAULT` dành cho giá trị mặc định có thật (`status DEFAULT 'pending'`, `created_at DEFAULT now()`).
+**Dùng NULL đúng nghĩa.** `NOT NULL` cho cột bắt buộc (tên khách, ngày đặt); cho phép NULL khi giá trị có thể thực sự chưa biết (email, ngày sinh). **Đừng thay NULL bằng giá trị giả** như `0`, `''`, `'1900-01-01'`: `MIN(birth_date)` (ra "khách sinh năm 1900") hay `COUNT(email)` sẽ tính cả giá trị giả và cho kết quả sai. NULL không làm truy vấn chậm, B-tree của PostgreSQL vẫn index được NULL; cái cần nhớ là các bẫy logic của NULL (`= NULL`, `NOT IN` khi có NULL, Ngày 3 và 11). `DEFAULT` dành cho giá trị mặc định có thật (`status DEFAULT 'pending'`, `created_at DEFAULT now()`).
 
 **Để cơ sở dữ liệu giữ quy tắc.** Khóa ngoại, `UNIQUE`, `CHECK`, `NOT NULL` chặn dữ liệu sai bất kể ứng dụng nào ghi vào. Kiểm tra ở ứng dụng là thêm, không phải thay thế.
 

@@ -1,6 +1,6 @@
 > Làm trên bộ dữ liệu DSC Shop. Tự viết và chạy truy vấn trước, sau đó mới mở **Đáp án** để so kết quả.
 
-## 2. Câu hỏi ôn tập cuối khóa
+## Câu hỏi ôn tập cuối khóa
 
 Mười câu, mỗi câu chạm vào một nhóm kỹ năng chính. Tự làm trước rồi mới mở đáp án. Mọi đáp án SQL chạy trên dữ liệu gốc của DSC Shop; câu nào có tạo đối tượng hay sửa dữ liệu đều tự dọn hoặc `ROLLBACK` ở cuối.
 
@@ -330,7 +330,7 @@ Quy trình chung (Ngày 15, 20, 28):
 Hai nguyên tắc:
 
 1. **Không bao giờ ghép chuỗi** dữ liệu người dùng vào câu SQL. Luôn dùng truy vấn tham số hóa: câu SQL và dữ liệu được gửi tách nhau, nên dữ liệu không bao giờ bị hiểu thành lệnh SQL.
-2. **Không lưu mật khẩu dạng rõ** và không so sánh mật khẩu trong câu SQL. Lưu chuỗi hash có salt (bcrypt, argon2), lấy hash ra theo username rồi so sánh ở tầng ứng dụng.
+2. **Không lưu mật khẩu dạng rõ** và không kiểm tra đăng nhập kiểu `WHERE username = ? AND password = ?` với mật khẩu dạng rõ. Lưu chuỗi hash có salt (bcrypt, argon2). Cách ưu tiên: lấy hash ra theo username rồi so sánh ở tầng ứng dụng. So bằng `crypt()` của pgcrypto ngay trong SQL cũng đúng (Ngày 30, Cách 2), nhưng mật khẩu dạng rõ phải đi qua câu SQL gửi tới server.
 
 ```python
 import bcrypt

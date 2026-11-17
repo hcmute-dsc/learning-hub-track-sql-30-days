@@ -12,5 +12,5 @@ license: "MIT"
 spec:
   checklist:
     - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
-    - "Kết quả của mình khớp với kết quả trong đáp án"
+    - "Plan của mình có cùng kiểu nút (Seq Scan, Index Scan, Hash Join...) và cùng số dòng thực tế (actual rows) như đáp án; thời gian, cost và số dòng ước lượng được phép khác"
     - "Đọc lại phần lý thuyết của những bài làm sai"

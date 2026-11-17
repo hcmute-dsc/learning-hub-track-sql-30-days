@@ -263,7 +263,7 @@ Kết quả:
 | PHN-004 | Nokia 105 4G | 690000 | 500000 | 190000 | 27.5 |
 | ACC-003 | Bàn phím cơ Keychron K2 | 1890000 | 1500000 | 390000 | 20.6 |
 
-Hai điểm cần chú ý: với `DESC`, PostgreSQL mặc định đặt NULL lên đầu, nên phải ghi `NULLS LAST`; nhân `100.0` trước khi chia để không bị chia nguyên. `ORDER BY` dùng được alias `ti_le_lai` vì nó chạy sau `SELECT`.
+Hai điểm cần chú ý: với `DESC`, PostgreSQL mặc định đặt NULL lên đầu, nên phải ghi `NULLS LAST`. `price` và `cost_price` là `NUMERIC` nên phép chia đã ra số thập phân; viết `100.0` chỉ là thói quen an toàn, cần thiết khi cả hai vế là số nguyên (như `stock_quantity`). `ORDER BY` dùng được alias `ti_le_lai` vì nó chạy sau `SELECT`.
 </details>
 
 **Bài 10 (Ngày 5).** Tính tuổi của 5 khách trẻ nhất (bỏ qua khách chưa có ngày sinh). Để kết quả cố định, tính tuổi tại ngày `2026-10-17`.

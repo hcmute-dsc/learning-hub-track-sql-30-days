@@ -12,5 +12,5 @@ license: "MIT"
 spec:
   checklist:
     - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
-    - "Kết quả của mình khớp với kết quả trong đáp án"
+    - "Kết quả SQL của mình khớp với đáp án; với câu phân tích (Bài 7), lập luận của mình có đủ các ý chính trong đáp án"
     - "Đọc lại phần lý thuyết của những bài làm sai"

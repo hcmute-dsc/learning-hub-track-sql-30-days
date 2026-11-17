@@ -252,6 +252,8 @@ Không có một đáp án duy nhất, đây là một hướng hợp lý:
 - **Phân vùng `orders` theo RANGE `order_date`, mỗi tháng hoặc mỗi quý một phân vùng.** (b) đọc đúng các phân vùng của khoảng thời gian cần báo cáo. (c) trở thành `DETACH` rồi `DROP` các phân vùng cũ, gần như tức thời. (a) không lọc theo ngày nên phải dò mọi phân vùng; giải quyết bằng index `customer_id` trên bảng cha (tự có trên từng phân vùng) và giới hạn lịch sử hiển thị trong vài năm gần nhất để vẫn được cắt tỉa (`AND order_date >= now() - INTERVAL '2 years'`).
 - **Shard key: `customer_id`.** Đơn, dòng hàng, thanh toán của một khách nằm cùng một shard, nên (a) chỉ hỏi một máy và JOIN vẫn nằm trong một máy. Báo cáo (b) phải hỏi mọi shard rồi gộp, nên thường chuyển sang kho dữ liệu cột. Không chọn `order_date` làm shard key, vì mọi đơn mới sẽ dồn vào shard của tháng hiện tại.
 - Trước khi nghĩ tới sharding, 50 triệu dòng vẫn nằm gọn trong một máy PostgreSQL có partition, index và một replica cho báo cáo.
+
+Tự chấm: câu trả lời của bạn đạt nếu (1) khóa phân vùng giúp được cả (b) và (c), (2) nói rõ (a) không được cắt tỉa và cách bù lại, (3) shard key giữ dữ liệu của một khách trên cùng một máy và tránh dồn ghi vào một shard.
 </details>
 
 ### Dọn dẹp

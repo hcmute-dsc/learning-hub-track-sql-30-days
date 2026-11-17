@@ -612,7 +612,7 @@ WHERE username = 'binh';
 | --- | --- | --- |
 | binh | t | f |
 
-Hash do pgcrypto tạo là bcrypt chuẩn, thư viện bcrypt của Python hay Node đọc được và ngược lại. Nhược điểm của cách 2: mật khẩu dạng rõ nằm trong câu SQL gửi tới server, có thể bị ghi vào log nếu server bật ghi log câu lệnh. Vì vậy với ứng dụng, cách 1 vẫn được ưu tiên.
+Hash do pgcrypto tạo là bcrypt chuẩn với prefix `$2a$`, thư viện bcrypt của Python hay Node kiểm tra được. Chiều ngược lại thì phải cẩn thận: pgcrypto chỉ đọc được `$2a$`, còn Python (`bcrypt.gensalt()`) và Node (`bcrypt.hash()`) mặc định sinh `$2b$`. Gặp `$2b$`, `crypt()` **không báo lỗi** mà trả về một chuỗi khác hẳn, nên phép so sánh luôn ra `false` và không ai đăng nhập được. Nếu cần dùng chung hash giữa ứng dụng và SQL, hãy sinh hash có prefix `$2a$`: trong Python là `bcrypt.gensalt(prefix=b"2a")`; với thư viện khác, kiểm tra chuỗi hash lưu vào database bắt đầu bằng `$2a$`. Đơn giản nhất là chỉ hash và kiểm tra ở **một** nơi. Nhược điểm của cách 2: mật khẩu dạng rõ nằm trong câu SQL gửi tới server, có thể bị ghi vào log nếu server bật ghi log câu lệnh. Vì vậy với ứng dụng, cách 1 vẫn được ưu tiên.
 
 ## Giữ bí mật thông tin kết nối
 

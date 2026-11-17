@@ -56,6 +56,7 @@ SELECT
 FROM employees AS e
 LEFT JOIN orders AS o
        ON o.employee_id = e.employee_id
+      AND o.channel = 'offline'
 LEFT JOIN order_totals AS t
        ON t.order_id = o.order_id
       AND t.status NOT IN ('pending', 'cancelled')
@@ -77,7 +78,7 @@ Kết quả:
 | 7 | Lâm Gia Huy | 0 | 0 |
 | 1 | Nguyễn Thành Long | 0 | 0 |
 
-Cả hai lần JOIN đều phải là `LEFT JOIN`; chỉ cần một `JOIN` thường là bốn nhân viên chưa bán hàng biến mất.
+Cả hai lần JOIN đều phải là `LEFT JOIN`; chỉ cần một `JOIN` thường là bốn nhân viên chưa bán hàng biến mất. Điều kiện `o.channel = 'offline'` đặt ở `ON` (không ở `WHERE`) để vẫn giữ nhân viên không có đơn offline. Trong dữ liệu mẫu chỉ đơn offline mới có `employee_id`, nên bỏ điều kiện này kết quả cũng không đổi, nhưng viết rõ ra thì view vẫn đúng khi dữ liệu thay đổi.
 </details>
 
 **Bài 3.** Thêm cột `channel` vào view `order_totals` mà không làm lỗi và không phải xóa `customer_spending`. Sau đó dùng view tính số đơn và doanh thu (không tính đơn `pending` và `cancelled`) theo kênh bán.

@@ -4,9 +4,20 @@ Cả khóa học dùng **PostgreSQL 16** và một bộ dữ liệu chung: cửa
 
 ## Cài đặt
 
+### Tải khóa học về máy
+
+Khóa học nằm trong repo [hcmute-dsc/learning-hub-content](https://github.com/hcmute-dsc/learning-hub-content), thư mục `tracks/sql-30-days` (nơi có file `docker-compose.yml`):
+
+```sh
+git clone https://github.com/hcmute-dsc/learning-hub-content.git
+cd learning-hub-content/tracks/sql-30-days
+```
+
+Mọi lệnh `docker compose ...` và mọi đường dẫn `setup/...` trong khóa học đều chạy từ thư mục `tracks/sql-30-days` này.
+
 ### Cách 1: Docker (khuyến nghị)
 
-Cần cài [Docker Desktop](https://www.docker.com/products/docker-desktop/). Ở thư mục gốc của repo:
+Cần cài [Docker Desktop](https://www.docker.com/products/docker-desktop/). Ở thư mục `tracks/sql-30-days`:
 
 ```sh
 docker compose up -d
@@ -32,7 +43,7 @@ Bạn cũng có thể dùng DBeaver, pgAdmin, DataGrip hoặc extension PostgreS
 ### Cách 2: Cài PostgreSQL trực tiếp
 
 1. Cài PostgreSQL 16 trở lên từ <https://www.postgresql.org/download/>.
-2. Tạo database và nạp dữ liệu (chạy ở thư mục gốc của repo):
+2. Tạo database và nạp dữ liệu (chạy ở thư mục `tracks/sql-30-days`):
 
 ```sh
 createdb -U postgres sql_challenge

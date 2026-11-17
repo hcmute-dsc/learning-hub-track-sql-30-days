@@ -28,7 +28,7 @@ license: "MIT"
 
 **Cần biết trước:** [Ngày 6](../../01-foundations/lessons/06-insert-update-delete.md) (INSERT/UPDATE/DELETE, RETURNING, ràng buộc CHECK), [Ngày 2](../../01-foundations/lessons/02-table-structure-and-data-types.md) (ràng buộc).
 
-> Bài này có sửa dữ liệu shop. Muốn đưa dữ liệu về như cũ, chạy lại hai file init như trong [setup/README.md](../../../setup/README.md) mục "Làm lại từ đầu". Mọi kết quả trong bài được chạy trên dữ liệu gốc.
+> Bài này có sửa dữ liệu shop thật (các ví dụ có `COMMIT` hoặc chạy ở chế độ autocommit). Mọi kết quả trong bài được chạy trên dữ liệu gốc, nên sau mỗi ví dụ như vậy bài sẽ nhắc bạn chạy lại hai file init như trong [setup/README.md](../../../setup/README.md) mục "Làm lại từ đầu" trước khi đi tiếp.
 
 ---
 
@@ -84,6 +84,8 @@ WARNING:  there is no transaction in progress
 
 Giá đã đổi thật, `ROLLBACK` chỉ nhận lại một cảnh báo. Muốn có quyền hối hận, phải mở transaction bằng `BEGIN` **trước** khi sửa.
 
+> Câu UPDATE trên đã được lưu thật. Trước khi đi tiếp, chạy lại hai file init (setup/README.md, mục "Làm lại từ đầu") để giá MacBook về 24990000 như các mục sau.
+
 > Trong psql, dấu nhắc cho bạn biết đang ở đâu: `sql_challenge=#` là ngoài transaction, `sql_challenge=*#` là đang trong transaction, `sql_challenge=!#` là transaction đã bị lỗi và đang chờ bạn ROLLBACK.
 
 ## 3. BEGIN, COMMIT, ROLLBACK
@@ -128,6 +130,8 @@ WHERE o.order_id = currval('orders_order_id_seq');
 | 41 | 16 | 16 | 2 | 58 |
 
 Tồn kho chuột G102 giảm từ 60 xuống 58, đơn và dòng hàng đều đã lưu.
+
+> Transaction này đã COMMIT thật. Trước khi sang mục 3.2, chạy lại hai file init (setup/README.md, mục "Làm lại từ đầu") để quay về 40 đơn và tồn kho gốc.
 
 ### 3.2. Một câu lỗi, cả transaction bị hủy
 
@@ -216,7 +220,7 @@ BEGIN;
 
 INSERT INTO orders (customer_id, order_date, status, channel, shipping_city)
 VALUES (16, '2026-10-17 09:00+07', 'pending', 'online', 'Cần Thơ')
-RETURNING order_id;   -- 41 trên dữ liệu gốc
+RETURNING order_id;   -- 41 trên dữ liệu gốc (42 nếu bạn vừa chạy mục 3.2, xem ghi chú IDENTITY ở trên)
 
 INSERT INTO order_items (order_id, product_id, quantity, unit_price)
 VALUES (currval('orders_order_id_seq'), 16, 2, 399000);
@@ -252,6 +256,8 @@ ORDER BY oi.product_id;
 
 Dòng loa JBL biến mất (đã bị lùi về savepoint), hai món còn lại được lưu.
 
+> Đơn này đã COMMIT thật. Chạy lại hai file init (setup/README.md, mục "Làm lại từ đầu") trước khi sang mục 6.
+
 ## 5. ACID: bốn lời hứa của transaction
 
 | Tính chất | Ý nghĩa | Ở DSC Shop |
@@ -272,6 +278,8 @@ docker compose exec db psql -U postgres -d sql_challenge
 ```
 
 Gọi cửa sổ thứ nhất là **phiên A**, cửa sổ thứ hai là **phiên B**, rồi gõ lệnh theo đúng thứ tự từng bước trong bảng. (Adminer không dùng được cho demo này, vì mỗi lần bấm "Execute" nó mở một kết nối mới.)
+
+> Các kịch bản hai phiên ở mục 6, 7 và 8 đều COMMIT thật. Mỗi bảng kịch bản bắt đầu từ dữ liệu gốc (ASUS còn 5, MacBook giá 24990000), nên trước **mỗi** kịch bản hãy chạy lại hai file init (setup/README.md, mục "Làm lại từ đầu").
 
 ### 6.1. Kiểu viết sai: đọc ra, tính ở ứng dụng, ghi lại
 
@@ -294,13 +302,15 @@ Bán 2 máy nhưng kho chỉ giảm 1. Lần ghi của B đè lên lần ghi c�
 
 ### 6.2. Cách 1: để database tự trừ, kèm điều kiện
 
-Đừng mang con số ra ngoài. Viết phép trừ ngay trong câu UPDATE, kèm điều kiện "còn đủ hàng":
+Đừng mang con số ra ngoài. Viết phép trừ ngay trong câu UPDATE, kèm điều kiện "còn đủ hàng" (ở đây bọc trong `BEGIN ... ROLLBACK` để giữ dữ liệu gốc):
 
 ```sql
+BEGIN;
 UPDATE products
 SET stock_quantity = stock_quantity - 1
 WHERE product_id = 1 AND stock_quantity >= 1
 RETURNING stock_quantity;
+ROLLBACK;
 ```
 
 | stock_quantity |
@@ -340,7 +350,7 @@ Khi bạn thật sự cần đọc giá trị lên để quyết định (ví d�
 
 Kết quả cuối là 3, đúng.
 
-Chú ý: SELECT thường (không có `FOR UPDATE`) **không bao giờ bị chặn** và cũng không chặn ai. Đó là lý do cách viết ở 6.1 hỏng.
+Chú ý: SELECT thường (không có `FOR UPDATE`) **không bị chặn bởi các lệnh ghi dòng** (UPDATE, DELETE, `SELECT ... FOR UPDATE`) và cũng không chặn chúng, vì PostgreSQL giữ nhiều phiên bản của mỗi dòng (MVCC). Đó là lý do cách viết ở 6.1 hỏng. (SELECT vẫn phải chờ các lệnh khóa cả bảng như `ALTER TABLE`, `DROP TABLE`, `TRUNCATE`.)
 
 ## 7. Isolation level: transaction thấy gì của nhau?
 

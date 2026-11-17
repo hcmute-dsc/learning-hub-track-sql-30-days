@@ -105,7 +105,7 @@ Kết quả `search(conn, "logitech")`:
 
 ### Vận dụng
 
-**Bài 4.** Viết hàm Python `monthly_revenue(conn, year)` trả về doanh thu từng tháng của một năm (bỏ đơn `cancelled`, doanh thu tính từ `order_items`, làm tròn đến đồng). Năm là tham số, không ghép chuỗi. In kết quả năm 2026.
+**Bài 4.** Viết hàm Python `monthly_revenue(conn, year)` trả về doanh thu từng tháng của một năm (chỉ tính đơn đã thanh toán: bỏ đơn `pending` và `cancelled`, doanh thu tính từ `order_items`, làm tròn đến đồng). Năm là tham số, không ghép chuỗi. In kết quả năm 2026.
 
 <details>
 <summary>Đáp án</summary>
@@ -121,7 +121,7 @@ def monthly_revenue(conn, year):
                ROUND(SUM(oi.quantity * oi.unit_price * (1 - oi.discount))) AS doanh_thu
         FROM orders o
         JOIN order_items oi ON oi.order_id = o.order_id
-        WHERE o.status <> 'cancelled'
+        WHERE o.status NOT IN ('pending', 'cancelled')
           AND o.order_date >= make_date(%s, 1, 1)
           AND o.order_date <  make_date(%s + 1, 1, 1)
         GROUP BY thang
@@ -148,7 +148,7 @@ Kết quả:
 | 7 | 17091000 |
 | 8 | 29990000 |
 | 9 | 17630000 |
-| 10 | 44870000 |
+| 10 | 39980000 |
 
 Lọc bằng khoảng `>= đầu năm AND < đầu năm sau` thay vì `EXTRACT(YEAR ...) = %s` để PostgreSQL dùng được index trên `order_date` nếu có (Ngày 28).
 </details>
@@ -272,6 +272,9 @@ class OutOfStockError extends Error {}
 app.post('/orders', async (req, res, next) => {
   try {
     const { customer_id: customerId, items } = req.body;
+    if (!Number.isInteger(customerId)) {
+      return res.status(400).json({ error: 'Thiếu customer_id hoặc customer_id không phải số nguyên' });
+    }
     if (!Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: 'Đơn hàng phải có ít nhất một sản phẩm' });
     }
@@ -282,11 +285,13 @@ app.post('/orders', async (req, res, next) => {
     res.status(201).json({ order_id: orderId });
   } catch (err) {
     if (err instanceof OutOfStockError) return res.status(409).json({ error: err.message });
-    if (err.code === '23503') return res.status(400).json({ error: 'Khách hàng hoặc sản phẩm không tồn tại' });
+    if (err.code === '23503') return res.status(400).json({ error: 'Khách hàng không tồn tại' });
     next(err); // 23514, 22P02 và lỗi khác đi qua middleware xử lý lỗi chung
   }
 });
 ```
 
 Đặt hàng sản phẩm 3 (đang hết hàng) sẽ nhận `409`, không có dòng `orders` nào được tạo vì `placeOrder` đã ROLLBACK. Gửi `"quantity": 0` thì câu UPDATE trừ kho vẫn chạy được, nhưng câu INSERT vào `order_items` vi phạm CHECK `quantity > 0` (mã `23514`), transaction bị ROLLBACK và middleware trả `400`.
+
+Lỗi `23503` ở đây chỉ đến từ `customer_id`. Một `product_id` không tồn tại không gây lỗi khóa ngoại, vì câu UPDATE trừ kho chạy trước và chỉ sửa 0 dòng, nên `placeOrder` ném `OutOfStockError` và API trả `409`. Muốn trả `404` riêng cho sản phẩm không tồn tại thì `placeOrder` phải kiểm tra thêm khi `rowCount === 0`. Thiếu `customer_id` bị chặn ngay ở bước kiểm tra đầu vào. Nếu không chặn, giá trị NULL sẽ gây lỗi `23502` (not_null_violation), mã này không nằm trong middleware nên client nhận `500`.
 </details>

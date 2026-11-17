@@ -10,7 +10,7 @@ authors:
 license: "MIT"
 ---
 
-> **Tóm tắt:** Trang này nhìn lại 30 ngày học SQL theo bốn chặng, cho bạn 10 câu ôn tập có đáp án chạy được trên DSC Shop, và giao **dự án cuối khóa** kèm rubric chấm điểm chi tiết để mentor CLB chấm thống nhất. Cuối trang là gợi ý những gì nên học tiếp sau khóa này.
+> **Tóm tắt:** Trang này nhìn lại 30 ngày học SQL theo bốn chặng, nêu các lỗi hay gặp khi làm dự án và gợi ý những gì nên học tiếp sau khóa này. Hai bài tập ngay sau trang này là **Câu hỏi ôn tập cuối khóa** (10 câu có đáp án chạy được trên DSC Shop) và **Dự án cuối khóa** (kèm rubric chấm điểm chi tiết để mentor CLB chấm thống nhất).
 
 **Sau bài này bạn có thể:**
 - Tự kiểm tra mình đã nắm từng chặng chưa bằng 10 câu ôn tập có đáp án.
@@ -33,19 +33,18 @@ Cả khóa dùng một hệ quản trị là **PostgreSQL 16** và một bộ d�
 | 3. Index, transaction và các đối tượng database | 15-21 | Index B-tree và cách đo; transaction, ACID, isolation level, khóa dòng; function, procedure, trigger; view, materialized view; `EXPLAIN ANALYZE` | Làm truy vấn nhanh hơn có số đo, viết thao tác nhiều bước không bị hỏng dữ liệu, đóng gói logic trong database |
 | 4. SQL trong thực tế | 22-30 | JSONB; kết nối từ Python/Node.js bằng truy vấn tham số hóa; `COPY`; partition; SQL và NoSQL; thiết kế và chuẩn hóa; tối ưu truy vấn; window function và CTE đệ quy; phân quyền, hash mật khẩu, `pg_dump` | Thiết kế database cho một bài toán mới, nối nó với ứng dụng, viết báo cáo phân tích, bảo vệ và sao lưu dữ liệu |
 
-Dự án cuối khóa ở mục 3 dùng lại kiến thức của **cả bốn chặng**. Nếu làm dự án mà thấy hổng chỗ nào, quay lại đúng ngày đó trong bảng trên.
+Bài tập **Dự án cuối khóa** dùng lại kiến thức của **cả bốn chặng**. Nếu làm dự án mà thấy hổng chỗ nào, quay lại đúng ngày đó trong bảng trên.
 
 ---
 
 ## Bài tập
 
-Phần bài tập của bài này nằm ở bài tập **Câu hỏi ôn tập cuối khóa** ngay sau bài học.
+Phần bài tập của bài này gồm hai bài ngay sau bài học:
 
-## Bài tập
+- **Câu hỏi ôn tập cuối khóa**: 10 câu, mỗi câu chạm vào một nhóm kỹ năng chính, có đáp án để tự so.
+- **Dự án cuối khóa**: xây database cho một bài toán mới, nộp repo, chấm theo rubric 100 điểm.
 
-Phần bài tập của bài này nằm ở bài tập **Dự án cuối khóa** ngay sau bài học.
-
-## 4. Lỗi thường gặp khi làm dự án
+## 2. Lỗi thường gặp khi làm dự án
 
 - **Thiết kế bảng theo màn hình giao diện** thay vì theo thực thể, dẫn tới một bảng chứa lặp thông tin của thực thể khác. Bắt đầu từ ERD, kiểm tra phụ thuộc hàm (Ngày 27).
 - **Dùng `FLOAT` cho tiền** và `TIMESTAMP` (không múi giờ) cho thời điểm sự kiện. Dùng `NUMERIC` và `TIMESTAMPTZ` (Ngày 2).
@@ -56,7 +55,7 @@ Phần bài tập của bài này nằm ở bài tập **Dự án cuối khóa**
 
 ---
 
-## 5. Học gì tiếp theo?
+## 3. Học gì tiếp theo?
 
 Khóa học đã phủ phần lõi. Những hướng dưới đây là phần **chưa có** trong 30 ngày, chọn theo việc bạn muốn làm:
 

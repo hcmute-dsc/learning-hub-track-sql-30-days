@@ -390,7 +390,7 @@ if __name__ == "__main__":
     pool.close()
 ```
 
-Chạy trên dữ liệu gốc:
+Code này COMMIT thật vào `shop`. Kết quả dưới đây chạy trên dữ liệu gốc: trước khi chạy, hãy chạy lại hai file init (mục "Làm lại từ đầu" trong [setup/README.md](../../../setup/README.md)).
 
 ```text
 Đơn mới: 41
@@ -515,7 +515,7 @@ with psycopg.connect(DSN) as conn:
     print("Tồn kho mới:", run_with_retry(conn, restock))
 ```
 
-Chạy trên dữ liệu gốc (chuột G102 còn 60):
+Chạy trên dữ liệu gốc (chuột G102 còn 60). Nếu bạn vừa chạy `place_order` ở trên thì G102 chỉ còn 58, nên hãy chạy lại hai file init trước (mục "Làm lại từ đầu" trong [setup/README.md](../../../setup/README.md)):
 
 ```text
 Lần 1: 40001 could not serialize access due to concurrent update
@@ -547,6 +547,8 @@ with psycopg.connect(os.environ["DATABASE_URL"]) as conn:
     except errors.CheckViolation as e:
         print("Lỗi:", e.sqlstate, e.diag.message_primary)
 ```
+
+Kết quả dưới đây chạy trên dữ liệu gốc (chạy lại hai file init trước, vì các ví dụ ở trên đã tạo đơn và trừ kho):
 
 ```text
 Đơn mới: 41

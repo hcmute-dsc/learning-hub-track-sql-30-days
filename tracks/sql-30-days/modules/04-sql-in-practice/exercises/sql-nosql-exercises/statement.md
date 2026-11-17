@@ -111,8 +111,8 @@ MongoDB:
 // (A) Embed: đếm phần tử mảng, không cần nối
 db.customers.aggregate([
     { $match: { city: "Hà Nội" } },
-    { $project: { full_name: 1, so_don: { $size: { $ifNull: ["$orders", []] } } } },
-    { $sort: { so_don: -1, _id: 1 } }
+    { $project: { customer_id: 1, full_name: 1, so_don: { $size: { $ifNull: ["$orders", []] } } } },
+    { $sort: { so_don: -1, customer_id: 1 } }
 ]);
 
 // (B) Reference: nối bằng $lookup, tương tự LEFT JOIN
@@ -120,10 +120,12 @@ db.customers.aggregate([
     { $match: { city: "Hà Nội" } },
     { $lookup: { from: "orders", localField: "customer_id",
                  foreignField: "customer_id", as: "orders" } },
-    { $project: { full_name: 1, so_don: { $size: "$orders" } } },
+    { $project: { customer_id: 1, full_name: 1, so_don: { $size: "$orders" } } },
     { $sort: { so_don: -1, customer_id: 1 } }
 ]);
 ```
+
+`$project` phải giữ lại `customer_id` thì `$sort` mới sắp được theo nó (giống `ORDER BY so_don DESC, c.customer_id` ở bản SQL).
 
 - Hàng chục nghìn đơn: thiết kế (A) gặp vấn đề. Mảng tăng không giới hạn, document phình to (giới hạn 16 MB), mỗi lần thêm đơn phải ghi lại document lớn.
 - Khách đổi tên: nếu (B) chỉ lưu `customer_id` thì chỉ sửa một chỗ. Vấn đề xảy ra khi đơn hàng chép sẵn tên khách vào trong (như document đơn 12 ở mục 4): phải sửa mọi đơn. Bảng chuẩn hóa của PostgreSQL không gặp cả hai vấn đề.
@@ -172,4 +174,6 @@ Một phương án hợp lý:
 - (a) Redis: khóa là mã phiên, giá trị là danh sách sản phẩm, đặt thời gian hết hạn 7 ngày. Mất dữ liệu cũng không nghiêm trọng. Khi khách đặt hàng, đơn được ghi vào PostgreSQL trong một transaction.
 - (b) Ghi vào bảng PostgreSQL phân vùng theo tháng (Ngày 25) là đủ ở quy mô vừa, xóa dữ liệu cũ bằng `DETACH`. Khi lên tới hàng tỷ lượt xem, chuyển sang wide-column (Cassandra) hoặc kho cột.
 - (c) PostgreSQL: bảng `reviews` có khóa ngoại tới `products` và `customers`, `CHECK (rating BETWEEN 1 AND 5)`, bảng con cho ảnh hoặc cột `JSONB` cho danh sách URL ảnh. Đánh giá gắn chặt với sản phẩm, khách, và đơn đã mua, nên cần ràng buộc quan hệ.
+
+Tự chấm: phương án khác vẫn được nếu lập luận nêu đủ các ý sau. (a) dữ liệu tạm, cần tự hết hạn, mất cũng không sao; (b) khối lượng ghi lớn, dữ liệu cũ phải xóa được rẻ, quy mô nào thì cần hệ khác; (c) cần khóa ngoại và `CHECK`, nên giữ trong PostgreSQL.
 </details>

@@ -2,7 +2,7 @@
 
 ## Bài tập
 
-Mỗi bài làm trên dữ liệu gốc. Làm xong bài nào có `COMMIT`, chạy lại script init (mục "Trước khi bắt đầu") trước khi sang bài sau nếu muốn kết quả khớp với đáp án.
+Mỗi đáp án được chạy trên dữ liệu gốc. Mọi lệnh `INSERT`/`UPDATE`/`DELETE` chạy không có `BEGIN` đều được lưu ngay (autocommit), nên các đáp án sửa dữ liệu đều bọc trong `BEGIN; ... ROLLBACK;`. Bài nào cố ý `COMMIT` thì có ghi chú chạy lại init ngay sau đó. `ROLLBACK` không trả lại số IDENTITY đã cấp, nên nếu làm nhiều bài liên tiếp, id mới có thể lớn hơn trong đáp án.
 
 ### Cơ bản
 
@@ -12,9 +12,11 @@ Mỗi bài làm trên dữ liệu gốc. Làm xong bài nào có `COMMIT`, chạ
 <summary>Đáp án</summary>
 
 ```sql
+BEGIN;
 INSERT INTO customers (full_name, email, city)
 VALUES ('Đoàn Minh Quân', 'quan.doan@gmail.com', 'Huế')
 RETURNING customer_id, full_name, phone, city;
+ROLLBACK;
 ```
 
 Kết quả:
@@ -34,10 +36,12 @@ Không nhắc tới `phone` thì cột nhận `NULL` (psql hiện ô trống).
 ```sql
 SELECT customer_id, full_name, email FROM customers WHERE customer_id = 5;
 
+BEGIN;
 UPDATE customers
 SET email = 'em.hoang@gmail.com'
 WHERE customer_id = 5
 RETURNING customer_id, full_name, email;
+ROLLBACK;  -- làm thật thì dùng COMMIT
 ```
 
 Kết quả (lệnh UPDATE, psql báo `UPDATE 1`):
@@ -59,12 +63,14 @@ Kết quả (lệnh UPDATE, psql báo `UPDATE 1`):
 <summary>Đáp án</summary>
 
 ```sql
+BEGIN;
 INSERT INTO products (sku, name, category_id, price, cost_price, stock_quantity)
 VALUES
     ('ACC-013', 'Sạc Ugreen 30W',        12, 390000, 250000, 50),
     ('ACC-014', 'Cáp Lightning 1m',      12, 190000,  90000, 80),
     ('ACC-015', 'Pin dự phòng 10000mAh', 12, 590000, 400000, 30)
 RETURNING product_id, sku, name, price;
+ROLLBACK;
 ```
 
 Kết quả:
@@ -117,6 +123,8 @@ Kết quả kiểm tra cuối:
 | city |
 | --- |
 | Đà Nẵng |
+
+Chạy lại hai file init ([setup/README.md](../../../../setup/README.md#làm-lại-từ-đầu), mục Làm lại từ đầu) trước khi làm tiếp để kết quả khớp.
 </details>
 
 **Bài 5.** Lô hàng mới về: 10 chiếc `LAP-003` (Acer Nitro V 15, đang hết hàng) và 5 chiếc `LAP-007` Lenovo IdeaPad Slim 5 (danh mục 4, giá 17.490.000, giá nhập 15.200.000, chưa có trong hệ thống). Viết một lệnh duy nhất: mã đã có thì cộng tồn kho, mã chưa có thì thêm mới.
@@ -125,6 +133,7 @@ Kết quả kiểm tra cuối:
 <summary>Đáp án</summary>
 
 ```sql
+BEGIN;
 INSERT INTO products (sku, name, category_id, price, cost_price, stock_quantity)
 VALUES
     ('LAP-003', 'Acer Nitro V 15',       3, 21990000, 19000000, 10),
@@ -132,6 +141,7 @@ VALUES
 ON CONFLICT (sku) DO UPDATE
 SET stock_quantity = products.stock_quantity + EXCLUDED.stock_quantity
 RETURNING product_id, sku, name, price, stock_quantity;
+ROLLBACK;
 ```
 
 Kết quả:
@@ -192,7 +202,7 @@ Kết quả `RETURNING` (`UPDATE 3`, sau `ROLLBACK` giá trở lại như cũ):
 <summary>Đáp án</summary>
 
 ```sql
-DROP TABLE IF EXISTS product_archive;
+BEGIN;
 CREATE TABLE product_archive (
     product_id  INT           PRIMARY KEY,
     sku         VARCHAR(20)   NOT NULL,
@@ -206,6 +216,7 @@ SELECT product_id, sku, name, price
 FROM products
 WHERE is_active = FALSE OR stock_quantity = 0
 RETURNING product_id, sku, name, price;
+ROLLBACK;  -- hủy cả bảng nháp lẫn dữ liệu vừa chép
 ```
 
 Kết quả (`INSERT 0 3`):
@@ -216,7 +227,7 @@ Kết quả (`INSERT 0 3`):
 | 13 | PHN-004 | Nokia 105 4G | 690000 |
 | 21 | ACC-006 | Loa JBL Flip 6 | 2690000 |
 
-Làm xong, dọn bảng nháp: `DROP TABLE product_archive;`
+`CREATE TABLE` cũng nằm trong transaction, nên `ROLLBACK` xóa luôn bảng nháp, không cần `DROP TABLE`.
 </details>
 
 ### Thử thách
@@ -231,7 +242,7 @@ SELECT customer_id, full_name, email FROM customers WHERE customer_id IN (2, 17)
 
 BEGIN;
 DELETE FROM customers WHERE customer_id = 17 RETURNING customer_id, full_name;
-COMMIT;
+ROLLBACK;  -- làm thật thì dùng COMMIT
 
 DELETE FROM customers WHERE customer_id = 2;
 ```
@@ -300,4 +311,6 @@ Kết quả hai lệnh UPDATE:
 | 10 | iPhone 15 128GB | 17 |
 
 iPhone 15 từ 15 lên 17. Hai lệnh nằm trong cùng transaction nên hoặc cả hai được lưu, hoặc không lệnh nào: không thể có cảnh đơn đã hủy mà kho chưa được cộng lại. Đây là ý tưởng cốt lõi của [Ngày 16](../../../03-database-objects/lessons/16-transactions-acid.md). (Việc hoàn tiền trong `payments` chưa xét ở bài này.)
+
+Chạy lại hai file init ([setup/README.md](../../../../setup/README.md#làm-lại-từ-đầu), mục Làm lại từ đầu) trước khi làm tiếp để kết quả khớp.
 </details>

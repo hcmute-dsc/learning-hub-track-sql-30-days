@@ -37,6 +37,7 @@ license: "MIT"
 - Database DSC Shop ở trạng thái gốc. Nếu đã sửa dữ liệu ở các bài trước, chạy lại script init (mục "Làm lại từ đầu" trong [setup/README.md](../../../setup/README.md)).
 - Schema `perf` (100.000 khách, 1.000.000 đơn) đã được nạp bằng `setup/perf_seed.sql`. Bảng `perf.orders` chỉ có index khóa chính.
 - Mọi bài tập sửa dữ liệu shop đều kết thúc bằng `ROLLBACK`, và mọi index tạo trên `perf` đều được xóa ở cuối bài, để bài sau chạy trên cùng một trạng thái.
+- Plan trong đáp án được đo với cấu hình mặc định, **có** chạy song song (`Gather`, `Parallel Seq Scan`), khác với Ngày 15 và 20. Nếu phiên psql còn `SET max_parallel_workers_per_gather = 0`, chạy `RESET max_parallel_workers_per_gather;` trước.
 
 ## Tóm tắt kiến thức chặng 3
 

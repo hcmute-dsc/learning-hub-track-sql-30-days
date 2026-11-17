@@ -33,14 +33,14 @@ license: "MIT"
 
 Các ví dụ dưới đây thêm, sửa, xóa thật trên các bảng của DSC Shop. Có hai cách để không làm hỏng dữ liệu cho các bài sau:
 
-1. Bọc lệnh trong `BEGIN; ... ROLLBACK;` (giải thích ở mục 4). Mọi thay đổi bị hủy khi gặp `ROLLBACK`.
+1. Bọc lệnh trong `BEGIN; ... ROLLBACK;` (giải thích ở mục 4). Mọi thay đổi bị hủy khi gặp `ROLLBACK`. Các ví dụ sửa dữ liệu trong bài đều đã được bọc sẵn như vậy, nên chạy xong dữ liệu shop vẫn như cũ.
 2. Khi đã lỡ sửa, đưa schema `shop` về dữ liệu gốc bằng cách chạy lại hai file init (xem [setup/README.md](../../../setup/README.md), mục "Làm lại từ đầu"):
 
 ```sh
 docker compose exec -T db psql -U postgres -d sql_challenge -f /docker-entrypoint-initdb.d/01_schema.sql -f /docker-entrypoint-initdb.d/02_seed.sql
 ```
 
-Mọi kết quả trong bài là kết quả thật khi chạy từng ví dụ trên dữ liệu gốc (vừa chạy lại init). Nếu bạn chạy liên tiếp nhiều ví dụ, id sinh ra hoặc giá trị có thể khác một chút.
+Mọi kết quả trong bài là kết quả thật khi chạy từng ví dụ trên dữ liệu gốc (vừa chạy lại init). `ROLLBACK` hủy dòng đã thêm nhưng không trả lại số IDENTITY đã cấp (mục 1 giải thích), nên nếu bạn chạy liên tiếp nhiều ví dụ, id sinh ra có thể lớn hơn trong bài.
 
 ## 1. INSERT: thêm dòng mới
 
@@ -49,6 +49,7 @@ Mọi kết quả trong bài là kết quả thật khi chạy từng ví dụ t
 Cú pháp: liệt kê tên cột, rồi các giá trị theo đúng thứ tự đó.
 
 ```sql
+BEGIN;
 INSERT INTO customers (full_name, email, phone, city, birth_date)
 VALUES ('Lâm Thảo Vy', 'vy.lam@gmail.com', '0901112223', 'Cần Thơ', '2004-07-07');
 ```
@@ -61,6 +62,7 @@ Bạn không truyền `customer_id` và `created_at`, nhưng dòng mới vẫn c
 SELECT customer_id, full_name, city, created_at IS NOT NULL AS has_created
 FROM customers
 WHERE email = 'vy.lam@gmail.com';
+ROLLBACK;
 ```
 
 | customer_id | full_name | city | has_created |
@@ -100,9 +102,11 @@ HINT:  Use OVERRIDING SYSTEM VALUE to override.
 Thêm sản phẩm xong, ứng dụng thường cần biết `product_id` để làm bước tiếp theo. Thay vì `SELECT` lại, thêm `RETURNING` vào cuối lệnh:
 
 ```sql
+BEGIN;
 INSERT INTO products (sku, name, category_id, price, cost_price)
 VALUES ('ACC-010', 'Hub USB-C 7 in 1', 12, 790000, 520000)
 RETURNING product_id, sku, stock_quantity, is_active;
+ROLLBACK;
 ```
 
 | product_id | sku | stock_quantity | is_active |
@@ -118,11 +122,13 @@ RETURNING product_id, sku, stock_quantity, is_active;
 Viết nhiều bộ giá trị, cách nhau bởi dấu phẩy. Cả lệnh thành công hoặc thất bại cùng nhau: nếu một dòng lỗi, không dòng nào được thêm.
 
 ```sql
+BEGIN;
 INSERT INTO categories (name, parent_id)
 VALUES
     ('Router Wi-Fi', 13),
     ('Bộ phát 4G',   13)
 RETURNING category_id, name, parent_id;
+ROLLBACK;
 ```
 
 | category_id | name | parent_id |
@@ -217,19 +223,21 @@ VALUES (1, now(), 'shopee');
 ERROR:  new row for relation "orders" violates check constraint "orders_channel_check"
 ```
 
-Một chi tiết hay gây thắc mắc: lệnh INSERT bị lỗi vẫn "tiêu" mất một số IDENTITY. Trên dữ liệu gốc (khách lớn nhất là 18), chạy hai lệnh lỗi trùng email và thiếu tên ở trên, rồi thêm một khách hợp lệ:
+Một chi tiết hay gây thắc mắc: lệnh INSERT bị lỗi vẫn "tiêu" mất một số IDENTITY. Ngay sau khi chạy lại init (khách lớn nhất là 18, chưa chạy ví dụ thêm khách nào ở trên), chạy hai lệnh lỗi trùng email và thiếu tên ở trên, rồi thêm một khách hợp lệ:
 
 ```sql
+BEGIN;
 INSERT INTO customers (full_name, email)
 VALUES ('Nguyễn Văn Bình', 'binh.nguyen@gmail.com')
 RETURNING customer_id;
+ROLLBACK;
 ```
 
 | customer_id |
 | --- |
 | 21 |
 
-Khách mới nhận số 21 chứ không phải 19, vì số 19 và 20 đã bị hai lệnh lỗi lấy mất. Id có lỗ hổng là bình thường; đừng dùng id để đếm số dòng.
+Khách mới nhận số 21 chứ không phải 19, vì số 19 và 20 đã bị hai lệnh lỗi lấy mất. `ROLLBACK` cũng vậy: số 21 đã cấp không được trả lại, lần thêm sau sẽ nhận 22. Id có lỗ hổng là bình thường; đừng dùng id để đếm số dòng.
 
 ## 2. UPDATE: sửa dữ liệu có sẵn
 
@@ -247,10 +255,12 @@ WHERE dieu_kien;
 Cách an toàn nhất là lọc theo khóa chính, vì khóa chính chắc chắn chỉ khớp một dòng:
 
 ```sql
+BEGIN;
 UPDATE customers
 SET phone = '0939123456'
 WHERE customer_id = 3
 RETURNING customer_id, full_name, phone;
+ROLLBACK;
 ```
 
 | customer_id | full_name | phone |
@@ -262,11 +272,13 @@ psql in thêm `UPDATE 1`: số dòng bị sửa. Luôn nhìn con số này. Bạ
 ### Sửa nhiều cột cùng lúc
 
 ```sql
+BEGIN;
 UPDATE orders
 SET status = 'cancelled',
     note   = 'Khách hủy qua điện thoại'
 WHERE order_id = 40
 RETURNING order_id, status, note;
+ROLLBACK;
 ```
 
 | order_id | status | note |
@@ -278,10 +290,12 @@ RETURNING order_id, status, note;
 Vế phải của `SET` là biểu thức, có thể dùng chính cột đang sửa. Tăng giá 5% cho danh mục `Tai nghe & Loa` (id 11), làm tròn đến hàng nghìn:
 
 ```sql
+BEGIN;
 UPDATE products
 SET price = ROUND(price * 1.05, -3)
 WHERE category_id = 11
 RETURNING sku, name, price;
+ROLLBACK;
 ```
 
 | sku | name | price |
@@ -295,10 +309,12 @@ RETURNING sku, name, price;
 Ví dụ làm sạch dữ liệu (nối tiếp Ngày 5): gộp các cách viết khác nhau của TP. Hồ Chí Minh về một dạng.
 
 ```sql
+BEGIN;
 UPDATE customers
 SET city = 'TP. Hồ Chí Minh'
 WHERE city IN ('Hồ Chí Minh', 'TP.HCM')
 RETURNING customer_id, full_name, city;
+ROLLBACK;
 ```
 
 | customer_id | full_name | city |
@@ -311,12 +327,14 @@ RETURNING customer_id, full_name, city;
 Sếp nói "giảm 10% cho mọi sản phẩm thuộc danh mục Máy tính bảng". Bạn biết tên danh mục nhưng không nhớ `category_id`. PostgreSQL cho phép thêm bảng khác vào mệnh đề `FROM` của `UPDATE` và nối hai bảng trong `WHERE`:
 
 ```sql
+BEGIN;
 UPDATE products
 SET price = ROUND(products.price * 0.9, -3)
 FROM categories
 WHERE categories.category_id = products.category_id
   AND categories.name = 'Máy tính bảng'
 RETURNING products.sku, products.name, products.price;
+ROLLBACK;
 ```
 
 | sku | name | price |
@@ -348,9 +366,11 @@ WHERE sku = 'ACC-009';
 | 24 | ACC-009 | Lót chuột DSC XXL |
 
 ```sql
+BEGIN;
 DELETE FROM products
 WHERE sku = 'ACC-009'
 RETURNING product_id, sku, name;
+ROLLBACK;
 ```
 
 | product_id | sku | name |
@@ -387,9 +407,11 @@ SELECT order_id, product_id, quantity FROM order_items WHERE order_id = 40;
 | 40 | 12 | 1 |
 
 ```sql
+BEGIN;
 DELETE FROM orders WHERE order_id = 40;   -- DELETE 1
 
 SELECT order_id, product_id, quantity FROM order_items WHERE order_id = 40;
+ROLLBACK;
 ```
 
 (0 dòng: dòng hàng đã bị xóa lan theo đơn.)
@@ -511,6 +533,7 @@ Transaction còn nhiều điều để nói (ACID, nhiều người sửa cùng 
 Tình huống nhập hàng: nhà cung cấp gửi danh sách `sku` kèm số lượng. Mã nào đã có thì cộng thêm tồn kho, mã nào chưa có thì thêm sản phẩm mới. Một `INSERT` bình thường sẽ lỗi trùng `sku`. PostgreSQL có `ON CONFLICT`:
 
 ```sql
+BEGIN;
 INSERT INTO products (sku, name, category_id, price, stock_quantity)
 VALUES
     ('ACC-001', 'Chuột Logitech G102', 10, 399000, 20),
@@ -518,6 +541,7 @@ VALUES
 ON CONFLICT (sku) DO UPDATE
 SET stock_quantity = products.stock_quantity + EXCLUDED.stock_quantity
 RETURNING product_id, sku, name, stock_quantity;
+ROLLBACK;
 ```
 
 | product_id | sku | name | stock_quantity |

@@ -104,7 +104,7 @@ Hai điều đáng để ý:
 - `AS profit` đặt **bí danh (alias)** cho cột. Không có alias, PostgreSQL đặt tên cột là `?column?`.
 - Sản phẩm `HP Pavilion 15` chưa có giá nhập (`cost_price` là `NULL`), nên `profit` cũng là `NULL`. Phép tính với `NULL` cho ra `NULL`. Mục 4 sẽ nói kỹ.
 
-Alias có dấu cách, chữ hoa hoặc tiếng Việt có dấu thì bọc trong **ngoặc kép**:
+Alias có dấu cách, chữ hoa hoặc tiếng Việt có dấu thì bọc trong **nháy kép**:
 
 ```sql
 SELECT name AS "Tên sản phẩm",
@@ -121,7 +121,7 @@ FROM products;
 
 (... tổng 24 dòng)
 
-Trong PostgreSQL, **ngoặc đơn `'...'` là giá trị chuỗi, ngoặc kép `"..."` là tên** (tên cột, tên bảng, alias). Viết nhầm sẽ lỗi:
+Trong PostgreSQL, **nháy đơn `'...'` là giá trị chuỗi, nháy kép `"..."` là tên** (tên cột, tên bảng, alias). Viết nhầm sẽ lỗi:
 
 ```sql
 SELECT name AS 'Tên sản phẩm'
@@ -134,7 +134,7 @@ LINE 1: SELECT name AS 'Tên sản phẩm'
                        ^
 ```
 
-> **Ghi chú dialect:** MySQL chấp nhận alias trong ngoặc đơn (`AS 'Tên'`) và dùng dấu backtick `` `...` `` cho tên; SQL Server dùng `[...]`. Viết `"..."` cho tên là cách chuẩn SQL.
+> **Ghi chú dialect:** MySQL chấp nhận alias trong nháy đơn (`AS 'Tên'`) và dùng dấu backtick `` `...` `` cho tên; SQL Server dùng `[...]`. Viết `"..."` cho tên là cách chuẩn SQL.
 
 ### DISTINCT: các giá trị khác nhau
 
@@ -215,7 +215,7 @@ WHERE price > 20000000;
 | LAP-003 | Acer Nitro V 15 | 21990000 |
 | LAP-005 | MacBook Air M2 13 inch | 24990000 |
 
-So sánh chuỗi phải bọc giá trị trong ngoặc đơn. Các đơn chưa giao xong:
+So sánh chuỗi phải bọc giá trị trong nháy đơn. Các đơn chưa giao xong:
 
 ```sql
 SELECT order_id, customer_id, status
@@ -758,7 +758,7 @@ SELECT full_name FROM customers WHERE phone IS NULL;
 
 **4. Trộn AND và OR không có ngoặc.** `WHERE category_id = 3 OR category_id = 4 AND price < 20000000` thực ra là `3 OR (4 AND rẻ)`. Đặt ngoặc, hoặc dùng `category_id IN (3, 4) AND price < 20000000`.
 
-**5. Nhầm ngoặc đơn và ngoặc kép.** Giá trị chuỗi dùng `'...'`. Viết `"Hà Nội"` thì PostgreSQL tìm **cột** tên `Hà Nội`:
+**5. Nhầm nháy đơn và nháy kép.** Giá trị chuỗi dùng `'...'`. Viết `"Hà Nội"` thì PostgreSQL tìm **cột** tên `Hà Nội`:
 
 ```sql
 SELECT full_name
@@ -783,7 +783,7 @@ Phần bài tập của bài này nằm ở bài tập **Bài tập: SELECT và 
 ## Tóm tắt
 
 - `SELECT` chọn cột, `FROM` chọn bảng. Hạn chế `SELECT *` trong truy vấn thật.
-- Cột tính toán đặt tên bằng `AS`. Tên có dấu cách hoặc tiếng Việt dùng ngoặc kép `"..."`; giá trị chuỗi dùng ngoặc đơn `'...'`.
+- Cột tính toán đặt tên bằng `AS`. Tên có dấu cách hoặc tiếng Việt dùng nháy kép `"..."`; giá trị chuỗi dùng nháy đơn `'...'`.
 - `DISTINCT` bỏ dòng trùng trên cả bộ cột được chọn; các `NULL` gom thành một dòng.
 - `WHERE` lọc từng dòng, chỉ giữ dòng có điều kiện là `TRUE`.
 - Thứ tự ưu tiên `NOT` > `AND` > `OR`. Trộn `AND` với `OR` thì luôn đặt ngoặc.

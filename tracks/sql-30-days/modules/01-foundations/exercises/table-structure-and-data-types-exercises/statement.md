@@ -2,7 +2,7 @@
 
 ## Bài tập
 
-Tất cả bài tập làm trong schema `nhap`. Nếu vừa mở phiên mới, chạy lại khối tạo khu vực nháp ở đầu bài.
+Tất cả bài tập làm trong schema `nhap` (tạo bằng khối "Khu vực nháp" ở đầu bài học, chạy một lần). Nếu vừa mở phiên mới, chỉ chạy lại `SET search_path = nhap, shop, public;` (đừng chạy `DROP SCHEMA`, sẽ mất các bảng đã tạo ở bài trước).
 
 ### Cơ bản
 

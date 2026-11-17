@@ -88,7 +88,7 @@ LIMIT 5;
 
 Đọc câu lệnh:
 
-- `FROM orders o`: chữ `o` là alias bảng (tên ngắn). Từ đây `o.order_id` nghĩa là cột `order_id` của bảng `orders`. Alias bảng giúp câu lệnh ngắn và bắt buộc khi hai bảng có cột trùng tên (cả hai bảng đều có `customer_id`). Có thể viết `FROM orders AS o`, ý nghĩa như nhau.
+- `FROM orders o`: chữ `o` là alias bảng (tên ngắn). Từ đây `o.order_id` nghĩa là cột `order_id` của bảng `orders`. Alias bảng giúp câu lệnh ngắn hơn. Khi hai bảng có cột trùng tên (cả hai bảng đều có `customer_id`), bạn bắt buộc ghi rõ cột của bảng nào: `o.customer_id` hoặc `orders.customer_id`. Alias chỉ thật sự bắt buộc khi một bảng xuất hiện hai lần trong câu (SELF JOIN, mục 6). Có thể viết `FROM orders AS o`, ý nghĩa như nhau.
 - `ON c.customer_id = o.customer_id`: điều kiện ghép. Với mỗi đơn hàng, database tìm khách có `customer_id` bằng `customer_id` của đơn.
 - `INNER JOIN` chỉ giữ những cặp tìm được nhau. Viết `JOIN` không có chữ nào phía trước cũng chính là `INNER JOIN`.
 

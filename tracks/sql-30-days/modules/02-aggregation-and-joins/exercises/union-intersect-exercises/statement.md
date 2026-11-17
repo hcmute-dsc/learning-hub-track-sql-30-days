@@ -65,7 +65,7 @@ Hai dòng của Nokia khác nhau ở `ly_do` nên dùng `UNION` cũng không m�
 
 </details>
 
-**Bài 3.** Tìm khách đã mua hàng (đơn không bị hủy) trong **cả** năm 2025 **và** năm 2026. Hiện `customer_id`, `full_name`.
+**Bài 3.** Tìm khách đã mua hàng (có đơn đã thanh toán, tức `status NOT IN ('pending', 'cancelled')`) trong **cả** năm 2025 **và** năm 2026. Hiện `customer_id`, `full_name`.
 
 <details>
 <summary>Đáp án</summary>
@@ -74,12 +74,12 @@ Hai dòng của Nokia khác nhau ở `ly_do` nên dùng `UNION` cũng không m�
 SELECT c.customer_id, c.full_name
 FROM customers c JOIN orders o ON o.customer_id = c.customer_id
 WHERE o.order_date >= '2025-01-01' AND o.order_date < '2026-01-01'
-  AND o.status <> 'cancelled'
+  AND o.status NOT IN ('pending', 'cancelled')
 INTERSECT
 SELECT c.customer_id, c.full_name
 FROM customers c JOIN orders o ON o.customer_id = c.customer_id
 WHERE o.order_date >= '2026-01-01' AND o.order_date < '2027-01-01'
-  AND o.status <> 'cancelled'
+  AND o.status NOT IN ('pending', 'cancelled')
 ORDER BY customer_id;
 ```
 
@@ -89,19 +89,19 @@ Kết quả:
 | --- | --- |
 | 1 | Nguyễn Văn An |
 | 2 | Trần Thị Bình |
-| 3 | Lê Hoàng Cường |
 | 4 | Phạm Minh Duy |
 | 6 | Võ Quốc Phong |
+| 7 | Đặng Thu Giang |
 
-(... tổng 13 dòng)
+(... tổng 12 dòng)
 
-Có `customer_id` trong kết quả nên hai khách `Nguyễn Văn An` (1 và 15) được tính riêng.
+Có `customer_id` trong kết quả nên hai khách `Nguyễn Văn An` (1 và 15) được tính riêng. Khách 3 không có mặt: đơn duy nhất của họ trong năm 2026 (đơn 40) đang `pending`, chưa thanh toán.
 
 </details>
 
 ### Vận dụng
 
-**Bài 4.** Tìm khách đã mua (đơn không bị hủy) trong năm 2025 nhưng **không quay lại** mua trong năm 2026.
+**Bài 4.** Tìm khách đã mua (đơn đã thanh toán, như Bài 3) trong năm 2025 nhưng **không quay lại** mua trong năm 2026.
 
 <details>
 <summary>Đáp án</summary>
@@ -110,12 +110,12 @@ Có `customer_id` trong kết quả nên hai khách `Nguyễn Văn An` (1 và 15
 SELECT c.customer_id, c.full_name
 FROM customers c JOIN orders o ON o.customer_id = c.customer_id
 WHERE o.order_date >= '2025-01-01' AND o.order_date < '2026-01-01'
-  AND o.status <> 'cancelled'
+  AND o.status NOT IN ('pending', 'cancelled')
 EXCEPT
 SELECT c.customer_id, c.full_name
 FROM customers c JOIN orders o ON o.customer_id = c.customer_id
 WHERE o.order_date >= '2026-01-01' AND o.order_date < '2027-01-01'
-  AND o.status <> 'cancelled'
+  AND o.status NOT IN ('pending', 'cancelled')
 ORDER BY customer_id;
 ```
 
@@ -123,10 +123,11 @@ Kết quả:
 
 | customer_id | full_name |
 | --- | --- |
+| 3 | Lê Hoàng Cường |
 | 5 | Hoàng Thị Em |
 | 9 | Ngô Thị Lan |
 
-Khách 5 có đặt một đơn năm 2026 (đơn 28) nhưng đơn đó bị hủy, nên vẫn tính là "không quay lại". Bỏ điều kiện `status <> 'cancelled'` thì chỉ còn khách 9.
+Khách 5 có đặt một đơn năm 2026 (đơn 28) nhưng đơn đó bị hủy; khách 3 có đơn 40 năm 2026 nhưng đơn đó còn `pending`. Cả hai vẫn tính là "không quay lại" mua. Bỏ điều kiện `status` ở cả hai vế thì chỉ còn khách 9.
 
 </details>
 
@@ -163,18 +164,23 @@ WHERE NOT EXISTS (SELECT 1 FROM order_items oi WHERE oi.product_id = p.product_i
 <summary>Đáp án</summary>
 
 ```sql
-SELECT o.channel AS kenh,
-       ROUND(SUM(oi.quantity * oi.unit_price * (1 - oi.discount))) AS doanh_thu
-FROM orders o
-JOIN order_items oi ON oi.order_id = o.order_id
-WHERE o.status NOT IN ('pending', 'cancelled')
-GROUP BY o.channel
-UNION ALL
-SELECT 'TỔNG CỘNG',
-       ROUND(SUM(oi.quantity * oi.unit_price * (1 - oi.discount)))
-FROM orders o
-JOIN order_items oi ON oi.order_id = o.order_id
-WHERE o.status NOT IN ('pending', 'cancelled');
+SELECT kenh, doanh_thu
+FROM (
+    SELECT 0 AS thu_tu,
+           o.channel AS kenh,
+           ROUND(SUM(oi.quantity * oi.unit_price * (1 - oi.discount))) AS doanh_thu
+    FROM orders o
+    JOIN order_items oi ON oi.order_id = o.order_id
+    WHERE o.status NOT IN ('pending', 'cancelled')
+    GROUP BY o.channel
+    UNION ALL
+    SELECT 1, 'TỔNG CỘNG',
+           ROUND(SUM(oi.quantity * oi.unit_price * (1 - oi.discount)))
+    FROM orders o
+    JOIN order_items oi ON oi.order_id = o.order_id
+    WHERE o.status NOT IN ('pending', 'cancelled')
+) AS t
+ORDER BY thu_tu, kenh;
 ```
 
 Kết quả:
@@ -185,7 +191,7 @@ Kết quả:
 | online | 324642500 |
 | TỔNG CỘNG | 536291000 |
 
-Không có `ORDER BY`, PostgreSQL không hứa thứ tự dòng. Trong thực tế với `UNION ALL` đơn giản như trên, dòng tổng thường nằm cuối, nhưng muốn chắc chắn thì thêm một cột thứ tự (ví dụ `0` cho các kênh, `1` cho dòng tổng) rồi `ORDER BY` theo cột đó. PostgreSQL có sẵn `GROUP BY ROLLUP` để làm việc này gọn hơn (đã nhắc ở Ngày 9).
+Không có `ORDER BY`, PostgreSQL không hứa thứ tự dòng, kể cả dòng tổng. Vì vậy mỗi vế có thêm cột thứ tự `thu_tu` (`0` cho các kênh, `1` cho dòng tổng), rồi truy vấn ngoài `ORDER BY thu_tu, kenh` và chỉ in hai cột cần xem. PostgreSQL có sẵn `GROUP BY ROLLUP` để làm việc này gọn hơn (đã nhắc ở Ngày 9).
 
 </details>
 

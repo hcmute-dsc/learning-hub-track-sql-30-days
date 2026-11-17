@@ -316,8 +316,8 @@ ORDER BY customer_id;
 
 ```sql
 SELECT c.customer_id, c.full_name,
-       COUNT(*) FILTER (WHERE o.channel = 'online')  AS don_online,
-       COUNT(*) FILTER (WHERE o.channel = 'offline') AS don_offline
+       SUM(CASE WHEN o.channel = 'online'  THEN 1 ELSE 0 END) AS don_online,
+       SUM(CASE WHEN o.channel = 'offline' THEN 1 ELSE 0 END) AS don_offline
 FROM customers c
 JOIN orders o ON o.customer_id = c.customer_id
 WHERE o.status <> 'cancelled'
@@ -342,7 +342,7 @@ Kết quả của cách thứ hai:
 | 11 | Lý Thanh Mai | 1 | 1 |
 | 18 | Mai Đức Uy | 1 | 1 |
 
-Cách `INTERSECT` trả đúng 11 khách này (hai cột đầu). Khách 5 và 12 có cả hai kênh nếu tính cả đơn bị hủy, nhưng đơn online của họ đã hủy nên bị loại. Cách `HAVING COUNT(DISTINCT channel) = 2` chạy được ở mọi hệ quản trị, kể cả MySQL cũ không có `INTERSECT`.
+Cách `INTERSECT` trả đúng 11 khách này (hai cột đầu). Khách 5 và 12 có cả hai kênh nếu tính cả đơn bị hủy, nhưng đơn online của họ đã hủy nên bị loại. Cách `HAVING COUNT(DISTINCT channel) = 2` chạy được ở mọi hệ quản trị, kể cả MySQL cũ không có `INTERSECT`. Hai cột đếm dùng `SUM(CASE ...)` thay cho `COUNT(*) FILTER (...)` vì MySQL và SQL Server không có `FILTER` (Ngày 13); trên PostgreSQL viết bằng `FILTER` cũng được.
 
 </details>
 
@@ -436,12 +436,12 @@ ORDER BY o.order_id;
 | 4 | 7881000.00 | 15762000 |
 | 12 | 63760000.00 | 63760000 |
 
-Đơn 4 "đã trả" gấp đôi tiền hàng, còn đơn 12 thì tiền hàng gấp đôi thực tế. Giải thích vì sao, rồi viết lại truy vấn đúng cho các đơn 4, 5, 12, 40, có cột kết luận đối soát.
+Đơn 4 "đã trả" gấp đôi thực tế; đơn 12 thì **cả hai cột** đều gấp đôi (đúng phải là 31.880.000) nên trông như khớp nhau. Giải thích vì sao, rồi viết lại truy vấn đúng cho các đơn 4, 5, 12, 40, có cột kết luận đối soát.
 
 <details>
 <summary>Đáp án</summary>
 
-Đây là lỗi **nhân dòng khi JOIN rồi SUM** (Ngày 10). Đơn 4 có 2 dòng hàng và 1 lần thanh toán: JOIN ra 2 × 1 = 2 dòng, nên khoản thanh toán bị cộng 2 lần. Đơn 12 có 2 dòng hàng và 2 lần trả góp: JOIN ra 2 × 2 = 4 dòng, mỗi dòng hàng bị cộng 2 lần. Cách sửa: tổng hợp **từng bảng riêng** về mức đơn hàng trước, rồi mới JOIN.
+Đây là lỗi **nhân dòng khi JOIN rồi SUM** (Ngày 10). Đơn 4 có 2 dòng hàng và 1 lần thanh toán: JOIN ra 2 × 1 = 2 dòng, nên khoản thanh toán bị cộng 2 lần. Đơn 12 có 2 dòng hàng và 2 lần trả góp: JOIN ra 2 × 2 = 4 dòng, mỗi dòng hàng và mỗi lần trả đều bị cộng 2 lần, nên hai con số sai giống nhau và lỗi bị che. Cách sửa: tổng hợp **từng bảng riêng** về mức đơn hàng trước, rồi mới JOIN.
 
 ```sql
 WITH tien_hang AS (
@@ -766,10 +766,10 @@ Kết quả có thêm khách 4 so với Bài C4: truy vấn này đếm cả đ�
 
 ## Tự đánh giá
 
-Có 16 bài (A1-A2, B1-B5, C1-C4, D1-D2, E1-E4). Tự chấm mỗi bài 1 điểm nếu kết quả của bạn khớp từng con số, không cần giống từng chữ trong câu lệnh.
+Có 17 bài (A1-A2, B1-B5, C1-C4, D1-D2, E1-E4). Tự chấm mỗi bài 1 điểm nếu kết quả của bạn khớp từng con số, không cần giống từng chữ trong câu lệnh.
 
-- **Từ 13 điểm:** sẵn sàng sang chặng 3 (index, transaction, function, trigger, view).
-- **9 đến 12 điểm:** ôn lại các ngày ứng với bài làm sai trước khi đi tiếp.
-- **Dưới 9 điểm:** làm lại phần bài tập của Ngày 9, 10, 11 rồi quay lại bài này.
+- **Từ 14 điểm:** sẵn sàng sang chặng 3 (index, transaction, function, trigger, view).
+- **10 đến 13 điểm:** ôn lại các ngày ứng với bài làm sai trước khi đi tiếp.
+- **Dưới 10 điểm:** làm lại phần bài tập của Ngày 9, 10, 11 rồi quay lại bài này.
 
 Nếu chỉ chọn một thói quen để mang theo: **trước khi `SUM` trên kết quả JOIN, hãy tự hỏi mỗi dòng đang đại diện cho cái gì** (một đơn? một dòng hàng? một lần thanh toán?). Phần lớn báo cáo sai trong thực tế bắt đầu từ câu hỏi này.

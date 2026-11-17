@@ -1,14 +1,14 @@
-> Làm trên bộ dữ liệu DSC Shop. Tự viết và chạy truy vấn trước, sau đó mới mở **Đáp án** để so kết quả.
+> Dự án làm trên database bạn tự thiết kế, không dùng DSC Shop. Đọc kỹ rubric ở mục **Rubric chấm điểm** để tự chấm trước khi nộp.
 
-## 3. Dự án cuối khóa
+## Dự án cuối khóa
 
-### 3.1. Mục tiêu và hình thức
+### Mục tiêu và hình thức
 
 Bạn (cá nhân hoặc nhóm 2-3 người) xây dựng **từ đầu** database cho một bài toán mới, không dùng lại DSC Shop, kèm một API nhỏ dùng database đó. Thời gian gợi ý: **2 tuần**. Cuối kỳ có buổi demo 10 phút và vấn đáp 5 phút với mentor.
 
 Mục tiêu là chứng minh bạn **vận dụng** được kiến thức, nên rubric chấm cả việc chạy đúng lẫn việc bạn giải thích được vì sao làm vậy.
 
-### 3.2. Chọn đề tài
+### Chọn đề tài
 
 Chọn một trong ba đề dưới đây, hoặc tự đề xuất đề tài có độ phức tạp tương đương (cần mentor duyệt trước ngày 2).
 
@@ -39,9 +39,9 @@ erDiagram
     }
 ```
 
-### 3.3. Yêu cầu bài nộp
+### Yêu cầu bài nộp
 
-Nộp một repo (hoặc thư mục nén) theo cấu trúc:
+Nộp link một repo GitHub (hoặc link pull request vào repo nộp bài mà mentor chỉ định) theo cấu trúc:
 
 ```text
 du-an-cuoi-khoa/
@@ -76,7 +76,7 @@ Yêu cầu bắt buộc theo từng phần:
 9. **API nhỏ.** 3-5 endpoint (ví dụ: danh sách sự kiện có phân trang, đăng ký sự kiện, báo cáo top thành viên tích cực) bằng Python (psycopg) hoặc Node.js (pg). **Mọi** câu SQL dùng truy vấn tham số hóa; nghiệp vụ nhiều bước chạy trong transaction; thông tin kết nối đọc từ biến môi trường, không ghi cứng trong code (Ngày 23).
 10. **Bảo mật và sao lưu.** Role riêng cho ứng dụng với quyền tối thiểu; nếu có lưu mật khẩu thì lưu hash; lệnh `pg_dump` và `pg_restore`, kèm bằng chứng đã khôi phục thử vào một database mới và so sánh số dòng (Ngày 30).
 
-### 3.4. Lịch gợi ý
+### Lịch gợi ý
 
 | Thời gian | Việc | Mốc kiểm tra với mentor |
 | --- | --- | --- |
@@ -88,7 +88,7 @@ Yêu cầu bắt buộc theo từng phần:
 | Ngày 12-13 | API, sao lưu và khôi phục thử | |
 | Ngày 14 | Hoàn thiện README, tập demo | Demo và vấn đáp |
 
-### 3.5. Rubric chấm điểm (100 điểm)
+### Rubric chấm điểm (100 điểm)
 
 Mỗi tiêu chí có ba mức. "Đầy đủ" nhận toàn bộ điểm, "Một phần" nhận khoảng một nửa (mentor chọn điểm trong khoảng ghi ở cột), "Chưa đạt" nhận 0.
 
@@ -113,7 +113,7 @@ Quy ước tổng điểm:
 - **Vấn đáp:** mentor chọn ngẫu nhiên 2 truy vấn và 1 quyết định thiết kế để hỏi. Không giải thích được phần mình nộp thì tiêu chí tương ứng hạ một mức.
 - **Điểm cộng** (tối đa +5, tổng không quá 100): partition cho bảng lớn, row-level security, materialized view có lịch refresh, test tự động cho API, CI chạy script SQL.
 
-### 3.6. Hướng dẫn cho mentor khi chấm
+### Hướng dẫn cho mentor khi chấm
 
 Để chấm nhất quán giữa các mentor:
 

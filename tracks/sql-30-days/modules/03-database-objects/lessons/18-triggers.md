@@ -64,7 +64,7 @@ $$;
 CREATE TRIGGER ten_trigger
 {BEFORE | AFTER} {INSERT | UPDATE [OF cot, ...] | DELETE} [OR ...]
 ON ten_bang
-[REFERENCING {OLD | NEW} TABLE AS ten]   -- chỉ cho AFTER ... FOR EACH STATEMENT
+[REFERENCING {OLD | NEW} TABLE AS ten]   -- chỉ cho trigger AFTER (thường dùng với FOR EACH STATEMENT)
 FOR EACH {ROW | STATEMENT}
 [WHEN (dieu_kien)]
 EXECUTE FUNCTION ten_ham();

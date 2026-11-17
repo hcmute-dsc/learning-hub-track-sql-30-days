@@ -163,6 +163,8 @@ SELECT check_login('binh', 'matkhau123')  AS dung,
 | t | f | f | f |
 
 Tham số của function là giá trị, không phải đoạn code, nên `binh' --` chỉ là một tên đăng nhập lạ. Nếu ứng dụng ghép chuỗi kiểu `"... WHERE username = '" + u + "' AND password_hash = crypt('" + p + "', password_hash)"` thì với `u = "binh' --"`, phần kiểm tra mật khẩu bị biến thành chú thích và kẻ tấn công đăng nhập được tài khoản `binh` mà không cần mật khẩu.
+
+Lưu ý: `check_login` chỉ đúng với hash có prefix `$2a$` (do pgcrypto sinh). Hash `$2b$` mà thư viện bcrypt của Python/Node sinh mặc định thì `crypt()` không đọc được và hàm luôn trả `false` (xem Ngày 30, mục Cách 2).
 </details>
 
 **Bài 6.** Sao lưu schema `shop` bằng định dạng custom, khôi phục vào database `shop_restore`, rồi trong `shop_restore` xóa nhầm bảng `payments` và khôi phục lại chỉ bảng đó từ file dump. So sánh số dòng và cấu trúc bảng `payments` sau khi khôi phục với bản gốc. Dọn dẹp khi xong.
@@ -271,6 +273,64 @@ RESET ROLE;
 
 ```text
 ERROR:  permission denied for table employees
+```
+
+Nhân viên bán hàng đổi được trạng thái đơn (bọc trong `BEGIN ... ROLLBACK` để giữ dữ liệu gốc):
+
+```sql
+BEGIN;
+SET ROLE shop_sales;
+UPDATE orders SET status = 'cancelled' WHERE order_id = 40 RETURNING order_id, status;
+RESET ROLE;
+ROLLBACK;
+```
+
+| order_id | status |
+| --- | --- |
+| 40 | cancelled |
+
+Nhưng không xem được ngày sinh, không xóa được đơn (mỗi lệnh chạy riêng):
+
+```sql
+SET ROLE shop_sales;
+SELECT full_name, birth_date FROM customers WHERE customer_id = 1;
+RESET ROLE;
+```
+
+```text
+ERROR:  permission denied for table customers
+```
+
+```sql
+SET ROLE shop_sales;
+DELETE FROM orders WHERE order_id = 40;
+RESET ROLE;
+```
+
+```text
+ERROR:  permission denied for table orders
+```
+
+Nhân sự đọc được `employees` nhưng không đọc được bảng khác:
+
+```sql
+SET ROLE shop_hr;
+SELECT count(*) AS so_nhan_vien FROM employees;
+RESET ROLE;
+```
+
+| so_nhan_vien |
+| --- |
+| 8 |
+
+```sql
+SET ROLE shop_hr;
+SELECT count(*) FROM orders;
+RESET ROLE;
+```
+
+```text
+ERROR:  permission denied for table orders
 ```
 
 Dọn dẹp:

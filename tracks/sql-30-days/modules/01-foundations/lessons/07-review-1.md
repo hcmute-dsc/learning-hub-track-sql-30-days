@@ -60,7 +60,7 @@ Gợi ý tự chấm: làm đúng 12/16 bài trở lên là sẵn sàng sang ch�
 | So sánh với NULL bằng `=` | `WHERE phone = NULL` (luôn 0 dòng) | `WHERE phone IS NULL` |
 | Quên rằng `<>` bỏ qua NULL | `WHERE city <> 'Hà Nội'` không trả khách chưa có city | thêm `OR city IS NULL` nếu muốn lấy cả họ (Bài 7) |
 | Trộn `AND`/`OR` không ngoặc | `status = 'paid' OR status = 'shipped' AND ...` | `(status = 'paid' OR status = 'shipped') AND ...` (Bài 8) |
-| Chia nguyên | `(price - cost_price) / price` ra 0 | nhân `100.0` hoặc ép `::NUMERIC` trước khi chia (Bài 9) |
+| Chia nguyên khi cả hai vế là số nguyên | `stock_quantity / 200 * 100` ra 0 với Sạc Anker (40 cái) | `stock_quantity * 100.0 / 200` hoặc ép `::NUMERIC` trước khi chia (Ngày 5) |
 | Phân trang không có thứ tự duy nhất | `ORDER BY price LIMIT 5 OFFSET 5` khi nhiều sản phẩm cùng giá | thêm cột khóa: `ORDER BY price DESC, product_id` (Bài 11) |
 | Dùng `FLOAT` cho tiền | `price FLOAT` | `price NUMERIC(12,0)` |
 | `UPDATE`/`DELETE` không xem trước | sửa theo tên, sửa nhầm hai "Nguyễn Văn An" | SELECT trước, lọc theo khóa chính, chạy trong `BEGIN` |

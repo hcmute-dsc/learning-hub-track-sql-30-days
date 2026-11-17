@@ -127,7 +127,7 @@ flowchart LR
     F2["File trên máy chủ DB"] -->|"COPY: server tự đọc file"| DB
 ```
 
-Khi bạn chạy `docker compose exec db psql ...`, psql cũng chạy bên trong container, nên cả `COPY` lẫn `\copy` đều thấy `/data`. Nếu bạn cài psql trực tiếp trên Windows và kết nối tới `localhost:5432`, `\copy` đọc file theo đường dẫn Windows (ví dụ `'D:/repos/sql-challenge/setup/data/new_customers.csv'`), còn `COPY` thì không thấy file đó.
+Khi bạn chạy `docker compose exec db psql ...`, psql cũng chạy bên trong container, nên cả `COPY` lẫn `\copy` đều thấy `/data`. Nếu bạn cài psql trực tiếp trên Windows và kết nối tới `localhost:5432`, `\copy` đọc file theo đường dẫn Windows (ví dụ `'D:/repos/learning-hub-content/tracks/sql-30-days/setup/data/new_customers.csv'`), còn `COPY` thì không thấy file đó.
 
 Với database trên cloud (Supabase, Neon, RDS...) bạn không có quyền superuser và không đặt file lên máy chủ được, nên `\copy` là lựa chọn duy nhất. Một user bình thường chạy `COPY` với file sẽ nhận lỗi:
 
@@ -436,7 +436,7 @@ COPY (
            ROUND(SUM(oi.quantity * oi.unit_price * (1 - oi.discount))) AS doanh_thu
     FROM orders o
     JOIN order_items oi ON oi.order_id = o.order_id
-    WHERE o.status <> 'cancelled'
+    WHERE o.status NOT IN ('pending', 'cancelled')
       AND o.order_date >= '2025-01-01' AND o.order_date < '2026-01-01'
     GROUP BY thang
     ORDER BY thang
@@ -464,6 +464,8 @@ thang,so_don,doanh_thu
 2025-11,3,40762500
 2025-12,2,49661000
 ```
+
+> Nếu Docker chạy trực tiếp trên Linux (không qua Docker Desktop), lệnh trên có thể báo `could not open file "/data/revenue_2025.csv" for writing: Permission denied`. `COPY ... TO` do chính tiến trình PostgreSQL ghi file, bằng user `postgres` trong container, và user này không có quyền ghi vào thư mục mount từ máy bạn. Khi đó dùng `\copy (SELECT ...) TO '/data/revenue_2025.csv' WITH (FORMAT csv, HEADER true)` (viết trên một dòng): psql sẽ ghi file thay cho server.
 
 `COPY ... TO STDOUT` in thẳng ra màn hình, tiện để xem nhanh hoặc chuyển hướng sang file:
 
@@ -506,7 +508,7 @@ SELECT to_char(o.order_date, 'YYYY-MM') AS thang,
        ROUND(SUM(oi.quantity * oi.unit_price * (1 - oi.discount))) AS doanh_thu
 FROM orders o
 JOIN order_items oi ON oi.order_id = o.order_id
-WHERE o.status <> 'cancelled'
+WHERE o.status NOT IN ('pending', 'cancelled')
   AND o.order_date >= %s AND o.order_date < %s
 GROUP BY thang
 ORDER BY thang
@@ -552,12 +554,12 @@ Nếu mọi cột đều là chữ thì không có lỗi nào, dòng `full_name,
 
 ```sql
 COPY customers (full_name, email, phone, city, birth_date)
-FROM 'D:/repos/sql-challenge/setup/data/new_customers.csv'
+FROM 'D:/repos/learning-hub-content/tracks/sql-30-days/setup/data/new_customers.csv'
 WITH (FORMAT csv, HEADER true);
 ```
 
 ```text
-ERROR:  could not open file "D:/repos/sql-challenge/setup/data/new_customers.csv" for reading: No such file or directory
+ERROR:  could not open file "D:/repos/learning-hub-content/tracks/sql-30-days/setup/data/new_customers.csv" for reading: No such file or directory
 HINT:  COPY FROM instructs the PostgreSQL server process to read a file. You may want a client-side facility such as psql's \copy.
 ```
 
