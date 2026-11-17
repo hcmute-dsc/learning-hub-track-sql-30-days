@@ -113,7 +113,7 @@ ORDER BY full_name, created_at DESC;
 
 ### Sắp xếp theo biểu thức, alias và cột không được chọn
 
-`ORDER BY` chạy **sau** `SELECT`, nên khác với `WHERE`, nó dùng được alias. Thứ tự xử lý logic bây giờ là:
+`ORDER BY` chạy **sau** `SELECT`, nên khác với `WHERE`, nó dùng được alias. Lưu ý: alias chỉ dùng được khi đứng một mình (`ORDER BY profit DESC`); đưa vào biểu thức (`ORDER BY profit * 2`) sẽ lỗi `column "profit" does not exist`, khi đó viết lại biểu thức gốc. Thứ tự xử lý logic bây giờ là:
 
 ```mermaid
 flowchart LR
@@ -242,7 +242,7 @@ ORDER BY full_name COLLATE "vi-x-icu";
 | Dương Minh Khoa |
 | Đặng Thu Giang |
 
-Collation còn quyết định chữ thường hay chữ hoa đứng trước khi hai chuỗi chỉ khác nhau ở hoa thường. Với `en_US.utf8`, `đà nẵng` đứng **trước** `Đà Nẵng` (thấy rõ ở Bài tập 4 bên dưới); collation khác, ví dụ `"C"` (so theo mã byte), lại xếp `Đ` hoa trước.
+Collation còn quyết định chữ thường hay chữ hoa đứng trước khi hai chuỗi chỉ khác nhau ở hoa thường. Với `en_US.utf8`, `đà nẵng` đứng **trước** `Đà Nẵng` (thấy rõ ở Bài 4 trong trang bài tập của bài này); collation khác, ví dụ `"C"` (so theo mã byte), lại xếp `Đ` hoa trước.
 
 Trong khóa học, bạn chỉ cần nhớ: thứ tự sắp xếp chuỗi tiếng Việt phụ thuộc collation của database, nên chạy cùng câu lệnh trên máy khác (database tạo với collation khác) có thể ra thứ tự lệch đôi chút so với bảng kết quả trong bài.
 
@@ -526,17 +526,17 @@ Thời gian đo trên máy tác giả, mỗi câu chạy 3 lần (máy bạn s�
 | `LIMIT 10 OFFSET 900000` | 500 ms | 89 ms | 63 ms |
 | `WHERE order_id > 900000 ... LIMIT 10` | 0,4 ms | 0,2 ms | 0,1 ms |
 
-![So sánh hai cách lấy trang 90.001 của bảng perf.orders 1.000.000 dòng. Kiểu OFFSET với LIMIT 10 OFFSET 900000 phải đọc và bỏ 900.000 dòng đầu rồi mới trả 10 dòng, mất khoảng 60 đến 90 ms. Kiểu keyset với WHERE order_id > 900000 LIMIT 10 dùng chỉ mục khóa chính nhảy thẳng tới order_id 900.001, không đọc phần trước, mất dưới 0,5 ms.](../../../assets/img/offset-va-keyset.png#gh-light-mode-only)
-![So sánh hai cách lấy trang 90.001 của bảng perf.orders 1.000.000 dòng. Kiểu OFFSET với LIMIT 10 OFFSET 900000 phải đọc và bỏ 900.000 dòng đầu rồi mới trả 10 dòng, mất khoảng 60 đến 90 ms. Kiểu keyset với WHERE order_id > 900000 LIMIT 10 dùng chỉ mục khóa chính nhảy thẳng tới order_id 900.001, không đọc phần trước, mất dưới 0,5 ms.](../../../assets/img/offset-va-keyset-dark.png#gh-dark-mode-only)
+![So sánh hai cách lấy trang 90.001 của bảng perf.orders 1.000.000 dòng. Kiểu OFFSET với LIMIT 10 OFFSET 900000 phải đọc và bỏ 900.000 dòng đầu rồi mới trả 10 dòng, mất khoảng 60 đến 90 ms. Kiểu keyset với WHERE order_id > 900000 LIMIT 10 dùng index của khóa chính nhảy thẳng tới order_id 900.001, không đọc phần trước, mất dưới 0,5 ms.](../../../assets/img/offset-va-keyset.png#gh-light-mode-only)
+![So sánh hai cách lấy trang 90.001 của bảng perf.orders 1.000.000 dòng. Kiểu OFFSET với LIMIT 10 OFFSET 900000 phải đọc và bỏ 900.000 dòng đầu rồi mới trả 10 dòng, mất khoảng 60 đến 90 ms. Kiểu keyset với WHERE order_id > 900000 LIMIT 10 dùng index của khóa chính nhảy thẳng tới order_id 900.001, không đọc phần trước, mất dưới 0,5 ms.](../../../assets/img/offset-va-keyset-dark.png#gh-dark-mode-only)
 
 <small>File gốc: [nền sáng](../../../assets/diagrams/order-by-limit/offset-va-keyset.html) · [nền tối](../../../assets/diagrams/order-by-limit/offset-va-keyset-dark.html)</small>
 
-Câu keyset nhanh vì `order_id` là khóa chính, đã có sẵn một **chỉ mục (index)**, giống mục lục của cuốn sách: PostgreSQL tra thẳng tới chỗ `order_id > 900000` thay vì đọc từ đầu. Index học kỹ ở [Ngày 15](../../03-database-objects/lessons/15-index.md).
+Câu keyset nhanh vì `order_id` là khóa chính, đã có sẵn một **index** (Ngày 2 đã thấy nó trong `\d`), giống mục lục của cuốn sách: PostgreSQL tra thẳng tới chỗ `order_id > 900000` thay vì đọc từ đầu. Index học kỹ ở [Ngày 15](../../03-database-objects/lessons/15-index.md).
 
 Đổi lại, keyset có giới hạn: chỉ đi được "trang tiếp theo"/"trang trước", không nhảy thẳng tới trang 537 được; ứng dụng phải nhớ giá trị cuối của trang trước. Vì vậy:
 
 - Danh sách ngắn, cần nút số trang (trang quản trị, vài nghìn dòng): `LIMIT ... OFFSET` là đủ.
-- Danh sách dài, cuộn vô hạn (bảng tin, lịch sử giao dịch): dùng keyset.
+- Danh sách dài, cuộn vô hạn (bảng tin, lịch sử đơn hàng): dùng keyset.
 
 [Ngày 28](../../04-sql-in-practice/lessons/28-sql-query-optimization.md) quay lại keyset với nhiều cột sắp xếp và đo bằng `EXPLAIN ANALYZE`.
 

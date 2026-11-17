@@ -11,6 +11,7 @@ authors:
 license: "MIT"
 spec:
   checklist:
-    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
-    - "Kết quả của mình khớp với kết quả trong đáp án"
-    - "Đọc lại phần lý thuyết của những bài làm sai"
+    - "Chứng minh bằng EXPLAIN ANALYZE câu bọc hàm quanh cột không dùng index, câu viết lại thì dùng (Bài 1)"
+    - "Giải thích được vì sao NOT EXISTS an toàn hơn NOT IN (subquery) (Bài 4)"
+    - "Trang 2 keyset trùng với LIMIT 5 OFFSET 5 cùng thứ tự sắp xếp (Bài 5)"
+    - "Bản LEFT JOIN + GROUP BY cho kết quả giống câu subquery, kể cả khách 0 đơn (Bài 7)"

@@ -45,7 +45,7 @@ Thứ tự thực thi logic của một câu `SELECT` (Ngày 9) là chìa khóa 
 
 ```mermaid
 flowchart LR
-    F["FROM / JOIN"] --> W["WHERE"] --> G["GROUP BY"] --> H["HAVING"] --> S["SELECT"] --> O["ORDER BY / LIMIT"]
+    F["FROM / JOIN"] --> W["WHERE"] --> G["GROUP BY"] --> H["HAVING"] --> S["SELECT"] --> D["DISTINCT"] --> O["ORDER BY / LIMIT"]
 ```
 
 ## Quy ước dùng trong bài

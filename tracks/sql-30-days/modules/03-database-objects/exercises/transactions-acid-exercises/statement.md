@@ -139,7 +139,7 @@ Trong thực tế, ứng dụng chỉ chạy `ROLLBACK TO SAVEPOINT` khi thấy 
 
 </details>
 
-**Bài 5.** Tạo lại bảng `wallets` như mục 9 (1: 1.000.000, 2: 500.000, 3: 0). Viết transaction chuyển 200.000 đ từ khách 1 sang khách 3, có khóa hai ví theo đúng thứ tự. Vì sao phải khóa theo thứ tự `customer_id` mà không khóa "người gửi trước, người nhận sau"?
+**Bài 5.** Tạo lại bảng `wallets` như [Ngày 16](../../lessons/16-transactions-acid.md) mục 9 (1: 1.000.000, 2: 500.000, 3: 0). Viết transaction chuyển 200.000 đ từ khách 1 sang khách 3, có khóa hai ví theo đúng thứ tự. Vì sao phải khóa theo thứ tự `customer_id` mà không khóa "người gửi trước, người nhận sau"?
 
 <details>
 <summary>Đáp án</summary>
@@ -169,7 +169,7 @@ Kết quả:
 | 2 | 500000 |
 | 3 | 200000 |
 
-Nếu khóa "người gửi trước", lệnh chuyển 1 → 3 khóa ví 1 rồi ví 3, còn lệnh chuyển 3 → 1 chạy cùng lúc khóa ví 3 rồi ví 1: đúng kịch bản deadlock ở mục 8. Khóa theo `customer_id` tăng dần thì mọi lệnh chuyển đều khóa ví 1 trước ví 3, nên không thể chờ vòng tròn.
+Nếu khóa "người gửi trước", lệnh chuyển 1 → 3 khóa ví 1 rồi ví 3, còn lệnh chuyển 3 → 1 chạy cùng lúc khóa ví 3 rồi ví 1: đúng kịch bản deadlock ở Ngày 16, mục 8. Khóa theo `customer_id` tăng dần thì mọi lệnh chuyển đều khóa ví 1 trước ví 3, nên không thể chờ vòng tròn.
 
 </details>
 
@@ -197,6 +197,8 @@ Kết quả lần đếm thứ hai:
 
 **Bài 7.** Flash sale: Lenovo Legion 5 (sản phẩm 2) chỉ còn 3 máy, mỗi khách mua 1. Viết **một câu lệnh** trừ kho cho một lượt mua sao cho: không bao giờ âm, hai khách bấm cùng lúc không làm mất lượt trừ, và ứng dụng biết lượt đó thành công hay hết hàng. Chạy câu đó 4 lần liên tiếp và giải thích kết quả.
 
+> Gợi ý: đưa điều kiện "còn hàng" vào chính `WHERE` của câu `UPDATE`, và dùng `RETURNING` để ứng dụng biết lượt đó có trúng dòng nào không.
+
 <details>
 <summary>Đáp án</summary>
 
@@ -216,7 +218,7 @@ Kết quả bốn lần chạy:
 | 3 | `stock_quantity = 0`, `UPDATE 1` |
 | 4 | `(0 rows)`, `UPDATE 0` |
 
-- Phép trừ nằm trong UPDATE nên dòng bị khóa trong lúc trừ; lượt đến sau phải chờ rồi đọc lại giá trị mới (mục 6.2), không mất lượt trừ.
+- Phép trừ nằm trong UPDATE nên dòng bị khóa trong lúc trừ; lượt đến sau phải chờ rồi đọc lại giá trị mới (Ngày 16, mục 6.2), không mất lượt trừ.
 - Điều kiện `stock_quantity >= 1` làm lượt thứ 4 không trúng dòng nào. `UPDATE 0` (hoặc không có dòng RETURNING) là tín hiệu "hết hàng" để ứng dụng ROLLBACK cả đơn.
 - `CHECK (stock_quantity >= 0)` là lưới an toàn thứ hai nếu ai đó quên điều kiện.
 
@@ -227,7 +229,7 @@ Kết quả bốn lần chạy:
 <details>
 <summary>Đáp án</summary>
 
-Đơn thứ nhất khóa dòng 1 rồi chờ dòng 2, đơn thứ hai khóa dòng 2 rồi chờ dòng 1: chờ vòng tròn (mục 8). Sửa bằng cách khóa mọi sản phẩm của đơn trong một câu, theo thứ tự `product_id` tăng dần, trước khi trừ:
+Đơn thứ nhất khóa dòng 1 rồi chờ dòng 2, đơn thứ hai khóa dòng 2 rồi chờ dòng 1: chờ vòng tròn (Ngày 16, mục 8). Sửa bằng cách khóa mọi sản phẩm của đơn trong một câu, theo thứ tự `product_id` tăng dần, trước khi trừ:
 
 ```sql
 BEGIN;

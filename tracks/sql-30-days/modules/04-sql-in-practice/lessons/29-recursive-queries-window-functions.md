@@ -2,7 +2,12 @@
 uid: "50e4b038-854f-5f1b-a81e-c5bc4637b19f"
 slug: "recursive-queries-window-functions"
 title: "Ngày 29: Window function và truy vấn đệ quy"
-objectives: []
+objectives:
+  - "Viết được `SUM/AVG/COUNT ... OVER (PARTITION BY ... ORDER BY ...)` để tính tỷ trọng, lũy kế và trung bình trượt mà vẫn giữ từng dòng."
+  - "Chọn đúng `ROW_NUMBER`, `RANK`, `DENSE_RANK`, `NTILE` khi xếp hạng có giá trị bằng nhau, và lấy top-N mỗi nhóm qua CTE."
+  - "Giải thích được khung (frame) `ROWS` và `RANGE`, và nhận ra bẫy khung mặc định khi `ORDER BY` có giá trị trùng."
+  - "Dùng `LAG`/`LEAD` để so sánh doanh thu tháng này với tháng trước."
+  - "Viết được CTE đệ quy duyệt cây `categories` và `employees` theo cả hai chiều, có điều kiện dừng và cơ chế chống vòng lặp (mảng đường đi hoặc mệnh đề `CYCLE`)."
 prerequisites:
   - "sql-30-days/foundations/operators-expressions"
   - "sql-30-days/aggregation-and-joins/aggregate-functions"
@@ -17,6 +22,7 @@ license: "MIT"
 > **Tóm tắt:** Window function tính toán trên một "cửa sổ" các dòng liên quan mà không gộp dòng như GROUP BY, nên làm được xếp hạng, lũy kế, trung bình trượt, so sánh với kỳ trước và top-N mỗi nhóm. CTE đệ quy (`WITH RECURSIVE`) lặp một truy vấn cho tới khi không còn dòng mới, dùng để duyệt dữ liệu dạng cây như danh mục sản phẩm hay sơ đồ tổ chức. Bài này dạy cả hai trên DSC Shop, kèm cách chặn vòng lặp vô hạn.
 
 **Sau bài này bạn có thể:**
+
 - Viết được `SUM/AVG/COUNT ... OVER (PARTITION BY ... ORDER BY ...)` để tính tỷ trọng, lũy kế và trung bình trượt mà vẫn giữ từng dòng.
 - Chọn đúng `ROW_NUMBER`, `RANK`, `DENSE_RANK`, `NTILE` khi xếp hạng có giá trị bằng nhau, và lấy top-N mỗi nhóm qua CTE.
 - Giải thích được khung (frame) `ROWS` và `RANGE`, và nhận ra bẫy khung mặc định khi `ORDER BY` có giá trị trùng.
@@ -140,7 +146,7 @@ Vị trí của window function trong thứ tự thực thi logic (bổ sung cho
 FROM → WHERE → GROUP BY → HAVING → window function → SELECT (đặt alias) → DISTINCT → ORDER BY → LIMIT
 ```
 
-Hệ quả: không dùng window function trong WHERE, GROUP BY, HAVING được (mục 8), nhưng dùng được trong ORDER BY cuối câu.
+Hệ quả: không dùng window function trong WHERE, GROUP BY, HAVING được (mục 9), nhưng dùng được trong ORDER BY cuối câu.
 
 ### 3. Hàm xếp hạng: ROW_NUMBER, RANK, DENSE_RANK, NTILE
 
@@ -570,9 +576,9 @@ SELECT ... FROM ten_cte;
 
 Cách PostgreSQL thực thi:
 
-1. Chạy phần neo, đưa kết quả vào kết quả cuối **và** vào một "bảng tạm" (working table).
-2. Chạy phần đệ quy, trong đó `ten_cte` chỉ là **các dòng của bảng tạm** (các dòng vòng trước vừa sinh ra), không phải toàn bộ kết quả.
-3. Dòng mới sinh ra được cộng vào kết quả cuối và trở thành bảng tạm của vòng sau.
+1. Chạy phần neo, đưa kết quả vào kết quả cuối **và** vào một working table (bảng làm việc chứa các dòng vòng vừa sinh).
+2. Chạy phần đệ quy, trong đó `ten_cte` chỉ là **các dòng của working table** (các dòng vòng trước vừa sinh ra), không phải toàn bộ kết quả.
+3. Dòng mới sinh ra được cộng vào kết quả cuối và trở thành working table của vòng sau.
 4. Lặp lại bước 2-3 cho tới khi một vòng **không sinh thêm dòng nào**.
 
 Ví dụ nhỏ nhất, đếm từ 1 đến 5:
@@ -648,8 +654,8 @@ ORDER BY duong_dan;
 
 Sơ đồ dưới đây cho thấy truy vấn trên chạy qua từng vòng:
 
-![CTE đệ quy duyệt cây categories theo từng vòng. Mỗi vòng chỉ JOIN với các dòng vòng ngay trước vừa sinh ra. Vòng 0 là phần neo, điều kiện parent_id IS NULL, cho 4 dòng mới: Máy tính, Điện thoại & Tablet, Phụ kiện, Thiết bị mạng. Vòng 1 là phần đệ quy, lấy con của vòng 0, cho 7 dòng mới: Laptop, PC & Màn hình, Điện thoại, Máy tính bảng, Chuột & Bàn phím, Tai nghe & Loa, Sạc & Cáp. Vòng 2 lấy con của vòng 1, cho 2 dòng mới: Laptop gaming, Laptop văn phòng. Vòng 3 lấy con của vòng 2 nhưng không danh mục nào có parent_id là 3 hoặc 4, bảng tạm rỗng nên đệ quy dừng. UNION ALL gom kết quả mọi vòng: 4 + 7 + 2 = 13 dòng, đủ 13 danh mục. Dữ liệu có vòng lặp thì bảng tạm không bao giờ rỗng, phải chặn.](../../../assets/img/cte-de-quy-tung-vong.png#gh-light-mode-only)
-![CTE đệ quy duyệt cây categories theo từng vòng. Mỗi vòng chỉ JOIN với các dòng vòng ngay trước vừa sinh ra. Vòng 0 là phần neo, điều kiện parent_id IS NULL, cho 4 dòng mới: Máy tính, Điện thoại & Tablet, Phụ kiện, Thiết bị mạng. Vòng 1 là phần đệ quy, lấy con của vòng 0, cho 7 dòng mới: Laptop, PC & Màn hình, Điện thoại, Máy tính bảng, Chuột & Bàn phím, Tai nghe & Loa, Sạc & Cáp. Vòng 2 lấy con của vòng 1, cho 2 dòng mới: Laptop gaming, Laptop văn phòng. Vòng 3 lấy con của vòng 2 nhưng không danh mục nào có parent_id là 3 hoặc 4, bảng tạm rỗng nên đệ quy dừng. UNION ALL gom kết quả mọi vòng: 4 + 7 + 2 = 13 dòng, đủ 13 danh mục. Dữ liệu có vòng lặp thì bảng tạm không bao giờ rỗng, phải chặn.](../../../assets/img/cte-de-quy-tung-vong-dark.png#gh-dark-mode-only)
+![CTE đệ quy duyệt cây categories theo từng vòng. Mỗi vòng chỉ JOIN với các dòng vòng ngay trước vừa sinh ra. Vòng 0 là phần neo, điều kiện parent_id IS NULL, cho 4 dòng mới: Máy tính, Điện thoại & Tablet, Phụ kiện, Thiết bị mạng. Vòng 1 là phần đệ quy, lấy con của vòng 0, cho 7 dòng mới: Laptop, PC & Màn hình, Điện thoại, Máy tính bảng, Chuột & Bàn phím, Tai nghe & Loa, Sạc & Cáp. Vòng 2 lấy con của vòng 1, cho 2 dòng mới: Laptop gaming, Laptop văn phòng. Vòng 3 lấy con của vòng 2 nhưng không danh mục nào có parent_id là 3 hoặc 4, working table rỗng nên đệ quy dừng. UNION ALL gom kết quả mọi vòng: 4 + 7 + 2 = 13 dòng, đủ 13 danh mục. Dữ liệu có vòng lặp thì working table không bao giờ rỗng, phải chặn.](../../../assets/img/cte-de-quy-tung-vong.png#gh-light-mode-only)
+![CTE đệ quy duyệt cây categories theo từng vòng. Mỗi vòng chỉ JOIN với các dòng vòng ngay trước vừa sinh ra. Vòng 0 là phần neo, điều kiện parent_id IS NULL, cho 4 dòng mới: Máy tính, Điện thoại & Tablet, Phụ kiện, Thiết bị mạng. Vòng 1 là phần đệ quy, lấy con của vòng 0, cho 7 dòng mới: Laptop, PC & Màn hình, Điện thoại, Máy tính bảng, Chuột & Bàn phím, Tai nghe & Loa, Sạc & Cáp. Vòng 2 lấy con của vòng 1, cho 2 dòng mới: Laptop gaming, Laptop văn phòng. Vòng 3 lấy con của vòng 2 nhưng không danh mục nào có parent_id là 3 hoặc 4, working table rỗng nên đệ quy dừng. UNION ALL gom kết quả mọi vòng: 4 + 7 + 2 = 13 dòng, đủ 13 danh mục. Dữ liệu có vòng lặp thì working table không bao giờ rỗng, phải chặn.](../../../assets/img/cte-de-quy-tung-vong-dark.png#gh-dark-mode-only)
 
 <small>File gốc: [nền sáng](../../../assets/diagrams/recursive-queries-window-functions/cte-de-quy-tung-vong.html) · [nền tối](../../../assets/diagrams/recursive-queries-window-functions/cte-de-quy-tung-vong-dark.html)</small>
 
@@ -791,7 +797,7 @@ ORDER BY buoc;
 
 ### 14. Chống vòng lặp vô hạn
 
-Cây "đúng nghĩa" không có vòng. Nhưng dữ liệu thật có thể bị nhập sai: A là cha của B, B là cha của A. Đồ thị như mạng lưới đường đi, quan hệ bạn bè thì có vòng là chuyện bình thường. Khi đó bảng tạm không bao giờ rỗng và truy vấn chạy mãi.
+Cây "đúng nghĩa" không có vòng. Nhưng dữ liệu thật có thể bị nhập sai: A là cha của B, B là cha của A. Đồ thị như mạng lưới đường đi, quan hệ bạn bè thì có vòng là chuyện bình thường. Khi đó working table không bao giờ rỗng và truy vấn chạy mãi.
 
 Tạo một bản sao `categories` rồi cố tình tạo vòng (không đụng vào bảng gốc của shop):
 
@@ -824,13 +830,14 @@ WITH RECURSIVE cay AS (
     JOIN cay ON c.parent_id = cay.category_id
 )
 SELECT COUNT(*) FROM cay;
+RESET statement_timeout;
 ```
 
 ```text
 ERROR:  canceling statement due to statement timeout
 ```
 
-Không có timeout thì truy vấn chạy tới khi bạn tự hủy (Ctrl+C trong psql) hoặc hết bộ nhớ. Nhớ trả lại thiết lập: `RESET statement_timeout;`.
+Không có timeout thì truy vấn chạy tới khi bạn tự hủy (Ctrl+C trong psql) hoặc hết bộ nhớ. Dòng `RESET statement_timeout;` cuối khối trả lại thiết lập mặc định, để các truy vấn nặng sau đó (ví dụ trên schema `perf`) không bị hủy sau 2 giây.
 
 Có ba cách chặn, nên dùng ít nhất một:
 

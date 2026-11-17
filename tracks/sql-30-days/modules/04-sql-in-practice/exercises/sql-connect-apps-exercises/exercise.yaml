@@ -11,6 +11,7 @@ authors:
 license: "MIT"
 spec:
   checklist:
-    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
-    - "Kết quả của mình khớp với kết quả trong đáp án"
-    - "Đọc lại phần lý thuyết của những bài làm sai"
+    - "Mọi câu SQL trong code đều truyền giá trị qua tham số (`%s` hoặc `$1`), không nối chuỗi (Bài 1-4)"
+    - "`cancel_order` chạy trong một transaction, kiểm tra số dòng bị sửa và không đổi gì khi đơn không ở trạng thái pending (Bài 5)"
+    - "Thay vòng lặp N+1 bằng một truy vấn duy nhất với `= ANY($1::int[])` (Bài 6)"
+    - "API trả đúng 201, 409, 400 cho từng trường hợp của Bài 7"

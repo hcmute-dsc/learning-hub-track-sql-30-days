@@ -129,7 +129,7 @@ flowchart LR
 
 Khi bạn chạy `docker compose exec db psql ...`, psql cũng chạy bên trong container, nên cả `COPY` lẫn `\copy` đều thấy `/data`. Nếu bạn cài psql trực tiếp trên Windows và kết nối tới `localhost:5432`, `\copy` đọc file theo đường dẫn Windows (ví dụ `'D:/repos/learning-hub-content/tracks/sql-30-days/setup/data/new_customers.csv'`), còn `COPY` thì không thấy file đó.
 
-Với database trên cloud (Supabase, Neon, RDS...) bạn không có quyền superuser và không đặt file lên máy chủ được, nên `\copy` là lựa chọn duy nhất. Một user bình thường chạy `COPY` với file sẽ nhận lỗi:
+Với database trên cloud (Supabase, Neon, RDS...) bạn không có quyền superuser và không đặt file lên máy chủ được, nên file phải do phía client đọc rồi gửi qua kết nối: dùng `\copy`, hoặc `COPY ... FROM STDIN` từ code ứng dụng (ví dụ `cursor.copy()` của psycopg 3). Một user bình thường chạy `COPY` với file sẽ nhận lỗi:
 
 ```sql
 COPY customers (full_name, email, phone, city, birth_date)
@@ -170,6 +170,12 @@ docker compose exec -T db sh -c "iconv -f UTF-16 -t UTF-8 /data/customers_utf16.
 
 ```text
 COPY 1
+```
+
+Lệnh trên viết cho Git Bash, macOS hoặc Linux; PowerShell thoát dấu nháy kép theo cách khác. Trên PowerShell, cách đơn giản nhất là mở shell bên trong container (`docker compose exec db bash`) rồi chạy:
+
+```sh
+iconv -f UTF-16 -t UTF-8 /data/customers_utf16.csv | psql -U postgres -d sql_challenge -c "\copy customers (full_name, email, phone, city, birth_date) FROM STDIN WITH (FORMAT csv, HEADER true)"
 ```
 
 Với file mã hóa một byte như Windows-1252 hay LATIN1, chỉ cần thêm `ENCODING 'WIN1252'` hoặc `ENCODING 'LATIN1'` vào `WITH (...)`, PostgreSQL tự chuyển sang UTF-8.
@@ -298,7 +304,7 @@ flowchart LR
     C -->|"dòng lỗi"| E["File báo lỗi gửi lại"]
 ```
 
-**Bước 1: bảng staging toàn cột `TEXT`.** Không có ràng buộc, không có kiểu số, nên mọi dòng đều vào được. Thêm `line_no` để biết dòng nào trong file, và cột `error` để ghi lý do lỗi:
+**Bước 1: bảng staging toàn cột `TEXT`.** Không có constraint, không có kiểu số, nên mọi dòng đều vào được. Thêm `line_no` để biết dòng nào trong file, và cột `error` để ghi lý do lỗi:
 
 ```sql
 DROP TABLE IF EXISTS stg_supplier_products;
@@ -617,7 +623,7 @@ SELECT a, b, b IS NULL AS b_is_null, length(b) FROM t_null;
 | a | b | b_is_null | length |
 | --- | --- | --- | --- |
 | x | NULL | t | NULL |
-| y |  | f | 0 |
+| y | '' | f | 0 |
 
 File dùng chữ khác cho NULL (`NULL`, `N/A`, `\N`) thì khai báo bằng tùy chọn `NULL 'N/A'`.
 
@@ -629,7 +635,7 @@ Phần bài tập của bài này nằm ở bài tập **Bài tập: Nhập và 
 
 ## Tóm tắt
 
-- `COPY ... FROM/TO` là cách nạp và xuất dữ liệu nhanh nhất của PostgreSQL. Gần như luôn cần `FORMAT csv, HEADER true`; thêm `DELIMITER`, `NULL`, `ENCODING`, `FORCE_QUOTE` khi file khác chuẩn.
+- `COPY ... FROM/TO` là cách nạp và xuất dữ liệu nhanh nhất của PostgreSQL. Gần như luôn cần `FORMAT csv, HEADER true`; thêm `DELIMITER`, `NULL`, `ENCODING` khi file khác chuẩn.
 - `COPY` đọc/ghi file trên máy chủ database và cần quyền đặc biệt. `\copy` của psql đọc/ghi file trên máy bạn, ai cũng dùng được, nhưng phải viết trên một dòng.
 - `COPY (truy vấn) TO ...` xuất kết quả của bất kỳ truy vấn nào.
 - `COPY` là tất cả hoặc không gì cả. File không sạch thì nạp vào bảng staging toàn `TEXT`, làm sạch, gắn lý do lỗi bằng `CASE`, đưa dòng hợp lệ vào bảng thật bằng `INSERT ... SELECT` trong transaction, và xuất dòng lỗi ra file.

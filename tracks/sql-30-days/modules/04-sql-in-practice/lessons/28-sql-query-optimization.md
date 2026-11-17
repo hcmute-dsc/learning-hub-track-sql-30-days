@@ -19,7 +19,7 @@ authors:
 license: "MIT"
 ---
 
-> **Tóm tắt:** Ngày 15 học tạo index, Ngày 20 học đọc plan. Bài này ghép hai kỹ năng đó để sửa truy vấn chậm: viết điều kiện sao cho index dùng được (sargable), viết lại subquery, chọn giữa `EXISTS`, `IN` và `JOIN`, chỉ lấy cột cần, phân trang keyset, tránh N+1. Mọi kết luận đều được đo bằng `EXPLAIN ANALYZE` trên schema `perf`.
+> **Tóm tắt:** Ngày 15 học tạo index, Ngày 20 học đọc plan. Bài này ghép hai kỹ năng đó để sửa truy vấn chậm: viết điều kiện sao cho index dùng được (sargable), viết lại subquery, chọn giữa `EXISTS`, `IN` và `JOIN`, chỉ lấy cột cần, phân trang keyset, tránh N+1. Các kết luận về tốc độ đều được đo bằng `EXPLAIN ANALYZE` trên schema `perf`.
 
 **Sau bài này bạn có thể:**
 
@@ -33,7 +33,7 @@ license: "MIT"
 
 ## Quy trình: đo, tìm nguyên nhân, sửa, đo lại
 
-Tối ưu không phải là thuộc lòng mẹo. Mỗi lần làm đều theo một vòng:
+Tối ưu không phải là thuộc lòng mẹo. Mỗi lần làm đều theo một vòng (mở rộng sơ đồ chẩn đoán ở [Ngày 20](../../03-database-objects/lessons/20-query-performance.md), thêm nhánh viết lại điều kiện và giảm việc):
 
 ```mermaid
 flowchart TD

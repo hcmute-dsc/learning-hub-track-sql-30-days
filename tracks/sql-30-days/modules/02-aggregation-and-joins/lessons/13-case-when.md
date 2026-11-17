@@ -137,7 +137,7 @@ ORDER BY order_id;
 | 38 | paid | Đã thanh toán |
 | 40 | pending | Chờ xác nhận |
 
-`CASE status WHEN 'pending' THEN ...` tương đương `CASE WHEN status = 'pending' THEN ...`. Vì bên trong là phép `=`, dạng đơn giản **không bắt được `NULL`** (xem mục Lỗi thường gặp). Cột `status` có ràng buộc `CHECK` nên chỉ có 5 giá trị trên; ở đây không cần `ELSE`.
+`CASE status WHEN 'pending' THEN ...` tương đương `CASE WHEN status = 'pending' THEN ...`. Vì bên trong là phép `=`, dạng đơn giản **không bắt được `NULL`** (xem mục Lỗi thường gặp). Cột `status` có constraint `CHECK` nên chỉ có 5 giá trị trên; ở đây không cần `ELSE`.
 
 ## 4. Điều kiện phức tạp: AND, OR, LIKE
 
@@ -469,8 +469,8 @@ ORDER BY customer_id;
 | customer_id | full_name | city | thanh_pho_sai | thanh_pho_dung |
 | --- | --- | --- | --- | --- |
 | 10 | Dương Minh Khoa | TP. Hồ Chí Minh | TP. Hồ Chí Minh | TP. Hồ Chí Minh |
-| 11 | Lý Thanh Mai | *(NULL)* | *(NULL)* | Chưa rõ |
-| 17 | Châu Ngọc Trâm | *(NULL)* | *(NULL)* | Chưa rõ |
+| 11 | Lý Thanh Mai | NULL | NULL | Chưa rõ |
+| 17 | Châu Ngọc Trâm | NULL | NULL | Chưa rõ |
 
 Muốn bắt `NULL` thì dùng dạng tìm kiếm với `IS NULL`. Với trường hợp đơn giản "thay NULL bằng giá trị mặc định", `COALESCE(city, 'Chưa rõ')` (Ngày 5) còn gọn hơn.
 
@@ -511,11 +511,11 @@ FROM orders;
 
 | khong_else | co_else_0 | dung_filter |
 | --- | --- | --- |
-| *(NULL)* | 0 | 0 |
+| NULL | 0 | 0 |
 
 Quy tắc dễ nhớ: đếm thì dùng `COUNT(*) FILTER (...)` hoặc `COUNT(CASE ... THEN 1 END)`; cộng tiền thì `SUM(CASE ... THEN tien ELSE 0 END)`, hoặc bọc `COALESCE(SUM(...), 0)`.
 
-**5. Quên `WHERE` khi `UPDATE ... SET cot = CASE ...`.** Mọi dòng không khớp nhánh nào rơi vào `ELSE` (hoặc thành `NULL` nếu không có `ELSE`, và vi phạm `NOT NULL` nếu cột có ràng buộc). Luôn xem trước bằng `SELECT`, giới hạn bằng `WHERE`, và chạy trong `BEGIN`.
+**5. Quên `WHERE` khi `UPDATE ... SET cot = CASE ...`.** Mọi dòng không khớp nhánh nào rơi vào `ELSE` (hoặc thành `NULL` nếu không có `ELSE`, và vi phạm constraint `NOT NULL` nếu cột có constraint này). Luôn xem trước bằng `SELECT`, giới hạn bằng `WHERE`, và chạy trong `BEGIN`.
 
 **6. Chia cho 0 trong nhánh tính tỷ lệ.** `CASE` không tự bảo vệ phép chia. Mẫu số có thể bằng 0 thì dùng `NULLIF(mau_so, 0)` (Ngày 5) để kết quả là `NULL` thay vì lỗi `division by zero`.
 

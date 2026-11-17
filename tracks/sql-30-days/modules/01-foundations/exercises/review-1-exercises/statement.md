@@ -64,27 +64,31 @@ Kết quả:
 | ACC-005 | Tai nghe AirPods Pro 2 | 5990000 |
 </details>
 
-**Bài 3 (Ngày 3).** Bộ phận chăm sóc khách cần danh sách khách thiếu số điện thoại hoặc thiếu email: `customer_id`, `full_name`, `email`, `phone`, sắp theo `customer_id`.
+**Bài 3 (Ngày 3).** Bộ phận chăm sóc khách chỉ gọi những khách thiếu **ít nhất hai** trong ba thông tin `email`, `phone`, `birth_date`. Liệt kê `customer_id`, `full_name`, `email`, `phone`, `birth_date`, sắp theo `customer_id`.
+
+> Gợi ý: "ít nhất hai trong ba" nghĩa là một trong ba cặp (email, phone), (email, birth_date), (phone, birth_date) cùng NULL.
 
 <details>
 <summary>Đáp án</summary>
 
 ```sql
-SELECT customer_id, full_name, email, phone
+SELECT customer_id, full_name, email, phone, birth_date
 FROM customers
-WHERE phone IS NULL OR email IS NULL
+WHERE (email IS NULL AND phone IS NULL)
+   OR (email IS NULL AND birth_date IS NULL)
+   OR (phone IS NULL AND birth_date IS NULL)
 ORDER BY customer_id;
 ```
 
 Kết quả:
 
-| customer_id | full_name | email | phone |
-| --- | --- | --- | --- |
-| 3 | Lê Hoàng Cường | cuong.le@outlook.com | NULL |
-| 5 | Hoàng Thị Em | NULL | 0934567890 |
-| 7 | Đặng Thu Giang | giang.dang@gmail.com | NULL |
-| 13 | Phan Thị Oanh | oanh.phan@hotmail.com | NULL |
-| 17 | Châu Ngọc Trâm | NULL | NULL |
+| customer_id | full_name | email | phone | birth_date |
+| --- | --- | --- | --- | --- |
+| 5 | Hoàng Thị Em | NULL | 0934567890 | NULL |
+| 13 | Phan Thị Oanh | oanh.phan@hotmail.com | NULL | NULL |
+| 17 | Châu Ngọc Trâm | NULL | NULL | NULL |
+
+Khách 3 và 7 chỉ thiếu số điện thoại nên không có mặt. Ngoặc quanh từng cặp `AND` là bắt buộc để đọc đúng ý, dù `AND` vốn được tính trước `OR`.
 </details>
 
 **Bài 4 (Ngày 3, 4).** 5 sản phẩm đắt nhất đang kinh doanh (`is_active = TRUE`).
@@ -111,7 +115,9 @@ Kết quả:
 | PHN-001 | iPhone 15 128GB | 19990000 |
 </details>
 
-**Bài 5 (Ngày 3).** Tìm các khách là sinh viên HCMUTE (email kết thúc bằng `@student.hcmute.edu.vn`).
+**Bài 5 (Ngày 3).** Bộ phận marketing muốn gửi ưu đãi riêng cho khách **không** dùng Gmail và cũng **không** dùng email sinh viên HCMUTE (`@student.hcmute.edu.vn`), tính cả khách chưa có email (để nhắc họ bổ sung). Liệt kê `customer_id`, `full_name`, `email`, sắp theo `customer_id`.
+
+> Gợi ý: `NOT LIKE` gặp `email` NULL thì cho `UNKNOWN`.
 
 <details>
 <summary>Đáp án</summary>
@@ -119,7 +125,8 @@ Kết quả:
 ```sql
 SELECT customer_id, full_name, email
 FROM customers
-WHERE email LIKE '%@student.hcmute.edu.vn'
+WHERE email IS NULL
+   OR (email NOT LIKE '%@gmail.com' AND email NOT LIKE '%@student.hcmute.edu.vn')
 ORDER BY customer_id;
 ```
 
@@ -127,9 +134,13 @@ Kết quả:
 
 | customer_id | full_name | email |
 | --- | --- | --- |
-| 6 | Võ Quốc Phong | phong.vo@student.hcmute.edu.vn |
-| 10 | Dương Minh Khoa | khoa.duong@student.hcmute.edu.vn |
-| 14 | Huỳnh Tấn Phát | phat.huynh@student.hcmute.edu.vn |
+| 3 | Lê Hoàng Cường | cuong.le@outlook.com |
+| 5 | Hoàng Thị Em | NULL |
+| 8 | Bùi Văn Hùng | hung.bui@yahoo.com |
+| 13 | Phan Thị Oanh | oanh.phan@hotmail.com |
+| 17 | Châu Ngọc Trâm | NULL |
+
+Thiếu vế `email IS NULL` thì chỉ còn 3 dòng (3, 8, 13): khách 5 và 17 biến mất vì `NULL NOT LIKE ...` là `UNKNOWN`.
 </details>
 
 **Bài 6 (Ngày 3, 4).** Tìm sản phẩm của Logitech hoặc Samsung dựa vào tên, không phân biệt hoa thường (người dùng có thể gõ `logitech`). Sắp theo giá tăng dần.
@@ -239,7 +250,7 @@ ORDER BY order_id;
 Gọn hơn: `WHERE status IN ('paid', 'shipped') AND shipping_city = 'TP. Hồ Chí Minh'`.
 </details>
 
-**Bài 9 (Ngày 4, 5).** Với mỗi sản phẩm, tính tiền lãi `price - cost_price` và tỉ lệ lãi trên giá bán (%, làm tròn 1 chữ số). Lấy 5 sản phẩm có tỉ lệ lãi cao nhất; sản phẩm chưa có giá nhập phải nằm cuối, không được chiếm chỗ đầu bảng.
+**Bài 9 (Ngày 4, 5).** Với mỗi sản phẩm, tính tiền lãi `price - cost_price` và tỷ lệ lãi trên giá bán (%, làm tròn 1 chữ số). Lấy 5 sản phẩm có tỷ lệ lãi cao nhất; sản phẩm chưa có giá nhập phải nằm cuối, không được chiếm chỗ đầu bảng.
 
 <details>
 <summary>Đáp án</summary>
@@ -266,31 +277,32 @@ Kết quả:
 Hai điểm cần chú ý: với `DESC`, PostgreSQL mặc định đặt NULL lên đầu, nên phải ghi `NULLS LAST`. `price` và `cost_price` là `NUMERIC` nên phép chia đã ra số thập phân; viết `100.0` chỉ là thói quen an toàn, cần thiết khi cả hai vế là số nguyên (như `stock_quantity`). `ORDER BY` dùng được alias `ti_le_lai` vì nó chạy sau `SELECT`.
 </details>
 
-**Bài 10 (Ngày 5).** Tính tuổi của 5 khách trẻ nhất (bỏ qua khách chưa có ngày sinh). Để kết quả cố định, tính tuổi tại ngày `2026-10-17`.
+**Bài 10 (Ngày 4, 5).** Cửa hàng chuẩn bị quà sinh nhật quý 4: liệt kê khách có sinh nhật từ tháng 10 đến tháng 12, gồm `full_name`, ngày sinh nhật dạng `DD/MM` (`sinh_nhat`) và số tuổi tròn trong năm 2026 (`tuoi_tron_2026`). Sắp theo thứ tự sinh nhật trong năm (tháng rồi ngày), không theo năm sinh.
+
+> Gợi ý: `EXTRACT(MONTH FROM ...)` và `EXTRACT(DAY FROM ...)` dùng được cả trong `WHERE` lẫn `ORDER BY`.
 
 <details>
 <summary>Đáp án</summary>
 
 ```sql
-SELECT full_name, birth_date,
-       EXTRACT(YEAR FROM AGE(DATE '2026-10-17', birth_date)) AS tuoi
+SELECT full_name,
+       TO_CHAR(birth_date, 'DD/MM')          AS sinh_nhat,
+       2026 - EXTRACT(YEAR FROM birth_date) AS tuoi_tron_2026
 FROM customers
-WHERE birth_date IS NOT NULL
-ORDER BY birth_date DESC
-LIMIT 5;
+WHERE EXTRACT(MONTH FROM birth_date) BETWEEN 10 AND 12
+ORDER BY EXTRACT(MONTH FROM birth_date), EXTRACT(DAY FROM birth_date);
 ```
 
 Kết quả:
 
-| full_name | birth_date | tuoi |
+| full_name | sinh_nhat | tuoi_tron_2026 |
 | --- | --- | --- |
-| Dương Minh Khoa | 2005-02-14 | 21 |
-| Huỳnh Tấn Phát | 2004-08-20 | 22 |
-| Võ Quốc Phong | 2004-05-12 | 22 |
-| Phạm Minh Duy | 2003-01-30 | 23 |
-| Tạ Quang Sơn | 2002-12-12 | 23 |
+| Trịnh Công Nam | 10/10 | 36 |
+| Lê Hoàng Cường | 02/11 | 27 |
+| Tạ Quang Sơn | 12/12 | 24 |
+| Ngô Thị Lan | 25/12 | 31 |
 
-Trong thực tế bạn viết `AGE(CURRENT_DATE, birth_date)` hoặc `AGE(birth_date)`; khi đó kết quả thay đổi theo ngày chạy. Trẻ nhất nghĩa là sinh muộn nhất, nên sắp `birth_date DESC`.
+Sắp theo `birth_date` sẽ ra thứ tự năm sinh (Nam 1990 trước Lan 1995), không phải thứ tự sinh nhật. Sắp theo chuỗi `sinh_nhat` cũng sai (`02/11` đứng trước `10/10`). Khách chưa có ngày sinh tự bị loại vì `EXTRACT(MONTH FROM NULL)` là NULL. `BETWEEN` an toàn ở đây vì so trên số tháng, không phải cột ngày giờ.
 </details>
 
 **Bài 11 (Ngày 4).** Trang sản phẩm hiển thị 5 sản phẩm mỗi trang, sắp giá giảm dần. Viết truy vấn lấy trang 2. Vì sao cần thêm `product_id` vào `ORDER BY`?
@@ -344,6 +356,8 @@ Không có `COALESCE`, `full_name || ' - ' || NULL` cho ra NULL cả chuỗi: kh
 </details>
 
 **Bài 13 (Ngày 5).** Liệt kê 5 dòng hàng có giảm giá mang lại thành tiền lớn nhất: `order_id`, `product_id`, `quantity`, `unit_price`, mức giảm dạng chữ như `5%`, và thành tiền `quantity * unit_price * (1 - discount)` làm tròn đến đồng.
+
+> Gợi ý: ép `discount * 100` sang `INT` trước khi nối `'%'`; `ROUND(x)` làm tròn đến đồng.
 
 <details>
 <summary>Đáp án</summary>
@@ -407,6 +421,8 @@ Kết quả:
 3. Thử thêm mã `SALE70` giảm 70% và đọc thông báo lỗi.
 4. Dùng UPSERT để "phát hành lại" `DSC10`: giảm 12%, hạn mới 31/01/2027.
 5. Xóa các mã hết hạn trước 01/12/2026 (xem trước bằng SELECT), rồi xóa bảng nháp.
+
+> Gợi ý: "Phát hành lại" một mã đã có là UPSERT: `ON CONFLICT (code) DO UPDATE`.
 
 <details>
 <summary>Đáp án</summary>

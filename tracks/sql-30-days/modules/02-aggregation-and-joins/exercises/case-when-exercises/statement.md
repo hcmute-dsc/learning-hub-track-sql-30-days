@@ -8,6 +8,8 @@ Bài 1-6 chỉ đọc dữ liệu. Bài 7 sửa dữ liệu nên phải chạy t
 
 **Bài 1.** Phân loại khách theo độ đầy đủ thông tin liên hệ: "Thiếu cả email và SĐT", "Thiếu email", "Thiếu SĐT", "Đủ thông tin". Đếm số khách mỗi loại, nhiều nhất lên đầu.
 
+> Gợi ý: nhánh `WHEN` nào đúng trước sẽ thắng, nên điều kiện hẹp nhất (thiếu cả hai) phải đứng đầu.
+
 <details>
 <summary>Đáp án</summary>
 
@@ -71,6 +73,8 @@ Kết quả:
 
 **Bài 3.** Đếm khách theo nhóm năm sinh: "Trước 1990", "1990 - 1999", "Từ 2000", "Chưa rõ" (không có `birth_date`). Sắp từ nhóm lớn tuổi nhất, "Chưa rõ" ở cuối.
 
+> Gợi ý: để sắp theo tuổi mà không sắp theo chữ cái, thử `ORDER BY MIN(birth_date)` của mỗi nhóm.
+
 <details>
 <summary>Đáp án</summary>
 
@@ -103,6 +107,8 @@ Nếu bỏ nhánh `IS NULL`, ba khách không có ngày sinh sẽ trượt mọi
 ### Vận dụng
 
 **Bài 4.** Xếp hạng khách theo tổng chi tiêu trên đơn đã thanh toán (`status NOT IN ('pending', 'cancelled')`): từ 50 triệu là "VIP", từ 20 triệu là "Thân thiết", có mua là "Thường", chưa có đơn đã thanh toán nào là "Chưa mua". Hiện mọi khách, kể cả khách chưa mua, sắp theo chi tiêu giảm dần.
+
+> Gợi ý: tính tổng chi tiêu mỗi khách trong một CTE, rồi đi từ `customers` bằng `LEFT JOIN` để giữ cả khách chưa mua.
 
 <details>
 <summary>Đáp án</summary>
@@ -183,6 +189,8 @@ Quý 4/2026 mới có nửa tháng 10 nên còn thấp. Quý nào không có đ�
 
 **Bài 6.** Với mỗi danh mục có sản phẩm, cho biết: số sản phẩm, số sản phẩm hết hàng, số sản phẩm chưa có giá nhập (`cost_price` là `NULL`), và giá trị tồn kho tính theo giá bán của các sản phẩm còn kinh doanh. Sắp theo giá trị tồn kho giảm dần.
 
+> Gợi ý: mỗi con số là một `COUNT(*) FILTER (WHERE ...)` hoặc `SUM(CASE ...)` trên cùng một `GROUP BY` danh mục.
+
 <details>
 <summary>Đáp án</summary>
 
@@ -262,6 +270,8 @@ ROLLBACK;
 
 **Bài 8.** Tính biên lợi nhuận `(price - cost_price) / price` (phần trăm, 1 chữ số thập phân) cho từng sản phẩm và xếp mức: "Cao (từ 30%)", "Trung bình (15-30%)", "Thấp (dưới 15%)", "Chưa có giá nhập". Sắp theo biên lợi nhuận giảm dần, sản phẩm chưa có giá nhập ở cuối. Có cần `CASE` để xử lý `cost_price` `NULL` trong cột phần trăm không?
 
+> Gợi ý: phép tính có `cost_price` là `NULL` sẽ ra `NULL`. Nhánh nào của `CASE` phải đứng đầu?
+
 <details>
 <summary>Đáp án</summary>
 
@@ -288,8 +298,8 @@ Kết quả:
 | PHN-004 | Nokia 105 4G | 690000 | 500000 | 27.5 | Trung bình (15-30%) |
 | ... | ... | ... | ... | ... | ... |
 | TAB-001 | iPad Air M2 11 inch | 16990000 | 15000000 | 11.7 | Thấp (dưới 15%) |
-| ACC-009 | Lót chuột DSC XXL | 250000 | *(NULL)* | *(NULL)* | Chưa có giá nhập |
-| LAP-006 | HP Pavilion 15 | 16990000 | *(NULL)* | *(NULL)* | Chưa có giá nhập |
+| ACC-009 | Lót chuột DSC XXL | 250000 | NULL | NULL | Chưa có giá nhập |
+| LAP-006 | HP Pavilion 15 | 16990000 | NULL | NULL | Chưa có giá nhập |
 
 (tổng 24 dòng: 3 Cao, 9 Trung bình, 10 Thấp, 2 Chưa có giá nhập)
 

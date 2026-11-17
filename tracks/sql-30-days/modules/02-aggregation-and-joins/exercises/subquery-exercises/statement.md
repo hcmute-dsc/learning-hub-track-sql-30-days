@@ -118,6 +118,8 @@ Kết quả:
 
 **Bài 5.** Với mỗi danh mục có sản phẩm, tìm sản phẩm đắt nhất của danh mục đó.
 
+> Gợi ý: so giá của mỗi sản phẩm với `MAX(price)` của chính danh mục đó (subquery tương quan).
+
 <details>
 <summary>Đáp án</summary>
 
@@ -147,6 +149,8 @@ Nếu hai sản phẩm cùng danh mục bằng giá cao nhất, cả hai đều 
 </details>
 
 **Bài 6.** Trong năm 2025, tháng nào có nhiều đơn nhất (tính mọi trạng thái)? Nếu nhiều tháng bằng nhau thì in hết. Dùng CTE.
+
+> Gợi ý: CTE đếm số đơn mỗi tháng, rồi so với `MAX` của chính CTE đó.
 
 <details>
 <summary>Đáp án</summary>
@@ -180,6 +184,8 @@ Dùng `ORDER BY so_don DESC LIMIT 1` sẽ chỉ in một trong hai tháng, mất
 
 **Bài 7.** Tìm khách chỉ mua online: đã có ít nhất một đơn, nhưng chưa từng có đơn `offline`.
 
+> Gợi ý: cần hai điều kiện cùng lúc: `EXISTS` (có đơn) và `NOT EXISTS` (có đơn offline).
+
 <details>
 <summary>Đáp án</summary>
 
@@ -206,6 +212,8 @@ Thiếu điều kiện `EXISTS` thứ nhất thì khách 16, 17 (chưa mua gì) 
 </details>
 
 **Bài 8.** Danh mục nào chiếm trên 20% tổng doanh thu (đơn có `status NOT IN ('pending', 'cancelled')`)? In doanh thu và tỷ lệ phần trăm, làm tròn 1 chữ số thập phân.
+
+> Gợi ý: CTE tính doanh thu từng danh mục, rồi so mỗi dòng với tổng của chính CTE đó bằng subquery vô hướng.
 
 <details>
 <summary>Đáp án</summary>

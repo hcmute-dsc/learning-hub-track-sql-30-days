@@ -1,0 +1,159 @@
+uid: "727a45dc-c45e-456a-bfba-9771fbe897bb"
+slug: "final-quiz"
+title: "Quiz tổng kết 30 ngày SQL"
+type: "quiz"
+difficulty: "medium"
+lesson: "summary"
+tags:
+  - "sql"
+authors:
+  - "github:TienNHM"
+license: "MIT"
+spec:
+  shuffle: false
+  passScore: 0.7
+  questions:
+    - id: "null-compare"
+      type: "single"
+      prompt: "`SELECT NULL = NULL;` trả về gì?"
+      options:
+        - "TRUE"
+        - "FALSE"
+        - "NULL"
+        - "Báo lỗi"
+      answer: 2
+      explanation: "So sánh với NULL cho kết quả NULL (logic ba trị). Muốn kiểm tra NULL phải dùng `IS NULL` (Ngày 3)."
+    - id: "count-null"
+      type: "short_text"
+      prompt: "Bảng `customers` của DSC Shop có 18 khách, trong đó 2 khách không để lại email (`email` là NULL). `SELECT COUNT(email) FROM customers;` trả về bao nhiêu?"
+      answer:
+        - "16"
+      explanation: "`COUNT(cot)` bỏ qua NULL, còn `COUNT(*)` đếm mọi dòng (18) (Ngày 8)."
+    - id: "where-vs-having"
+      type: "single"
+      prompt: "Muốn chỉ giữ những khách có **trên 2 đơn** sau khi `GROUP BY customer_id`, điều kiện `COUNT(*) > 2` đặt ở đâu?"
+      options:
+        - "WHERE"
+        - "HAVING"
+        - "ORDER BY"
+        - "ON của JOIN"
+      answer: 1
+      explanation: "WHERE lọc từng dòng trước khi gom nhóm nên không dùng được hàm tổng hợp; HAVING lọc nhóm sau GROUP BY (Ngày 9)."
+    - id: "join-multiply"
+      type: "short_text"
+      prompt: "DSC Shop có 40 đơn và 60 dòng hàng, đơn nào cũng có ít nhất một dòng hàng. `SELECT COUNT(*) FROM orders o JOIN order_items oi ON oi.order_id = o.order_id;` trả về bao nhiêu?"
+      answer:
+        - "60"
+      explanation: "JOIN 1-n nhân dòng: mỗi đơn xuất hiện một lần cho mỗi dòng hàng của nó. Muốn đếm đơn phải dùng `COUNT(DISTINCT o.order_id)` (Ngày 10)."
+    - id: "not-in-null"
+      type: "single"
+      prompt: "`SELECT 1 WHERE 3 NOT IN (1, 2, NULL);` trả về mấy dòng?"
+      options:
+        - "0 dòng"
+        - "1 dòng"
+        - "Báo lỗi"
+      answer: 0
+      explanation: "`3 NOT IN (1, 2, NULL)` nghĩa là `3 <> 1 AND 3 <> 2 AND 3 <> NULL`; vế cuối là NULL nên cả biểu thức là NULL, không phải TRUE. Đây là lý do nên dùng `NOT EXISTS` (Ngày 11, 28)."
+    - id: "anti-join"
+      type: "multiple"
+      prompt: "Trên DSC Shop, khách nào **chưa từng đặt đơn**? Chọn mọi `customer_id` đúng."
+      options:
+        - "15"
+        - "16"
+        - "17"
+        - "18"
+      answer:
+        - 1
+        - 2
+      explanation: "`LEFT JOIN orders ... WHERE o.order_id IS NULL` hoặc `NOT EXISTS` trả về khách 16 và 17 (Ngày 10, 11)."
+    - id: "sargable"
+      type: "multiple"
+      prompt: "Bảng có index B-tree trên `order_date` (kiểu `TIMESTAMPTZ`). Điều kiện nào PostgreSQL dùng được index để tìm?"
+      options:
+        - "`order_date >= '2025-03-01' AND order_date < '2025-03-02'`"
+        - "`date_trunc('day', order_date) = '2025-03-01'`"
+        - "`order_date::date = '2025-03-01'`"
+        - "`order_date BETWEEN '2025-03-01' AND '2025-03-02'`"
+      answer:
+        - 0
+        - 3
+      explanation: "Điều kiện sargable để cột \"trần\" một bên. Bọc hàm hay ép kiểu quanh cột thì index trên cột không dùng được (Ngày 15, 28). `BETWEEN` dùng được index nhưng gồm cả mốc 00:00 ngày 2/3, nên lọc theo ngày vẫn nên dùng khoảng nửa mở."
+    - id: "explain-analyze"
+      type: "single"
+      prompt: "Lệnh nào **chạy thật** câu truy vấn và cho thời gian, số dòng thực tế của từng bước trong plan?"
+      options:
+        - "`EXPLAIN`"
+        - "`EXPLAIN ANALYZE`"
+        - "`ANALYZE ten_bang`"
+        - "`VACUUM`"
+      answer: 1
+      explanation: "`EXPLAIN` chỉ in plan dự kiến; `EXPLAIN ANALYZE` chạy thật, nên với `UPDATE`/`DELETE` phải bọc trong `BEGIN ... ROLLBACK`. `ANALYZE ten_bang` cập nhật thống kê (Ngày 20)."
+    - id: "sequence-rollback"
+      type: "single"
+      prompt: "Đơn mới nhất có `order_id` 40. Bạn chạy `BEGIN; INSERT INTO orders ... RETURNING order_id; ROLLBACK;` (nhận 41), rồi INSERT thêm một đơn và `COMMIT`. Đơn đó có `order_id` bao nhiêu?"
+      options:
+        - "41"
+        - "42"
+        - "40"
+        - "Báo lỗi trùng khóa"
+      answer: 1
+      explanation: "Sequence không quay lui khi `ROLLBACK`, nên id có thể nhảy số. Đừng dựa vào id liên tục (Ngày 16, 30)."
+    - id: "isolation-default"
+      type: "single"
+      prompt: "Isolation level mặc định của PostgreSQL là gì?"
+      options:
+        - "READ UNCOMMITTED"
+        - "READ COMMITTED"
+        - "REPEATABLE READ"
+        - "SERIALIZABLE"
+      answer: 1
+      explanation: "`SHOW default_transaction_isolation;` cho `read committed`: mỗi câu lệnh thấy dữ liệu đã commit tại thời điểm câu đó bắt đầu (Ngày 16)."
+    - id: "rank"
+      type: "single"
+      prompt: "Các giá trị 100, 90, 90, 80 được xếp hạng bằng `RANK() OVER (ORDER BY v DESC)`. Giá trị 80 được hạng mấy?"
+      options:
+        - "2"
+        - "3"
+        - "4"
+      answer: 2
+      explanation: "`RANK` cho 1, 2, 2, 4: đồng hạng rồi nhảy số. `DENSE_RANK` cho 1, 2, 2, 3 (Ngày 29)."
+    - id: "default-frame"
+      type: "single"
+      prompt: "`SUM(x) OVER (ORDER BY ngay)` không ghi khung thì dùng khung mặc định nào?"
+      options:
+        - "`ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW`"
+        - "`RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW`"
+        - "`ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING`"
+        - "Cả partition"
+      answer: 1
+      explanation: "Có `ORDER BY` mà không ghi khung thì mặc định là `RANGE ... CURRENT ROW`: các dòng trùng `ngay` được cộng cùng lúc. Muốn lũy kế từng dòng, ghi rõ `ROWS` (Ngày 29)."
+    - id: "recursive-stop"
+      type: "single"
+      prompt: "CTE đệ quy (`WITH RECURSIVE`) dừng khi nào?"
+      options:
+        - "Khi một vòng của phần đệ quy không sinh thêm dòng mới"
+        - "Sau đúng 100 vòng"
+        - "Khi phần đệ quy gặp giá trị NULL"
+        - "Khi phần neo trả về 0 dòng ở vòng sau"
+      answer: 0
+      explanation: "Mỗi vòng chỉ JOIN với các dòng vòng trước vừa sinh ra; vòng nào không sinh dòng mới thì dừng. Dữ liệu có vòng lặp thì phải chặn bằng mảng đường đi hoặc `CYCLE` (Ngày 29)."
+    - id: "sql-injection"
+      type: "single"
+      prompt: "Cách nào chặn SQL injection tận gốc khi đưa input người dùng vào câu truy vấn?"
+      options:
+        - "Tự thay `'` bằng `''` trước khi ghép chuỗi"
+        - "Truy vấn tham số hóa (`%s` trong psycopg, `$1` trong pg)"
+        - "Giới hạn độ dài input"
+        - "Đặt câu SQL ghép chuỗi vào function PL/pgSQL rồi `EXECUTE`"
+      answer: 1
+      explanation: "Với truy vấn tham số hóa, cấu trúc câu được chốt trước, giá trị gửi riêng nên chỉ có thể là dữ liệu. Quyền tối thiểu là lớp phòng thủ thứ hai (Ngày 23, 30)."
+    - id: "normalization"
+      type: "single"
+      prompt: "Bảng `dong_hang(order_id, product_id, quantity, product_name)` có khóa chính `(order_id, product_id)`, và `product_name` chỉ phụ thuộc `product_id`. Bảng vi phạm dạng chuẩn nào đầu tiên?"
+      options:
+        - "1NF"
+        - "2NF"
+        - "3NF"
+        - "Không vi phạm"
+      answer: 1
+      explanation: "`product_name` phụ thuộc vào một phần của khóa ghép (phụ thuộc bộ phận) nên vi phạm 2NF. Tách `product_name` sang bảng sản phẩm (Ngày 27)."

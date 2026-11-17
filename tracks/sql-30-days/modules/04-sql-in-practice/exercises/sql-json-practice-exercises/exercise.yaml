@@ -11,6 +11,7 @@ authors:
 license: "MIT"
 spec:
   checklist:
-    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
-    - "Kết quả của mình khớp với kết quả trong đáp án"
-    - "Đọc lại phần lý thuyết của những bài làm sai"
+    - "Lấy giá trị JSONB bằng `->>` và ép kiểu khi so sánh hoặc sắp xếp số (Bài 1, 5)"
+    - "Tách mảng bằng `jsonb_array_elements_text` và dựng JSON lồng nhau mà không bị nhân dòng (Bài 6, 7)"
+    - "Tạo được `product_colors` có khóa chính, khóa ngoại và thấy đủ hai lỗi constraint (Bài 8)"
+    - "So sánh được kích thước và các toán tử dùng được index của GIN mặc định với `jsonb_path_ops` (Bài 9)"

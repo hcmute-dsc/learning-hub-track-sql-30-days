@@ -20,7 +20,7 @@ authors:
 license: "MIT"
 ---
 
-> **Tóm tắt:** Bài ôn tập chặng 3: index, transaction, function và procedure, trigger, view, đọc plan bằng `EXPLAIN`. Phần đầu là bảng tóm tắt và câu hỏi kiểm tra khái niệm, phần sau là 10 bài tập chạy trên DSC Shop (schema `shop`) và dữ liệu lớn (schema `perf`), có đáp án và số đo thật.
+> **Tóm tắt:** Bài ôn tập chặng 3: index, transaction, function và procedure, trigger, view, đọc plan bằng `EXPLAIN`. Trang này có bảng tóm tắt kiến thức chặng 3. Câu hỏi kiểm tra khái niệm và 10 bài tập chạy trên DSC Shop (schema `shop`) và dữ liệu lớn (schema `perf`), có đáp án và số đo thật, nằm ở trang **Bài tập: Ôn tập 3 (Ngày 15-20)**.
 
 **Sau bài này bạn có thể:**
 
@@ -45,7 +45,7 @@ license: "MIT"
 | --- | --- | --- |
 | 15 | Index | B-tree giúp tìm ít dòng trong bảng lớn. Index nhiều cột dùng được khi điều kiện chạm cột đầu tiên (tiền tố trái). Partial index chỉ chứa dòng thỏa `WHERE`. Mỗi index làm chậm `INSERT`/`UPDATE` và tốn chỗ. PostgreSQL không tự tạo index cho khóa ngoại. |
 | 16 | Transaction | `BEGIN` ... `COMMIT`/`ROLLBACK`: tất cả hoặc không gì cả. Một lệnh lỗi làm transaction hỏng, chỉ còn `ROLLBACK` được. `SELECT ... FOR UPDATE` khóa dòng để tránh lost update. |
-| 17 | Function, procedure | Function trả về giá trị, gọi trong `SELECT`. Procedure gọi bằng `CALL`, được `COMMIT` bên trong. `RAISE EXCEPTION` dừng và hủy mọi thay đổi chưa commit. |
+| 17 | Function, procedure | Function trả về giá trị, gọi trong `SELECT`. Procedure gọi bằng `CALL`, được `COMMIT` bên trong. `RAISE EXCEPTION` dừng và hủy thay đổi của câu lệnh/transaction đang chạy (hoặc chỉ của khối `BEGIN ... EXCEPTION` nếu lỗi được bắt ở đó). |
 | 18 | Trigger | Chạy tự động trước/sau `INSERT`/`UPDATE`/`DELETE`. Tiện nhưng là "logic ẩn": người gọi không thấy, dễ trùng việc với code ứng dụng. |
 | 19 | View | View thường chỉ lưu câu `SELECT`, không nhanh hơn. Materialized view lưu kết quả, phải `REFRESH`. `WITH CHECK OPTION` chặn ghi dữ liệu ngoài view. |
 | 20 | EXPLAIN | `EXPLAIN` cho plan ước lượng, `EXPLAIN ANALYZE` chạy thật và cho số thật. So `rows` ước lượng với `actual rows`. Seq Scan không phải lúc nào cũng xấu. |

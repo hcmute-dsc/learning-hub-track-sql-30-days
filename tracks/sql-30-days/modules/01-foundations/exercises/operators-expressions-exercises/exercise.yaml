@@ -2,7 +2,7 @@ uid: "c6722be6-b9cb-5664-b200-1a514f2aec69"
 slug: "operators-expressions-exercises"
 title: "Bài tập: Toán tử, biểu thức và hàm thường dùng"
 type: "self_check"
-difficulty: "easy"
+difficulty: "medium"
 lesson: "operators-expressions"
 tags:
   - "sql"
@@ -11,6 +11,7 @@ authors:
 license: "MIT"
 spec:
   checklist:
-    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
-    - "Kết quả của mình khớp với kết quả trong đáp án"
-    - "Đọc lại phần lý thuyết của những bài làm sai"
+    - "Kết quả khớp đáp án, kể cả số chữ số thập phân sau `ROUND`"
+    - "Tránh được chia nguyên và chia cho 0 (`100.0`, `::NUMERIC`, `NULLIF`)"
+    - "Xử lý NULL trong biểu thức bằng `COALESCE` mà không biến \"chưa biết\" thành 0 sai nghĩa"
+    - "Dùng đúng hàm chuỗi và ngày giờ (`TRIM`, `LOWER`, `TO_CHAR`, `EXTRACT`, `AGE`, `INTERVAL`)"

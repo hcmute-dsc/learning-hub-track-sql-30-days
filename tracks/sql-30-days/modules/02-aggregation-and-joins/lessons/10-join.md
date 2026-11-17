@@ -140,7 +140,7 @@ Hai chi tiết quan trọng:
 - Đếm `COUNT(o.order_id)`, không đếm `COUNT(*)`. Với khách 16, dòng kết quả vẫn tồn tại (chỉ có cột của `orders` là NULL), nên `COUNT(*)` ra 1. `COUNT(o.order_id)` bỏ qua NULL nên ra 0.
 - Nhóm theo `c.customer_id`, không nhóm chỉ theo `c.full_name`: hai khách tên `Nguyễn Văn An` sẽ bị gộp làm một.
 
-PostgreSQL cho phép chọn `c.full_name` vì đã nhóm theo khóa chính `c.customer_id` (mỗi `customer_id` chỉ có một tên). Thêm `c.full_name` vào `GROUP BY` như trên thì chạy được ở mọi hệ quản trị.
+Thật ra PostgreSQL vẫn chạy nếu bạn bỏ `c.full_name` khỏi `GROUP BY`, vì đã nhóm theo khóa chính `c.customer_id` (mỗi `customer_id` chỉ có một tên). Ghi thêm `c.full_name` vào `GROUP BY` như trên thì chạy được ở mọi hệ quản trị.
 
 ## 4. Bốn kiểu JOIN trên cùng một cặp bảng
 
@@ -339,7 +339,7 @@ WHERE oi.product_id IS NULL;
 | --- | --- |
 | ACC-009 | Lót chuột DSC XXL |
 
-Kiểm tra `IS NULL` trên một cột không bao giờ NULL khi khớp (khóa chính hoặc cột trong `ON`), như `o.order_id`. Nếu kiểm tra một cột vốn có thể NULL, như `o.note`, bạn sẽ lẫn cả các đơn có thật nhưng không ghi chú. Ngày 11 sẽ học cách viết khác cho cùng câu hỏi: `NOT EXISTS`.
+Hãy kiểm tra `IS NULL` trên một cột không bao giờ NULL khi đã ghép được (khóa chính hoặc cột trong `ON`), như `o.order_id`. Nếu kiểm tra một cột vốn có thể NULL, như `o.note`, bạn sẽ lẫn cả các đơn có thật nhưng không ghi chú. Ngày 11 sẽ học cách viết khác cho cùng câu hỏi: `NOT EXISTS`.
 
 ## 9. Bẫy 1: điều kiện ở WHERE biến LEFT JOIN thành INNER JOIN
 
@@ -437,7 +437,7 @@ WHERE o.order_id = 12;
 
 `order_items` và `payments` đều là bảng con của `orders`, nhưng giữa chúng không có quan hệ gì. JOIN cả hai vào cùng một đơn thì mỗi dòng hàng được ghép với từng lần thanh toán: 2 × 2 = 4 dòng. Một đơn có 3 dòng hàng và 2 lần trả sẽ ra 6 dòng. Lỗi này nguy hiểm vì câu lệnh chạy bình thường, số trông hợp lý, và với đơn chỉ có 1 lần thanh toán thì kết quả lại đúng.
 
-Cách sửa: tổng hợp từng bảng con riêng (mỗi đơn còn một dòng), rồi mới JOIN. Việc này cần truy vấn con trong `FROM`, sẽ học kỹ ở [Ngày 11](11-subquery.md). Ở đây chỉ cần hiểu mỗi cặp ngoặc là một bảng tạm đã được `GROUP BY order_id`:
+Cách sửa: tổng hợp từng bảng con riêng (mỗi đơn còn một dòng), rồi mới JOIN. Việc này cần truy vấn con trong `FROM`, sẽ học kỹ ở [Ngày 11](11-subquery.md). Ở đây chỉ cần hiểu mỗi phần trong ngoặc là một derived table (bảng kết quả của một subquery) đã được `GROUP BY order_id`:
 
 ```sql
 SELECT o.order_id, h.tien_hang, t.da_thanh_toan

@@ -2,7 +2,7 @@
 
 ## Bài tập
 
-Khôi phục dữ liệu gốc trước khi làm. Bài 3 và Bài 4 cần trigger `trg_order_items_decrease_stock` của mục 5; Bài 7 cần thêm procedure `place_order` của [Ngày 17](../../lessons/17-stored-procedures-functions.md) mục 6.
+Khôi phục dữ liệu gốc trước khi làm. Bài 3 và Bài 4 bổ sung những trường hợp mà trigger `trg_order_items_decrease_stock` ([Ngày 18](../../lessons/18-triggers.md) mục 5) chưa xử lý, và tự tạo trigger riêng. Bài 7 cần trigger đó cùng procedure `place_order` của [Ngày 17](../../lessons/17-stored-procedures-functions.md) mục 6.
 
 ### Cơ bản
 
@@ -113,7 +113,7 @@ Nếu đơn không tồn tại, `v_channel` là NULL và hàm áp mức 50%; cò
 
 ### Vận dụng
 
-**Bài 3.** Trigger ở mục 5 chỉ trừ kho khi thêm dòng hàng. Viết trigger AFTER DELETE trên `order_items` để trả lại kho khi xóa dòng hàng. Thử xóa toàn bộ dòng hàng của đơn 40 (một Xiaomi Redmi Note 13, sản phẩm 12) và so sánh tồn kho trước và sau.
+**Bài 3.** Trigger ở Ngày 18, mục 5 chỉ trừ kho khi thêm dòng hàng. Viết trigger AFTER DELETE trên `order_items` để trả lại kho khi xóa dòng hàng. Thử xóa toàn bộ dòng hàng của đơn 40 (một Xiaomi Redmi Note 13, sản phẩm 12) và so sánh tồn kho trước và sau.
 
 <details>
 <summary>Đáp án</summary>
@@ -158,6 +158,8 @@ sau khi xóa (`DELETE 1`)
 </details>
 
 **Bài 4.** Viết trigger AFTER UPDATE OF quantity trên `order_items` để điều chỉnh kho theo chênh lệch số lượng: tăng số lượng thì trừ thêm kho (không đủ hàng thì báo lỗi), giảm số lượng thì trả lại kho. Chỉ chạy khi số lượng thật sự đổi. Thử: đơn 39 sản phẩm 10 (iPhone 15, tồn 15) từ 2 lên 3 rồi xuống 1; đơn 36 sản phẩm 2 (Lenovo, tồn 3) từ 1 lên 5.
+
+> Gợi ý: phần chênh lệch là `NEW.quantity - OLD.quantity`; điều kiện `WHEN (...)` trong `CREATE TRIGGER` giúp trigger chỉ chạy khi số lượng thật sự đổi.
 
 <details>
 <summary>Đáp án</summary>
@@ -341,7 +343,7 @@ Trigger mức câu lệnh chạy một lần sau khi mọi dòng đã sửa, nh�
 
 </details>
 
-**Bài 7.** Khôi phục dữ liệu gốc, tạo trigger `trg_order_items_decrease_stock` (mục 5) và procedure `place_order` (Ngày 17, mục 6). Dự đoán tồn kho chuột G102 (sản phẩm 16, đang có 60) sau `CALL place_order(16, 16, 2, NULL);`, chạy thử, giải thích và đề xuất cách sửa.
+**Bài 7.** Khôi phục dữ liệu gốc, tạo trigger `trg_order_items_decrease_stock` (Ngày 18, mục 5) và procedure `place_order` (Ngày 17, mục 6). Dự đoán tồn kho chuột G102 (sản phẩm 16, đang có 60) sau `CALL place_order(16, 16, 2, NULL);`, chạy thử, giải thích và đề xuất cách sửa.
 
 <details>
 <summary>Đáp án</summary>

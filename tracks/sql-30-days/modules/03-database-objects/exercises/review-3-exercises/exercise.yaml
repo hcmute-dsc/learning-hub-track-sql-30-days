@@ -2,7 +2,7 @@ uid: "2cd770c7-b2e6-5cae-acba-6e71198bff58"
 slug: "review-3-exercises"
 title: "Bài tập: Ôn tập 3 (Ngày 15-20)"
 type: "self_check"
-difficulty: "medium"
+difficulty: "hard"
 lesson: "review-3"
 tags:
   - "sql"

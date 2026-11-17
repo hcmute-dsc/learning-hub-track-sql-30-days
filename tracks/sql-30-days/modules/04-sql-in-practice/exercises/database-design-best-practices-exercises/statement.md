@@ -16,6 +16,8 @@ Các đáp án tạo bảng trong schema `bai_tap`, mỗi đáp án tự tạo l
 
 **Bài 2.** Liệu `customer_id → shipping_city` có đúng trong `orders` không? Viết truy vấn kiểm tra trên dữ liệu, rồi cho biết có nên chuyển `shipping_city` sang bảng `customers` không.
 
+> Gợi ý: Đếm `count(DISTINCT shipping_city)` theo `customer_id` rồi `HAVING ... > 1`, như mục 4.2 của bài học.
+
 <details>
 <summary>Đáp án</summary>
 
@@ -79,9 +81,9 @@ Kết quả:
 
 | full_name | phong_ban | quan_ly |
 | --- | --- | --- |
-| Lê Thị Hạnh | Kinh doanh | |
+| Lê Thị Hạnh | Kinh doanh | NULL |
 | Phạm Thị Thu | Kinh doanh | Lê Thị Hạnh |
-| Trần Quốc Bảo | Kỹ thuật | |
+| Trần Quốc Bảo | Kỹ thuật | NULL |
 | Lâm Gia Huy | Kỹ thuật | Trần Quốc Bảo |
 </details>
 
@@ -91,6 +93,8 @@ Kết quả:
 orders(order_id, order_date, customer_name, customer_phone, product_name, product_price, quantity)
 -- một đơn có thể có nhiều sản phẩm, mỗi sản phẩm một dòng
 ```
+
+> Gợi ý: Khóa của bảng gốc không còn là `order_id`. Liệt kê mỗi cột phụ thuộc vào cột nào trước khi tách bảng.
 
 <details>
 <summary>Đáp án</summary>
@@ -158,6 +162,8 @@ Không có cột tổng tiền: đó là dữ liệu dẫn xuất. Nếu muốn 
 </details>
 
 **Bài 5.** DSC Shop thêm hai tính năng: (a) mỗi khách có nhiều địa chỉ giao hàng, tối đa một địa chỉ mặc định; (b) khách đánh giá sản phẩm từ 1 tới 5 sao, mỗi khách chỉ một đánh giá cho mỗi sản phẩm. Thiết kế bảng (trỏ tới `shop.customers`, `shop.products`) sao cho cơ sở dữ liệu tự chặn dữ liệu sai, rồi thử chèn dữ liệu vi phạm.
+
+> Gợi ý: "Tối đa một địa chỉ mặc định" là `UNIQUE` chỉ áp dụng cho các dòng `is_default`: nghĩ tới partial unique index (Ngày 15).
 
 <details>
 <summary>Đáp án</summary>
@@ -261,6 +267,8 @@ WHERE NOT EXISTS (
 
 **Bài 6.** Bảng `nguon_hang(sku, nha_cung_cap, nguoi_lien_he)` ghi mỗi sản phẩm được nhập từ nhà cung cấp nào, qua người liên hệ nào. Quy tắc: mỗi người liên hệ chỉ làm cho một nhà cung cấp (`nguoi_lien_he → nha_cung_cap`); với mỗi sản phẩm, mỗi nhà cung cấp chỉ cử một người liên hệ (`(sku, nha_cung_cap) → nguoi_lien_he`). Tìm các khóa ứng viên. Bảng đạt dạng chuẩn cao nhất nào? Nếu tách lên BCNF thì mất gì?
 
+> Gợi ý: Tìm mọi tập cột xác định được cả ba cột, rồi xét phụ thuộc `nguoi_lien_he → nha_cung_cap` theo định nghĩa 3NF và BCNF ở mục 5.
+
 <details>
 <summary>Đáp án</summary>
 
@@ -271,6 +279,8 @@ WHERE NOT EXISTS (
 </details>
 
 **Bài 7.** Trang quản trị cần tổng tiền của mọi đơn, mở hàng trăm lần mỗi phút, chấp nhận số liệu cũ vài phút. Hãy phi chuẩn hóa bằng materialized view (không sửa bảng `orders`), kiểm tra tổng của đơn 12 và 31, và cho thấy view không tự cập nhật khi dữ liệu gốc đổi.
+
+> Gợi ý: Sửa dữ liệu gốc trong `BEGIN ... ROLLBACK` rồi đọc view trước và sau `REFRESH`.
 
 <details>
 <summary>Đáp án</summary>

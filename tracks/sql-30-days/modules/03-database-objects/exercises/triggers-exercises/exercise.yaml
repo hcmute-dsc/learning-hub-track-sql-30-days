@@ -2,7 +2,7 @@ uid: "d155db9e-9e5e-5cf0-a799-fa0f68f45387"
 slug: "triggers-exercises"
 title: "Bài tập: Trigger"
 type: "self_check"
-difficulty: "medium"
+difficulty: "hard"
 lesson: "triggers"
 tags:
   - "sql"
@@ -12,5 +12,7 @@ license: "MIT"
 spec:
   checklist:
     - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
-    - "Kết quả của mình khớp với kết quả trong đáp án"
-    - "Đọc lại phần lý thuyết của những bài làm sai"
+    - "Tồn kho, trạng thái đơn và bảng log sau khi chạy các câu thử khớp với đáp án"
+    - "Chọn đúng BEFORE/AFTER, ROW/STATEMENT cho từng bài và trả về đúng NEW, OLD hoặc NULL"
+    - "Giải thích được vì sao trigger và procedure cùng trừ kho thì kho bị trừ hai lần (Bài 7)"
+    - "Xóa các trigger thử nghiệm (hoặc khôi phục dữ liệu gốc) sau khi làm xong"

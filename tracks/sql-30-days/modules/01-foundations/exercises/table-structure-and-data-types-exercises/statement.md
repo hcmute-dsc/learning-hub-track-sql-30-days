@@ -2,7 +2,7 @@
 
 ## Bài tập
 
-Tất cả bài tập làm trong schema `nhap` (tạo bằng khối "Khu vực nháp" ở đầu bài học, chạy một lần). Nếu vừa mở phiên mới, chỉ chạy lại `SET search_path = nhap, shop, public;` (đừng chạy `DROP SCHEMA`, sẽ mất các bảng đã tạo ở bài trước).
+Tất cả bài tập làm trong schema `nhap` (tạo bằng khối [Khu vực nháp](../../lessons/02-table-structure-and-data-types.md#khu-vực-nháp-cho-bài-hôm-nay) của bài học, chạy một lần). Nếu vừa mở phiên mới, chỉ chạy lại `SET search_path = nhap, shop, public;` (đừng chạy `DROP SCHEMA`, sẽ mất các bảng đã tạo ở bài trước).
 
 ### Cơ bản
 
@@ -79,7 +79,7 @@ Kết quả:
 | supplier_id | name | tax_code | email | city | is_active |
 | --- | --- | --- | --- | --- | --- |
 | 1 | Công ty Phân phối Số Việt | 0301234567 | sales@sovietdist.vn | TP. Hồ Chí Minh | t |
-| 2 | Nhà phân phối Linh Kiện Xanh | 0109876543 | | | t |
+| 2 | Nhà phân phối Linh Kiện Xanh | 0109876543 | NULL | NULL | t |
 </details>
 
 ### Vận dụng
@@ -122,6 +122,8 @@ Indexes:
 </details>
 
 **Bài 5.** Tạo bảng `product_reviews` (đánh giá sản phẩm của khách DSC Shop): mã tự tăng; sản phẩm và khách hàng (bắt buộc, là khóa ngoại tới `shop.products` và `shop.customers`); số sao từ 1 đến 5 (dùng `SMALLINT`); bình luận; thời điểm tạo. Mỗi khách chỉ được đánh giá mỗi sản phẩm một lần. Sau đó thử bốn lệnh: khách 1 đánh giá iPhone 15 (product 10) 5 sao kèm bình luận "Máy đẹp, pin ổn"; khách 2 đánh giá sản phẩm 10 với 6 sao; khách 1 đánh giá lại sản phẩm 10 với 4 sao; khách 1 đánh giá sản phẩm 99. Lệnh nào thành công, lệnh nào lỗi, vì sao?
+
+> Gợi ý: "Mỗi khách chỉ đánh giá mỗi sản phẩm một lần" là một ràng buộc `UNIQUE` trên **hai** cột.
 
 <details>
 <summary>Đáp án</summary>
@@ -201,7 +203,9 @@ DETAIL:  A field with precision 3, scale 2 must round to an absolute value less 
 - Phí giao (VNĐ) không âm, mặc định 0.
 - Thời điểm gửi hàng bắt buộc; thời điểm giao xong có thể chưa có, nhưng nếu có thì không được sớm hơn lúc gửi.
 
-Thử thêm: đơn 1 gửi bằng GHN lúc `2025-01-13 09:00+07`, giao xong `2025-01-15 16:00+07`, phí 30.000; đơn 2 gửi bằng GHTK lúc `2025-01-21 08:00+07`, chưa giao xong; đơn 3 gửi lúc `2025-02-04 08:00+07` nhưng giao xong `2025-02-02 08:00+07`; đơn 1 gửi thêm lần nữa bằng GHTK.
+Thử thêm: đơn 1 gửi bằng GHN lúc `2025-01-13 09:00+07`, giao xong `2025-01-15 16:00+07`, phí 30.000; đơn 2 gửi bằng GHTK lúc `2025-01-21 08:00+07`, chưa giao xong; đơn 3 gửi bằng GHN lúc `2025-02-04 08:00+07` nhưng giao xong `2025-02-02 08:00+07`; đơn 1 gửi thêm lần nữa bằng GHTK lúc `2025-01-14 08:00+07`.
+
+> Gợi ý: điều kiện liên quan tới hai cột viết thành `CHECK` cấp bảng (sau danh sách cột); "tối đa một lần giao" là `UNIQUE` trên `order_id`.
 
 <details>
 <summary>Đáp án</summary>
@@ -241,13 +245,13 @@ DETAIL:  Key (order_id)=(1) already exists.
 | shipment_id | order_id | carrier | fee | shipped_at | delivered_at |
 | --- | --- | --- | --- | --- | --- |
 | 1 | 1 | GHN | 30000 | 2025-01-13 09:00:00+07 | 2025-01-15 16:00:00+07 |
-| 2 | 2 | GHTK | 0 | 2025-01-21 08:00:00+07 | |
+| 2 | 2 | GHTK | 0 | 2025-01-21 08:00:00+07 | NULL |
 
 Các điểm mấu chốt:
 
 - `UNIQUE` trên `order_id` biến quan hệ thành 1-1: mỗi đơn tối đa một lần giao.
 - `CHECK (delivered_at >= shipped_at)` là ràng buộc **cấp bảng** vì liên quan hai cột, viết sau danh sách cột.
-- Đơn 2 có `delivered_at` là NULL, điều kiện `NULL >= shipped_at` cho kết quả không xác định, và `CHECK` vẫn nhận dòng. Ở đây đó đúng là điều ta muốn (chưa giao xong), nhưng hãy nhớ hiện tượng này: `CHECK` không thay được `NOT NULL`. Ngày 3 giải thích logic ba trị đứng sau.
+- Đơn 2 có `delivered_at` là NULL, điều kiện `NULL >= shipped_at` cho kết quả không xác định, và `CHECK` vẫn nhận dòng. Ở đây đó đúng là điều ta muốn (chưa giao xong), nhưng hãy nhớ hiện tượng này: `CHECK` không thay được `NOT NULL`. [Ngày 3](../../lessons/03-select-where.md) giải thích logic ba trị đứng sau.
 </details>
 
 **Bài 8.** `order_items` và `payments` đều trỏ tới `orders`, nhưng chỉ `order_items` có `ON DELETE CASCADE`. Thử xóa đơn 1 trong một transaction rồi hủy (`BEGIN ... ROLLBACK`, để chắc chắn không mất dữ liệu). Chuyện gì xảy ra với các dòng `order_items` của đơn 1? Vì sao thiết kế này hợp lý?

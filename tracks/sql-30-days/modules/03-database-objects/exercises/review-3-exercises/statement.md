@@ -118,7 +118,7 @@ WHERE customer_id = 4242;
  Execution Time: 0.041 ms
 ```
 
-Trên máy mình: khoảng 17-35 ms trước, 0,04-0,2 ms sau (lần đầu chậm hơn vì dữ liệu chưa nằm trong bộ nhớ đệm). Máy bạn sẽ ra số khác. Plan chuyển sang Bitmap Index Scan: tìm 9 vị trí trong index, rồi chỉ đọc 9 trang của bảng (`Heap Blocks: exact=9`). Index này nặng khoảng 9 MB, bảng 64 MB (`pg_size_pretty(pg_relation_size('perf.idx_perf_orders_customer'))`).
+Trên máy tác giả: khoảng 17-35 ms trước, 0,04-0,2 ms sau (lần đầu chậm hơn vì dữ liệu chưa nằm trong bộ nhớ đệm). Máy bạn sẽ ra số khác. Plan chuyển sang Bitmap Index Scan: tìm 9 vị trí trong index, rồi chỉ đọc 9 trang của bảng (`Heap Blocks: exact=9`). Index này nặng khoảng 9 MB, bảng 64 MB (`pg_size_pretty(pg_relation_size('perf.idx_perf_orders_customer'))`).
 
 ```sql
 DROP INDEX perf.idx_perf_orders_customer;
@@ -353,7 +353,7 @@ DECLARE
     v_stock      INT;
     v_order_id   INT;
 BEGIN
-    IF p_quantity <= 0 THEN
+    IF p_quantity IS NULL OR p_quantity <= 0 THEN
         RAISE EXCEPTION 'Số lượng phải lớn hơn 0 (nhận %)', p_quantity;
     END IF;
 
@@ -423,7 +423,7 @@ ERROR:  Số lượng phải lớn hơn 0 (nhận 0)
 CONTEXT:  PL/pgSQL function place_order(integer,character varying,integer) line 9 at RAISE
 ```
 
-Mỗi lần `RAISE EXCEPTION`, mọi thứ procedure đã làm trong lần gọi đó bị hủy, nên khách 16 vẫn có 0 đơn. `FOR UPDATE` khóa dòng sản phẩm tới khi transaction kết thúc: hai người cùng mua món cuối cùng thì người thứ hai phải chờ, rồi đọc được tồn kho đã bị trừ (câu 5 ở trên).
+Mỗi lần `RAISE EXCEPTION`, mọi thứ procedure đã làm trong lần gọi đó bị hủy, nên khách 16 vẫn có 0 đơn. `FOR UPDATE` khóa dòng sản phẩm tới khi transaction kết thúc: hai người cùng mua món cuối cùng thì người thứ hai phải chờ, rồi đọc được tồn kho đã bị trừ (Câu 5 trong phần "Câu hỏi kiểm tra khái niệm").
 </details>
 
 **Bài 7. Trigger và bẫy trừ kho hai lần.** Tạo trigger `AFTER INSERT` trên `order_items` tự trừ `stock_quantity` theo `NEW.quantity`. Sau đó gọi lại `place_order(16, 'ACC-001', 2)` từ bài 6. Tồn kho còn bao nhiêu, đúng không? Sửa thế nào? Cuối bài xóa trigger.
@@ -432,7 +432,7 @@ Mỗi lần `RAISE EXCEPTION`, mọi thứ procedure đã làm trong lần gọi
 <summary>Đáp án</summary>
 
 ```sql
-CREATE OR REPLACE FUNCTION trg_decrease_stock()
+CREATE OR REPLACE FUNCTION order_items_decrease_stock_fn()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 AS $$
@@ -444,10 +444,10 @@ BEGIN
 END;
 $$;
 
-CREATE TRIGGER order_items_decrease_stock
+CREATE TRIGGER trg_order_items_decrease_stock
 AFTER INSERT ON order_items
 FOR EACH ROW
-EXECUTE FUNCTION trg_decrease_stock();
+EXECUTE FUNCTION order_items_decrease_stock_fn();
 
 BEGIN;
 CALL place_order(16, 'ACC-001', 2);
@@ -475,13 +475,13 @@ ERROR:  new row for relation "products" violates check constraint "products_stoc
 CONTEXT:  SQL statement "UPDATE products
     SET stock_quantity = stock_quantity - NEW.quantity
     WHERE product_id = NEW.product_id"
-PL/pgSQL function trg_decrease_stock() line 3 at SQL statement
+PL/pgSQL function order_items_decrease_stock_fn() line 3 at SQL statement
 ```
 
 Xóa trigger để các bài sau không bị ảnh hưởng:
 
 ```sql
-DROP TRIGGER order_items_decrease_stock ON order_items;
+DROP TRIGGER trg_order_items_decrease_stock ON order_items;
 ```
 </details>
 
@@ -591,7 +591,7 @@ LIMIT 20;
  Execution Time: 0.245 ms
 ```
 
-Từ khoảng 20-33 ms xuống 0,2 ms trên máy mình (đo nhiều lần). Index chỉ chứa đơn `pending`, đã xếp theo `order_date`, nên PostgreSQL đọc ngược từ cuối index (`Index Scan Backward`) và dừng sau 20 dòng, không cần sắp xếp.
+Từ khoảng 20-33 ms xuống 0,2 ms trên máy tác giả (đo nhiều lần). Index chỉ chứa đơn `pending`, đã xếp theo `order_date`, nên PostgreSQL đọc ngược từ cuối index (`Index Scan Backward`) và dừng sau 20 dòng, không cần sắp xếp.
 
 So kích thước (tạo tạm một index thường để so, rồi xóa):
 
@@ -610,7 +610,7 @@ DROP INDEX perf.idx_perf_orders_date_full;
 | idx_perf_orders_pending | 232 kB |
 | idx_perf_orders_date_full | 21 MB |
 
-Partial index nhỏ hơn khoảng 90 lần và chỉ phải cập nhật khi có đơn `pending` thay đổi. Truy vấn với `status = 'shipped'` thì **không** dùng được nó, vì điều kiện không khớp `WHERE status = 'pending'` của index; plan vẫn là Parallel Seq Scan và Sort (khoảng 25-31 ms trên máy mình):
+Partial index nhỏ hơn khoảng 90 lần và chỉ phải cập nhật khi có đơn `pending` thay đổi. Truy vấn với `status = 'shipped'` thì **không** dùng được nó, vì điều kiện không khớp `WHERE status = 'pending'` của index; plan vẫn là Parallel Seq Scan và Sort (khoảng 25-31 ms trên máy tác giả):
 
 ```sql
 EXPLAIN ANALYZE
@@ -659,7 +659,7 @@ WHERE DATE_TRUNC('day', order_date) = '2025-06-15';
  Execution Time: 85.066 ms
 ```
 
-Index có sẵn nhưng không được dùng: PostgreSQL phải tính `DATE_TRUNC` cho cả triệu dòng. Để ý thêm `rows=2083` ước lượng so với `rows=251` thực tế mỗi tiến trình: với điều kiện bọc hàm, planner không có thống kê nên đoán theo tỉ lệ mặc định.
+Index có sẵn nhưng không được dùng: PostgreSQL phải tính `DATE_TRUNC` cho cả triệu dòng. Để ý thêm `rows=2083` ước lượng so với `rows=251` thực tế mỗi tiến trình: với điều kiện bọc hàm, planner không có thống kê nên đoán theo tỷ lệ mặc định.
 
 Viết lại bằng khoảng nửa mở trên chính cột:
 
@@ -682,7 +682,7 @@ WHERE order_date >= '2025-06-15'
  Execution Time: 5.938 ms
 ```
 
-Kết quả hai cách giống nhau (754 đơn, tổng `10883531000`), nhưng thời gian giảm từ khoảng 80 ms xuống 1-6 ms (đo nhiều lần trên máy mình), và ước lượng `rows=741` sát thực tế 754.
+Kết quả hai cách giống nhau (754 đơn, tổng `10883531000`), nhưng thời gian giảm từ khoảng 80 ms xuống 1-6 ms (đo nhiều lần trên máy tác giả), và ước lượng `rows=741` sát thực tế 754.
 
 Thử expression index:
 

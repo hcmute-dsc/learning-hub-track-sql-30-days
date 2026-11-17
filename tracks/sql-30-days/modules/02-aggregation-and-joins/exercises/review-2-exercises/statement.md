@@ -4,6 +4,8 @@
 
 **Bài A1.** Đếm số đơn theo từng trạng thái, sắp theo vòng đời đơn hàng: `pending`, `paid`, `shipped`, `delivered`, rồi `cancelled`.
 
+> Gợi ý: sắp theo chữ cái không ra vòng đời đơn hàng. Dùng `CASE` trong `ORDER BY` để gán số thứ tự cho từng trạng thái.
+
 <details>
 <summary>Đáp án</summary>
 
@@ -34,7 +36,7 @@ Kết quả:
 
 **Bài A2.** Với mỗi kênh bán (`online`, `offline`), tính số đơn đã thanh toán, doanh thu, giá trị trung bình mỗi đơn và đơn lớn nhất.
 
-Gợi ý: "trung bình mỗi đơn" phải tính trên **tổng tiền của đơn**, không phải trên từng dòng hàng. Hãy tính tổng tiền mỗi đơn trong một CTE trước.
+> Gợi ý: "trung bình mỗi đơn" phải tính trên **tổng tiền của đơn**, không phải trên từng dòng hàng. Hãy tính tổng tiền mỗi đơn trong một CTE trước.
 
 <details>
 <summary>Đáp án</summary>
@@ -72,6 +74,8 @@ Nếu bỏ CTE và viết thẳng `AVG(oi.quantity * oi.unit_price * (1 - oi.dis
 ## Phần B: Báo cáo doanh thu
 
 **Bài B1.** Doanh thu và số đơn đã thanh toán theo từng tháng của năm 2025.
+
+> Gợi ý: sau khi JOIN `order_items`, mỗi đơn có nhiều dòng; đếm đơn bằng `COUNT(DISTINCT ...)`. Nhóm theo `DATE_TRUNC('month', ...)`.
 
 <details>
 <summary>Đáp án</summary>
@@ -145,7 +149,7 @@ Kết quả:
 
 **Bài B3.** Doanh thu theo danh mục. Hiện mọi danh mục **lá** (danh mục không có danh mục con), kể cả danh mục chưa bán được gì, kèm tên danh mục cha, số sản phẩm, tổng số lượng bán và doanh thu. Sắp theo doanh thu giảm dần.
 
-Gợi ý: tính doanh thu theo sản phẩm trong CTE trước, rồi đi từ `categories` bằng `LEFT JOIN`. Danh mục lá là danh mục mà không tồn tại danh mục nào có `parent_id` trỏ tới nó.
+> Gợi ý: tính doanh thu theo sản phẩm trong CTE trước, rồi đi từ `categories` bằng `LEFT JOIN`. Danh mục lá là danh mục mà không tồn tại danh mục nào có `parent_id` trỏ tới nó.
 
 <details>
 <summary>Đáp án</summary>
@@ -186,7 +190,7 @@ Kết quả:
 | PC & Màn hình | Máy tính | 3 | 7 | 42330000 |
 | Chuột & Bàn phím | Phụ kiện | 4 | 12 | 15534000 |
 | Sạc & Cáp | Phụ kiện | 2 | 19 | 7290000 |
-| Thiết bị mạng | *(NULL)* | 0 | 0 | 0 |
+| Thiết bị mạng | NULL | 0 | 0 | 0 |
 
 Vì sao phải tính trong CTE trước? Nếu JOIN thẳng `products` với `order_items` và `orders` rồi lọc `o.status IN (...)` ở `WHERE`, các danh mục không có dòng hàng sẽ bị loại (`LEFT JOIN` thành `INNER JOIN`). Còn nếu đưa điều kiện trạng thái vào `ON` của `orders`, dòng hàng của đơn bị hủy vẫn còn trong `order_items` và vẫn bị cộng vào `SUM`. Tách CTE giúp mỗi bước làm đúng một việc.
 
@@ -225,6 +229,8 @@ Kết quả:
 </details>
 
 **Bài B5.** Doanh số của từng nhân viên bán hàng (chức danh có chữ "bán hàng"): tên, chức danh, tên quản lý trực tiếp, số đơn đã thanh toán đã bán và doanh thu. Nhân viên chưa bán đơn nào vẫn phải hiện với số 0.
+
+> Gợi ý: đi từ `employees` bằng `LEFT JOIN`; tính doanh số mỗi nhân viên trong CTE trước để không mất người chưa bán. Tên quản lý cần JOIN `employees` lần nữa.
 
 <details>
 <summary>Đáp án</summary>
@@ -300,6 +306,8 @@ Kết quả (cả hai cách):
 
 **Bài C2.** Tìm khách đã mua ở **cả hai** kênh online và offline, chỉ tính đơn không bị hủy. Giải bằng `INTERSECT`, rồi giải lại bằng `GROUP BY ... HAVING` và hiện thêm số đơn mỗi kênh.
 
+> Gợi ý: với cách `GROUP BY`, khách mua cả hai kênh là khách có `COUNT(DISTINCT channel) = 2`.
+
 <details>
 <summary>Đáp án</summary>
 
@@ -346,41 +354,45 @@ Cách `INTERSECT` trả đúng 11 khách này (hai cột đầu). Khách 5 và 1
 
 </details>
 
-**Bài C3.** Tìm khách có tổng chi tiêu (đơn đã thanh toán) **cao hơn mức trung bình** của những khách đã mua.
+**Bài C3.** Tìm khách có **giá trị trung bình mỗi đơn** (đơn đã thanh toán) cao hơn giá trị trung bình mỗi đơn của cả cửa hàng. Hiện số đơn và giá trị trung bình mỗi đơn của khách.
+
+> Gợi ý: cần hai mức tổng hợp: tổng tiền **mỗi đơn**, rồi trung bình **mỗi khách**. Mức so sánh là trung bình trên các đơn, tính từ CTE thứ nhất.
 
 <details>
 <summary>Đáp án</summary>
 
 ```sql
-WITH chi_tieu AS (
-    SELECT o.customer_id,
-           SUM(oi.quantity * oi.unit_price * (1 - oi.discount)) AS tong_chi
+WITH tong_don AS (
+    SELECT o.order_id, o.customer_id,
+           SUM(oi.quantity * oi.unit_price * (1 - oi.discount)) AS tien
     FROM orders o
     JOIN order_items oi ON oi.order_id = o.order_id
     WHERE o.status NOT IN ('pending', 'cancelled')
-    GROUP BY o.customer_id
+    GROUP BY o.order_id, o.customer_id
+),
+theo_khach AS (
+    SELECT customer_id, COUNT(*) AS so_don, AVG(tien) AS tb_don
+    FROM tong_don
+    GROUP BY customer_id
 )
-SELECT c.customer_id, c.full_name, ROUND(ct.tong_chi) AS tong_chi
-FROM chi_tieu ct
-JOIN customers c ON c.customer_id = ct.customer_id
-WHERE ct.tong_chi > (SELECT AVG(tong_chi) FROM chi_tieu)
-ORDER BY ct.tong_chi DESC;
+SELECT c.customer_id, c.full_name, k.so_don, ROUND(k.tb_don) AS tb_moi_don
+FROM theo_khach k
+JOIN customers c ON c.customer_id = k.customer_id
+WHERE k.tb_don > (SELECT AVG(tien) FROM tong_don)
+ORDER BY k.tb_don DESC, c.customer_id;
 ```
 
 Kết quả:
 
-| customer_id | full_name | tong_chi |
-| --- | --- | --- |
-| 10 | Dương Minh Khoa | 63220500 |
-| 15 | Nguyễn Văn An | 58970000 |
-| 2 | Trần Thị Bình | 58262500 |
-| 18 | Mai Đức Uy | 46980000 |
-| 14 | Huỳnh Tấn Phát | 45880500 |
-| 1 | Nguyễn Văn An | 45430000 |
-| 9 | Ngô Thị Lan | 43570000 |
-| 6 | Võ Quốc Phong | 42018500 |
+| customer_id | full_name | so_don | tb_moi_don |
+| --- | --- | --- | --- |
+| 10 | Dương Minh Khoa | 2 | 31610250 |
+| 15 | Nguyễn Văn An | 2 | 29485000 |
+| 18 | Mai Đức Uy | 2 | 23490000 |
+| 14 | Huỳnh Tấn Phát | 2 | 22940250 |
+| 9 | Ngô Thị Lan | 2 | 21785000 |
 
-Mức trung bình là khoảng 33,5 triệu (tính trên 16 khách đã mua). Không thể viết `WHERE SUM(...) > AVG(SUM(...))`: hàm tổng hợp không lồng nhau được, nên phải tính tổng trước trong CTE rồi so với một subquery vô hướng. Có `customer_id` trong kết quả nên hai khách cùng tên vẫn phân biệt được.
+Mức so sánh là trung bình trên 36 đơn đã thanh toán, khoảng 14,9 triệu (`SELECT AVG(tien) FROM tong_don`). Nếu lấy trung bình của 16 con số `tb_don` trong `theo_khach` thì ra khoảng 15,0 triệu: "trung bình của các trung bình" coi khách 1 đơn và khách 5 đơn nặng như nhau, nên không phải trung bình mỗi đơn. Không thể viết `AVG(SUM(...))` trong một câu vì hàm tổng hợp không lồng nhau được; CTE tách từng mức ra. Có `customer_id` nên hai khách cùng tên vẫn phân biệt được.
 
 </details>
 
@@ -486,6 +498,8 @@ Bỏ dòng `WHERE o.order_id IN (...)`, thay `SELECT` bằng `doi_soat, COUNT(*)
 
 **Bài D2.** Phân bố đơn đã thanh toán theo giá trị: dưới 5 triệu, 5 đến dưới 20 triệu, từ 20 triệu. Mỗi nhóm cho biết số đơn, doanh thu và tỷ trọng doanh thu (%).
 
+> Gợi ý: tính tổng tiền mỗi đơn trong CTE, rồi `GROUP BY` theo một biểu thức `CASE`. Tỷ trọng = doanh thu nhóm chia tổng doanh thu (subquery vô hướng).
+
 <details>
 <summary>Đáp án</summary>
 
@@ -526,6 +540,8 @@ Kết quả:
 ## Phần E: Thử thách
 
 **Bài E1.** Với mỗi danh mục, tìm sản phẩm bán được **nhiều nhất** (theo tổng số lượng, đơn đã thanh toán). Nếu hòa thì hiện tất cả sản phẩm đồng hạng. Không dùng window function.
+
+> Gợi ý: tính số lượng bán mỗi sản phẩm trong CTE, rồi giữ sản phẩm có số lượng bằng `MAX` của chính danh mục đó.
 
 <details>
 <summary>Đáp án</summary>
@@ -578,6 +594,8 @@ Dữ liệu nhỏ nên nhiều danh mục bị hòa. Cách này tự nhiên gi�
 
 **Bài E2.** Báo cáo doanh thu từng tháng của năm 2026, kèm doanh thu tháng trước và tỷ lệ tăng trưởng (%) so với tháng trước. Không dùng window function.
 
+> Gợi ý: tính doanh thu theo tháng trong CTE, rồi JOIN CTE với chính nó theo điều kiện tháng kia = tháng này - `INTERVAL '1 month'`.
+
 <details>
 <summary>Đáp án</summary>
 
@@ -622,6 +640,8 @@ Lọc `WHERE t.thang >= '2026-01-01'` đặt **sau** khi JOIN nên tháng 1/2026
 </details>
 
 **Bài E3.** Bảng chéo doanh thu theo danh mục và năm: mỗi danh mục một dòng, cột `nam_2025`, `nam_2026`, và cột tỷ trọng (%) của danh mục trên tổng doanh thu. Sắp theo tỷ trọng giảm dần.
+
+> Gợi ý: mỗi cột năm là một `SUM(...) FILTER (WHERE ...)`; tỷ trọng chia cho tổng của cả CTE.
 
 <details>
 <summary>Đáp án</summary>

@@ -11,6 +11,7 @@ authors:
 license: "MIT"
 spec:
   checklist:
-    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
-    - "Kết quả của mình khớp với kết quả trong đáp án"
-    - "Đọc lại phần lý thuyết của những bài làm sai"
+    - "Câu hỏi \"không có\" viết bằng `NOT EXISTS`, không dùng `NOT IN` trên cột có thể `NULL`"
+    - "Subquery tương quan có điều kiện nối với alias của truy vấn ngoài"
+    - "Truy vấn nhiều bước được tách thành CTE và chạy thử từng bước"
+    - "Kết quả của mình khớp từng con số với đáp án"

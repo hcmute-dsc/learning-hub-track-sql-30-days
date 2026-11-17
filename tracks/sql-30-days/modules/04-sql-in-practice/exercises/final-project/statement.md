@@ -125,7 +125,7 @@ Quy ước tổng điểm:
    docker compose exec -T db psql -U postgres -d cham_bai -v ON_ERROR_STOP=1 < db/02_seed.sql
    ```
 
-   `ON_ERROR_STOP=1` làm psql dừng ngay ở lỗi đầu tiên, nên bạn biết chắc script có chạy trọn vẹn hay không.
+   `ON_ERROR_STOP=1` làm psql dừng ngay ở lỗi đầu tiên, nên bạn biết chắc script có chạy trọn vẹn hay không. Database `cham_bai` mới tạo không có sẵn `search_path` và `timezone = 'Asia/Ho_Chi_Minh'` như `sql_challenge`; nếu README của học viên yêu cầu, đặt bằng `ALTER DATABASE cham_bai SET ...` trước khi chạy script.
 2. Chạy `queries/bao-cao.sql` tương tự, đối chiếu vài kết quả với dữ liệu seed bằng cách tự đếm tay trên 1-2 câu.
 3. Tìm nhanh lỗi SQL injection trong `app/`: mọi chỗ gọi `execute`/`query` mà chuỗi SQL được tạo bằng f-string, `+` hoặc template string có biến từ request.
 4. Mở `perf/explain.md`: số dòng của bảng lớn có đủ không, có cả "trước" và "sau" không, kiểu scan có đổi không.

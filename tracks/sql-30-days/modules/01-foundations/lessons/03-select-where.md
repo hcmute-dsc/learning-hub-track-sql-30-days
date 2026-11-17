@@ -73,7 +73,7 @@ FROM customers;
 
 (... tổng 18 dòng)
 
-> **NULL hiển thị thế nào?** Trong bảng kết quả của bài, ô trống được ghi là `NULL`. Còn `psql` mặc định in `NULL` thành ô trống, rất dễ nhầm với chuỗi rỗng `''`. Gõ `\pset null 'NULL'` trong `psql` để thấy chữ `NULL` giống bài học.
+> **NULL hiển thị thế nào?** Trong bảng kết quả của khóa học, giá trị NULL luôn được ghi rõ là `NULL`. Còn `psql` mặc định in `NULL` thành ô trống, rất dễ nhầm với chuỗi rỗng `''`. Gõ `\pset null 'NULL'` trong `psql` để thấy chữ `NULL` giống bài học.
 
 ### Cột tính toán và bí danh (alias)
 
@@ -494,6 +494,8 @@ WHERE name ILIKE '%iphone%';
 | sku | name |
 | --- | --- |
 | PHN-001 | iPhone 15 128GB |
+
+Muốn tìm đúng ký tự `%` hoặc `_` (chứ không phải ký tự đại diện), đặt `\` trước nó: `name LIKE '%100\%%'` tìm tên chứa "100%". PostgreSQL mặc định dùng `\` làm ký tự escape; có thể chọn ký tự khác bằng `LIKE '%100!%%' ESCAPE '!'`.
 
 `NOT LIKE` lấy các dòng không khớp mẫu. Khách không dùng Gmail:
 

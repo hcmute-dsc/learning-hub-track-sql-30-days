@@ -322,7 +322,7 @@ DSC Shop không lưu cột tổng tiền trong `orders`. Tiền của mỗi dòn
 quantity * unit_price * (1 - discount)
 ```
 
-`unit_price` là giá lúc mua (không phải `products.price` hiện tại), `discount` là tỉ lệ giảm (`0.10` là 10%). Tổng tiền đơn là `SUM` của biểu thức đó trên các dòng của đơn.
+`unit_price` là giá lúc mua (không phải `products.price` hiện tại), `discount` là tỷ lệ giảm (`0.10` là 10%). Tổng tiền đơn là `SUM` của biểu thức đó trên các dòng của đơn.
 
 Xem các dòng hàng của đơn 4 trước:
 
@@ -492,11 +492,11 @@ SELECT SUM(quantity * unit_price) AS dung FROM order_items WHERE order_id = 13;
 
 Cách sai tính `(2 + 3) * (890000 + 150000)`, ghép số lượng của món này với giá của món khác. Luôn tính tiền từng dòng bên trong `SUM`.
 
-**4. Nhầm "trung bình mỗi dòng" với "trung bình mỗi đơn".** `AVG(quantity * unit_price * (1 - discount))` trên `order_items` là trung bình một dòng hàng, không phải giá trị trung bình một đơn (một đơn có nhiều dòng). Xem Bài 9.
+**4. Nhầm "trung bình mỗi dòng" với "trung bình mỗi đơn".** `AVG(quantity * unit_price * (1 - discount))` trên `order_items` là trung bình một dòng hàng, không phải giá trị trung bình một đơn (một đơn có nhiều dòng). Bài tập 9 của bài này làm rõ điểm này.
 
 **5. Quên rằng SUM của tập rỗng là NULL.** Dùng `COALESCE(SUM(...), 0)` khi kết quả sẽ được hiển thị hoặc đem đi tính tiếp.
 
-**6. SUM/AVG trên cột chữ.** `SUM(full_name)` báo `function sum(character varying) does not exist`. Chỉ `COUNT`, `MIN`, `MAX` dùng được với chuỗi.
+**6. SUM/AVG trên cột chữ.** `SUM(full_name)` báo `function sum(character varying) does not exist`. Với chuỗi chỉ dùng được `COUNT`, `MIN`, `MAX`, và `STRING_AGG` để nối các chuỗi lại (học ở [Ngày 9](09-group-by-having.md)).
 
 ## Bài tập
 

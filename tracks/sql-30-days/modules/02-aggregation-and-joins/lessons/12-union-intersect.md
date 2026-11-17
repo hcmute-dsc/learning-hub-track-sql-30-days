@@ -101,7 +101,7 @@ ORDER BY city NULLS FIRST;
 
 | city |
 | --- |
-| *(NULL)* |
+| NULL |
 | Biên Hòa |
 | Cần Thơ |
 | đà nẵng |

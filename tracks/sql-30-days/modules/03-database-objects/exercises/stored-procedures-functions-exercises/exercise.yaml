@@ -2,7 +2,7 @@ uid: "adc31b9f-3e55-596f-ab39-aa5da6346060"
 slug: "stored-procedures-functions-exercises"
 title: "Bài tập: Function và Stored Procedure"
 type: "self_check"
-difficulty: "medium"
+difficulty: "hard"
 lesson: "stored-procedures-functions"
 tags:
   - "sql"
@@ -12,5 +12,7 @@ license: "MIT"
 spec:
   checklist:
     - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
-    - "Kết quả của mình khớp với kết quả trong đáp án"
+    - "Function và procedure của mình cho đúng kết quả và đúng thông báo lỗi như đáp án với cùng các lần gọi thử"
+    - "Mỗi trường hợp sai (số lượng không dương, không có dòng, không đủ tiền/hàng) đều báo lỗi rõ ràng có ERRCODE, không lặng lẽ trả NULL"
+    - "Procedure có ghi dữ liệu khóa dòng (UPDATE có điều kiện hoặc FOR UPDATE) trước khi kiểm tra rồi ghi"
     - "Đọc lại phần lý thuyết của những bài làm sai"

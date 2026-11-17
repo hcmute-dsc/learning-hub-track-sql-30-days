@@ -3,7 +3,7 @@ uid: "cede657f-6c2f-5ddd-b27d-f5b9f8933690"
 slug: "intro-to-sql-and-dbms"
 title: "Ngày 1: Giới thiệu SQL, RDBMS và môi trường thực hành"
 objectives:
-  - "Giải thích SQL, cơ sở dữ liệu, RDBMS là gì và vì sao khóa học chọn PostgreSQL."
+  - "Giải thích SQL, database, RDBMS là gì và vì sao khóa học chọn PostgreSQL."
   - "Dựng môi trường thực hành bằng Docker (hoặc cài trực tiếp) và kết nối được bằng `psql` và Adminer."
   - "Dùng `\\dt`, `\\d tên_bảng` để xem danh sách bảng và cấu trúc một bảng của DSC Shop."
   - "Viết câu `SELECT` đơn giản để xem dữ liệu của một bảng."
@@ -14,11 +14,11 @@ authors:
 license: "MIT"
 ---
 
-> **Tóm tắt:** SQL là ngôn ngữ để làm việc với dữ liệu trong cơ sở dữ liệu quan hệ. Hôm nay bạn tìm hiểu SQL và hệ quản trị CSDL quan hệ (RDBMS) là gì, dựng PostgreSQL 16 cùng bộ dữ liệu DSC Shop trên máy, rồi chạy những câu lệnh đầu tiên để khám phá dữ liệu.
+> **Tóm tắt:** SQL là ngôn ngữ để làm việc với dữ liệu trong database quan hệ. Hôm nay bạn tìm hiểu SQL và hệ quản trị database quan hệ (RDBMS) là gì, dựng PostgreSQL 16 cùng bộ dữ liệu DSC Shop trên máy, rồi chạy những câu lệnh đầu tiên để khám phá dữ liệu.
 
 **Sau bài này bạn có thể:**
 
-- Giải thích SQL, cơ sở dữ liệu, RDBMS là gì và vì sao khóa học chọn PostgreSQL.
+- Giải thích SQL, database, RDBMS là gì và vì sao khóa học chọn PostgreSQL.
 - Dựng môi trường thực hành bằng Docker (hoặc cài trực tiếp) và kết nối được bằng `psql` và Adminer.
 - Dùng `\dt`, `\d tên_bảng` để xem danh sách bảng và cấu trúc một bảng của DSC Shop.
 - Viết câu `SELECT` đơn giản để xem dữ liệu của một bảng.
@@ -36,24 +36,23 @@ SELECT full_name, city FROM customers;
 
 SQL được dùng ở hầu hết mọi nơi có dữ liệu: backend web và mobile, phân tích dữ liệu, báo cáo kinh doanh, kho dữ liệu (BigQuery, Snowflake). SQL có chuẩn quốc tế (ISO/IEC 9075), nhưng mỗi DBMS thêm phần mở rộng riêng, gọi là **dialect**. Khóa học viết theo dialect của PostgreSQL và ghi chú khi các hệ khác viết khác.
 
-## Cơ sở dữ liệu quan hệ và RDBMS
+## Database quan hệ và RDBMS
 
-**Cơ sở dữ liệu quan hệ** lưu dữ liệu thành các **bảng** (table). Mỗi bảng có các **cột** (column) cố định, mỗi **dòng** (row) là một bản ghi. Các bảng liên kết với nhau qua giá trị chung: dòng trong bảng `orders` ghi `customer_id = 1` nghĩa là đơn đó của khách có mã 1 trong bảng `customers`.
+**Database quan hệ** (relational database, cơ sở dữ liệu quan hệ) lưu dữ liệu thành các **bảng** (table). Mỗi bảng có các **cột** (column) cố định, mỗi **dòng** (row) là một bản ghi. Các bảng liên kết với nhau qua giá trị chung: dòng trong bảng `orders` ghi `customer_id = 1` nghĩa là đơn đó của khách có mã 1 trong bảng `customers`.
 
 Hai khái niệm cốt lõi (Ngày 2 học kỹ):
 
 - **Khóa chính** (primary key): cột xác định duy nhất mỗi dòng, ví dụ `customers.customer_id`.
 - **Khóa ngoại** (foreign key): cột trỏ tới khóa chính của bảng khác, ví dụ `orders.customer_id`.
 
-**RDBMS** là phần mềm quản lý cơ sở dữ liệu quan hệ. Khi bạn gửi một câu SQL, RDBMS phân tích câu lệnh, chọn cách thực hiện nhanh nhất, rồi đọc/ghi dữ liệu trên đĩa:
+**RDBMS** là phần mềm quản lý database quan hệ. Khi bạn gửi một câu SQL, RDBMS phân tích câu lệnh, chọn cách thực hiện mà nó ước lượng là rẻ nhất (Ngày 20 học cách đọc query plan), rồi đọc/ghi dữ liệu trên đĩa:
 
 ```mermaid
 flowchart LR
-    A["Client / Ứng dụng"] -->|"Gửi câu lệnh SQL"| B["DBMS"]
-    subgraph RDBMS["Hệ quản trị CSDL quan hệ"]
+    subgraph RDBMS["RDBMS (hệ quản trị database quan hệ)"]
         C["Parser + Optimizer"] --> D["Bộ máy thực thi"] --> E["Quản lý lưu trữ"]
     end
-    B --> C
+    A["Client / Ứng dụng"] -->|"Gửi câu lệnh SQL"| C
     E --> F[("Bảng dữ liệu trên đĩa")]
     F -->|"Tập kết quả"| A
 ```
@@ -151,6 +150,7 @@ Ngoài câu lệnh SQL, `psql` có các **lệnh meta** bắt đầu bằng dấ
 | `\c tên_db` | Chuyển sang database khác |
 | `\conninfo` | Xem đang kết nối tới đâu |
 | `\x` | Bật/tắt hiển thị dọc (tiện khi bảng nhiều cột) |
+| `\pset null 'NULL'` | In giá trị NULL thành chữ `NULL` thay vì ô trống |
 | `\?` | Danh sách mọi lệnh meta |
 | `\q` | Thoát `psql` |
 
@@ -238,21 +238,21 @@ SELECT * FROM categories;
 
 | category_id | name | parent_id |
 | --- | --- | --- |
-| 1 | Máy tính | |
+| 1 | Máy tính | NULL |
 | 2 | Laptop | 1 |
 | 3 | Laptop gaming | 2 |
 | 4 | Laptop văn phòng | 2 |
 | 5 | PC & Màn hình | 1 |
-| 6 | Điện thoại & Tablet | |
+| 6 | Điện thoại & Tablet | NULL |
 | 7 | Điện thoại | 6 |
 | 8 | Máy tính bảng | 6 |
-| 9 | Phụ kiện | |
+| 9 | Phụ kiện | NULL |
 | 10 | Chuột & Bàn phím | 9 |
 | 11 | Tai nghe & Loa | 9 |
 | 12 | Sạc & Cáp | 9 |
-| 13 | Thiết bị mạng | |
+| 13 | Thiết bị mạng | NULL |
 
-Ô trống ở `parent_id` là giá trị **NULL**, nghĩa là "không có giá trị": danh mục gốc thì không có cha. NULL rất quan trọng và sẽ được học kỹ ở Ngày 3.
+Ô `NULL` ở `parent_id` nghĩa là "không có giá trị": danh mục gốc thì không có cha. `psql` mặc định in NULL thành ô trống, rất dễ nhầm với chuỗi rỗng; khóa học luôn ghi rõ chữ `NULL` trong bảng kết quả, và bạn gõ `\pset null 'NULL'` để `psql` hiển thị giống vậy. NULL rất quan trọng và sẽ được học kỹ ở Ngày 3.
 
 Chỉ lấy vài cột thì liệt kê tên cột, cách nhau bởi dấu phẩy:
 
@@ -266,7 +266,7 @@ SELECT full_name, email, city FROM customers;
 | Trần Thị Bình | binh.tran@gmail.com | Hà Nội |
 | Lê Hoàng Cường | cuong.le@outlook.com | Đà Nẵng |
 | Phạm Minh Duy | duy.pham@gmail.com | TP. Hồ Chí Minh |
-| Hoàng Thị Em | | Cần Thơ |
+| Hoàng Thị Em | NULL | Cần Thơ |
 | Võ Quốc Phong | phong.vo@student.hcmute.edu.vn | Hồ Chí Minh |
 | ... | ... | ... |
 
@@ -285,14 +285,14 @@ Câu lệnh SQL chia thành bốn nhóm theo việc chúng làm:
 | DDL | Data Definition Language | Định nghĩa cấu trúc: tạo, sửa, xóa bảng và các đối tượng khác | `CREATE`, `ALTER`, `DROP`, `TRUNCATE` | Ngày 2, 6 |
 | DML | Data Manipulation Language | Đọc và thay đổi dữ liệu trong bảng | `SELECT`, `INSERT`, `UPDATE`, `DELETE` | Ngày 3-14 |
 | DCL | Data Control Language | Cấp và thu hồi quyền | `GRANT`, `REVOKE` | Ngày 30 |
-| TCL | Transaction Control Language | Gom nhiều lệnh thành một giao dịch (transaction): hoặc tất cả thành công, hoặc không gì cả | `BEGIN`, `COMMIT`, `ROLLBACK`, `SAVEPOINT` | Ngày 6, 16 |
+| TCL | Transaction Control Language | Gom nhiều lệnh thành một transaction (giao dịch): hoặc tất cả thành công, hoặc không gì cả | `BEGIN`, `COMMIT`, `ROLLBACK`, `SAVEPOINT` | Ngày 6, 16 |
 
 Nhiều tài liệu tách `SELECT` ra một nhóm riêng là **DQL** (Data Query Language), vì nó chỉ đọc chứ không thay đổi dữ liệu. Hai cách chia đều gặp, bạn chỉ cần biết cả hai.
 
 Chạy thử khối dưới đây để thấy ba nhóm DDL, DML, TCL làm việc cùng nhau. Chưa cần hiểu từng lệnh, chỉ cần quan sát:
 
 ```sql
-BEGIN;                                          -- TCL: mở giao dịch
+BEGIN;                                          -- TCL: mở transaction
 CREATE TABLE thu_nghiem (ghi_chu TEXT);         -- DDL: tạo bảng
 INSERT INTO thu_nghiem VALUES ('Xin chào SQL'); -- DML: thêm dữ liệu
 SELECT * FROM thu_nghiem;                       -- DML/DQL: đọc dữ liệu
@@ -378,11 +378,11 @@ Phần bài tập của bài này nằm ở bài tập **Bài tập: Giới thi�
 
 ## Tóm tắt
 
-- SQL là ngôn ngữ khai báo để làm việc với cơ sở dữ liệu quan hệ; RDBMS là phần mềm lưu trữ và thực thi SQL.
+- SQL là ngôn ngữ khai báo để làm việc với database quan hệ; RDBMS là phần mềm lưu trữ và thực thi SQL.
 - Khóa học dùng PostgreSQL 16 và bộ dữ liệu DSC Shop (7 bảng trong schema `shop`), dựng bằng `docker compose up -d` hoặc cài trực tiếp theo [setup/README.md](../../../setup/README.md).
 - `psql`: câu SQL kết thúc bằng `;`; lệnh meta bắt đầu bằng `\` (`\dt`, `\d bảng`, `\conninfo`, `\q`) không cần `;`.
-- `SELECT cột1, cột2 FROM bảng;` lấy dữ liệu; `*` là mọi cột; ô trống là NULL.
-- Bốn nhóm lệnh: DDL (cấu trúc), DML (dữ liệu), DCL (quyền), TCL (giao dịch).
+- `SELECT cột1, cột2 FROM bảng;` lấy dữ liệu; `*` là mọi cột; NULL là "không có giá trị" (`\pset null 'NULL'` để `psql` in rõ chữ NULL).
+- Bốn nhóm lệnh: DDL (cấu trúc), DML (dữ liệu), DCL (quyền), TCL (transaction).
 - Chuỗi dùng nháy đơn; tên đặt bằng chữ thường `snake_case`.
 
 ## Đọc thêm

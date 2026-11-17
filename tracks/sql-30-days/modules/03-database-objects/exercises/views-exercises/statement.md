@@ -2,7 +2,7 @@
 
 ## Bài tập
 
-Các bài tập dùng `order_totals` và `customer_spending` bản ở đầu bài. Nếu cần làm lại từ đầu, chạy lại script init (xem mục "Làm lại từ đầu" trong [setup/README.md](../../../../setup/README.md)) rồi tạo lại hai view đó.
+Các bài tập dùng `order_totals` và `customer_spending` bản ở đầu [Ngày 19](../../lessons/19-views.md). Nếu cần làm lại từ đầu, chạy lại script init (xem mục "Làm lại từ đầu" trong [setup/README.md](../../../../setup/README.md)) rồi tạo lại hai view đó.
 
 ### Cơ bản
 
@@ -121,6 +121,8 @@ Kết quả:
 
 **Bài 4.** Tạo view `hcm_customers` gồm `customer_id`, `full_name`, `email`, `phone`, `city` của khách ở TP. Hồ Chí Minh (dữ liệu có ba cách viết: `TP. Hồ Chí Minh`, `Hồ Chí Minh`, `TP.HCM`). View phải chặn việc thêm qua nó một khách ở thành phố khác. Thử thêm khách `Lê Thị Hoa` ở `Hà Nội` rồi ở `TP. Hồ Chí Minh`.
 
+> Gợi ý: xem `WITH CHECK OPTION` ở Ngày 19. Lệnh thêm thứ hai sẽ thành công thật, nên bọc nó trong `BEGIN ... ROLLBACK`.
+
 <details>
 <summary>Đáp án</summary>
 
@@ -186,7 +188,7 @@ Kết quả:
 | 15 | Nguyễn Văn An | 2 | 58970000 |
 | 2 | Trần Thị Bình | 4 | 58262500 |
 
-Lưu ý: `SELECT *` ở đây được PostgreSQL thay bằng 4 cột của `customer_spending` lúc tạo view (lỗi thường gặp số 3).
+Lưu ý: `SELECT *` ở đây được PostgreSQL thay bằng 4 cột của `customer_spending` lúc tạo view (Ngày 19, mục "Lỗi thường gặp" số 3).
 </details>
 
 **Bài 6.** Không cần thử từng lệnh `UPDATE`, hãy liệt kê mọi view trong schema `shop` và cho biết view nào cập nhật được, view nào `INSERT` được. Giải thích vì sao `customer_directory` cập nhật được dù có cột tính toán.
@@ -328,5 +330,5 @@ Hai truy vấn trả cùng kết quả:
 | Vũng Tàu | 91947 | 1390873509000 |
 | Nha Trang | 91954 | 1387547305000 |
 
-Thời gian trên máy mình: qua view khoảng 180-215 ms, qua materialized view khoảng 0,2-0,5 ms, `REFRESH` khoảng 210 ms. Máy bạn sẽ ra số khác. Kết luận: nếu báo cáo này được mở hàng nghìn lần mỗi ngày và chấp nhận số liệu trễ vài phút, materialized view làm mới định kỳ tiết kiệm rất nhiều; nếu cần số liệu tức thời, dùng view thường (và tối ưu truy vấn bên dưới).
+Thời gian trên máy tác giả: qua view khoảng 180-215 ms, qua materialized view khoảng 0,2-0,5 ms, `REFRESH` khoảng 210 ms. Máy bạn sẽ ra số khác. Kết luận: nếu báo cáo này được mở hàng nghìn lần mỗi ngày và chấp nhận số liệu trễ vài phút, materialized view làm mới định kỳ tiết kiệm rất nhiều; nếu cần số liệu tức thời, dùng view thường (và tối ưu truy vấn bên dưới).
 </details>

@@ -12,5 +12,7 @@ license: "MIT"
 spec:
   checklist:
     - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
-    - "Kết quả của mình khớp với kết quả trong đáp án"
+    - "Kết quả truy vấn qua view của mình khớp với đáp án (Bài 8 chỉ so kết quả, thời gian được phép khác)"
+    - "Biết view nào cập nhật được và vì sao, kiểm tra lại bằng information_schema.views"
+    - "Thấy materialized view chỉ đổi số liệu sau REFRESH, và tạo được UNIQUE index để REFRESH CONCURRENTLY"
     - "Đọc lại phần lý thuyết của những bài làm sai"

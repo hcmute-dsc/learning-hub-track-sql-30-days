@@ -41,6 +41,8 @@ ERROR:  permission denied for table orders
 
 **Bài 2.** Kế toán cần đọc toàn bộ bảng `payments` và chỉ hai cột `order_id`, `status` của `orders`. Tạo role `accountant` (NOLOGIN) với đúng các quyền đó, rồi dùng `has_table_privilege` / `has_column_privilege` kiểm tra: đọc `payments` được, đọc `orders.status` được, đọc `orders.customer_id` không được.
 
+> Gợi ý: Quyền mức cột viết `GRANT SELECT (cot1, cot2) ON bang TO ...`.
+
 <details>
 <summary>Đáp án</summary>
 
@@ -96,6 +98,8 @@ app.get('/orders/:id/items', async (req, res) => {
 });
 ```
 
+> Gợi ý: Giá trị là số nên không cần nháy đơn để thoát khỏi chuỗi. Dấu cách trong URL viết là `%20`.
+
 <details>
 <summary>Đáp án</summary>
 
@@ -105,7 +109,7 @@ Gọi `/orders/0%20OR%201=1/items` (dấu cách mã hóa thành `%20` trong URL)
 SELECT product_id, quantity, unit_price FROM order_items WHERE order_id = 0 OR 1=1;
 ```
 
-Ở đây không cần dấu nháy vì giá trị là số: ghép số vào SQL cũng nguy hiểm như ghép chuỗi. Truy vấn trả về đủ 60 dòng hàng. Sửa:
+Ở đây không cần nháy đơn vì giá trị là số: ghép số vào SQL cũng nguy hiểm như ghép chuỗi. Truy vấn trả về đủ 60 dòng hàng. Sửa:
 
 ```js
 app.get('/orders/:id/items', async (req, res, next) => {
@@ -130,7 +134,7 @@ Với `id = "0 OR 1=1"`, PostgreSQL báo `invalid input syntax for type integer:
 <summary>Đáp án</summary>
 
 ```sql
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
+CREATE EXTENSION IF NOT EXISTS pgcrypto SCHEMA public;
 
 DROP TABLE IF EXISTS app_users;
 CREATE TABLE app_users (
@@ -165,9 +169,19 @@ SELECT check_login('binh', 'matkhau123')  AS dung,
 Tham số của function là giá trị, không phải đoạn code, nên `binh' --` chỉ là một tên đăng nhập lạ. Nếu ứng dụng ghép chuỗi kiểu `"... WHERE username = '" + u + "' AND password_hash = crypt('" + p + "', password_hash)"` thì với `u = "binh' --"`, phần kiểm tra mật khẩu bị biến thành chú thích và kẻ tấn công đăng nhập được tài khoản `binh` mà không cần mật khẩu.
 
 Lưu ý: `check_login` chỉ đúng với hash có prefix `$2a$` (do pgcrypto sinh). Hash `$2b$` mà thư viện bcrypt của Python/Node sinh mặc định thì `crypt()` không đọc được và hàm luôn trả `false` (xem Ngày 30, mục Cách 2).
+
+Dọn dẹp:
+
+```sql
+DROP FUNCTION check_login(TEXT, TEXT);
+DROP TABLE app_users;
+DROP EXTENSION IF EXISTS pgcrypto;
+```
 </details>
 
 **Bài 6.** Sao lưu schema `shop` bằng định dạng custom, khôi phục vào database `shop_restore`, rồi trong `shop_restore` xóa nhầm bảng `payments` và khôi phục lại chỉ bảng đó từ file dump. So sánh số dòng và cấu trúc bảng `payments` sau khi khôi phục với bản gốc. Dọn dẹp khi xong.
+
+> Gợi ý: `pg_restore -t ten_bang` chỉ khôi phục một bảng. So `\d payments` giữa hai database.
 
 <details>
 <summary>Đáp án</summary>
@@ -215,6 +229,8 @@ docker compose exec db rm /data/shop.dump
 - `shop_sales`: đọc sản phẩm, danh mục, khách, đơn, dòng hàng; tạo đơn và dòng hàng; đổi trạng thái đơn; không được xem `customers.birth_date` và không được xóa gì.
 - `shop_hr`: đọc và sửa `employees`, không đọc được bất kỳ bảng nào khác.
 - `shop_analyst`: đọc mọi bảng trừ `employees.salary` và các cột liên lạc của khách (`email`, `phone`).
+
+> Gợi ý: Kết hợp quyền mức bảng với quyền mức cột; kiểm tra nhanh bằng `has_table_privilege`/`has_column_privilege` trước khi thử bằng `SET ROLE`.
 
 <details>
 <summary>Đáp án</summary>

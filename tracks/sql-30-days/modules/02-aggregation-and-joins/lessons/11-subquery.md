@@ -47,7 +47,7 @@ Rồi chép con số đó vào câu thứ hai. Cách này dở: giá thay đổi
 SELECT sku, name, price
 FROM products
 WHERE price > (SELECT AVG(price) FROM products)
-ORDER BY price DESC;
+ORDER BY price DESC, sku;
 ```
 
 | sku | name | price |
@@ -312,9 +312,9 @@ Cả hai cho:
 
 Cách 2 đúng hôm nay nhưng dễ quên khi viết câu mới. Hãy tập thói quen: câu hỏi "không có" thì dùng `NOT EXISTS`. `IN` (không có `NOT`) không gặp bẫy này: NULL trong danh sách chỉ không khớp với gì, các giá trị khác vẫn khớp bình thường.
 
-## 7. Subquery trong FROM: bảng tạm
+## 7. Subquery trong FROM: derived table
 
-Subquery trả về một bảng thì đặt được vào `FROM`, như một bảng bình thường. Nó còn được gọi là bảng dẫn xuất (derived table). Cách này dùng khi cần tổng hợp hai lần, việc mà một câu `GROUP BY` không làm được (bạn đã gặp ở bài 9 của Ngày 9).
+Subquery trả về một bảng thì đặt được vào `FROM`, như một bảng bình thường. Nó được gọi là derived table (bảng dẫn xuất). Cách này dùng khi cần tổng hợp hai lần, việc mà một câu `GROUP BY` không làm được (bạn đã gặp ở Bài tập 9 của [Ngày 9](09-group-by-having.md)).
 
 Trung bình mỗi khách (đã mua) có bao nhiêu đơn? Bước 1 đếm đơn của từng khách, bước 2 lấy trung bình của các con số đó:
 
@@ -330,7 +330,7 @@ FROM (SELECT customer_id, COUNT(*) AS so_don
 | --- | --- |
 | 2.50 | 5 |
 
-`AS t` đặt tên cho bảng tạm. Truy vấn ngoài dùng các cột của nó (`so_don`) như cột của một bảng thật. Bạn cũng có thể JOIN bảng tạm với bảng khác, như cách sửa lỗi nhân dòng ở mục 10 của Ngày 10.
+`AS t` đặt tên cho derived table. Truy vấn ngoài dùng các cột của nó (`so_don`) như cột của một bảng thật. Bạn cũng có thể JOIN derived table với bảng khác, như cách sửa lỗi nhân dòng ở mục 10 của Ngày 10.
 
 > **Ghi chú dialect:** PostgreSQL từ bản 16 cho phép bỏ alias của subquery trong `FROM`. MySQL, SQL Server và PostgreSQL bản cũ hơn bắt buộc phải có alias (MySQL báo lỗi `Every derived table must have its own alias`). Luôn đặt alias để câu lệnh chạy được ở mọi nơi và dễ đọc.
 
@@ -348,7 +348,7 @@ ten_buoc_2 AS (
 SELECT ... FROM ten_buoc_2 ...;
 ```
 
-Mỗi CTE giống một bảng tạm chỉ sống trong câu lệnh đó. CTE sau dùng được CTE trước, và truy vấn chính dùng được tất cả.
+Mỗi CTE giống một bảng có tên, chỉ tồn tại trong câu lệnh đó (khác với `TEMP TABLE` ở [Ngày 24](../../04-sql-in-practice/lessons/24-import-export-data.md), sống đến hết phiên làm việc). CTE sau dùng được CTE trước, và truy vấn chính dùng được tất cả.
 
 Câu hỏi: "khách nào có tổng chi tiêu cao hơn mức chi tiêu trung bình của các khách?". Ba bước:
 
@@ -421,7 +421,7 @@ Về tốc độ: PostgreSQL thường tự viết lại `IN`, `EXISTS` thành p
 
 **2. NOT IN với danh sách có NULL.** Trả về 0 dòng mà không báo lỗi (mục 6). Dùng `NOT EXISTS`.
 
-**3. Quên điều kiện tương quan trong EXISTS.** Thiếu `o.customer_id = c.customer_id`, subquery trở thành "có đơn nào trong năm 2026 không?", câu trả lời luôn là có, và mọi khách đều được chọn:
+**3. Quên điều kiện tương quan trong EXISTS.** Thiếu `o.customer_id = c.customer_id`, subquery trở thành "có đơn nào từ tháng 7/2026 trở đi không?", câu trả lời luôn là có, và mọi khách đều được chọn:
 
 ```sql
 SELECT COUNT(*) AS so_khach
@@ -450,7 +450,7 @@ Phần bài tập của bài này nằm ở bài tập **Bài tập: Truy vấn 
 - Subquery thường tự chạy được và chỉ cần tính một lần. Subquery tương quan tham chiếu cột của truy vấn ngoài và (về mặt logic) được tính lại cho từng dòng ngoài.
 - `EXISTS` hỏi "có ít nhất một dòng không". `NOT EXISTS` là cách an toàn cho câu hỏi "không có".
 - `NOT IN` với danh sách có NULL luôn trả về 0 dòng. Tránh `NOT IN` với subquery trên cột có thể NULL.
-- Subquery trong `FROM` (bảng dẫn xuất) cần alias, dùng để tổng hợp hai lần.
+- Subquery trong `FROM` (derived table) cần alias, dùng để tổng hợp hai lần.
 - CTE `WITH` đặt tên cho từng bước, đọc từ trên xuống, dùng lại được nhiều lần trong cùng câu lệnh. Gỡ lỗi bằng cách chạy từng CTE.
 
 ## Đọc thêm

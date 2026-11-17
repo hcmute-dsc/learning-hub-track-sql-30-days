@@ -11,6 +11,7 @@ authors:
 license: "MIT"
 spec:
   checklist:
-    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
-    - "Kết quả của mình khớp với kết quả trong đáp án"
-    - "Đọc lại phần lý thuyết của những bài làm sai"
+    - "Mọi cột đều ghi alias bảng (`o.order_id`, `c.name`)"
+    - "Với `LEFT JOIN`, điều kiện trên bảng bên phải đặt ở `ON`, không đặt ở `WHERE`"
+    - "Đếm sau `LEFT JOIN` bằng `COUNT(cot_ben_phai)`, không bằng `COUNT(*)`"
+    - "Kết quả của mình khớp từng con số với đáp án"

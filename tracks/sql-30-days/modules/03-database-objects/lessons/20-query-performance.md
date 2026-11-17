@@ -532,7 +532,7 @@ DROP TABLE perf.orders_2026;
 
 Ước lượng bây giờ là 174.699, gần đúng, và planner đổi sang Seq Scan. Trên bảng nhỏ này hai plan nhanh ngang nhau, nhưng với truy vấn nhiều bảng, một ước lượng sai 300 lần ở nút dưới có thể khiến planner chọn Nested Loop cho hàng trăm nghìn dòng và chậm đi hàng trăm lần. Vì vậy, **ước lượng lệch xa thực tế là thứ đầu tiên cần tìm** khi đọc một plan chậm.
 
-Các bảng của schema `shop` cũng là ví dụ. Mỗi bảng chỉ vài chục dòng, chưa đủ để autovacuum tự chạy `ANALYZE` (ngưỡng mặc định là 50 dòng thay đổi cộng 10% kích thước bảng). Sau khi chạy script init, chúng chưa có thống kê (`reltuples = -1`), và planner giả định bảng lớn hơn thực tế nhiều:
+Các bảng của schema `shop` cũng là ví dụ. Phần lớn các bảng chỉ vài chục dòng, dưới ngưỡng để autovacuum tự chạy `ANALYZE` (ngưỡng mặc định là 50 dòng thay đổi cộng 10% kích thước bảng; riêng `order_items` 60 dòng thì vượt ngưỡng nên được tự `ANALYZE`). Ví dụ bảng `orders` (40 dòng): sau khi chạy script init, nó chưa có thống kê (`reltuples = -1`), và planner giả định bảng lớn hơn thực tế nhiều:
 
 ```sql
 EXPLAIN
@@ -627,6 +627,4 @@ Phần bài tập của bài này nằm ở bài tập **Bài tập: Đọc kế
 ## Đọc thêm
 
 - [Có index rồi mà truy vấn vẫn quét toàn bảng? Sargability và một hàm bọc quanh cột](https://tiennhm.io.vn/blog/sql-index-khong-duoc-dung-sargable) — Cột đã có index, câu WHERE lọc đúng cột đó, nhưng execution plan vẫn là Seq Scan.
-- [Thêm 4 index làm INSERT chậm 6 lần: cái giá không ai nhắc khi bảo bạn đánh index](https://tiennhm.io.vn/blog/chi-phi-ghi-cua-index) — Mọi hướng dẫn tối ưu đều bảo thêm index, rất ít bài nói về hoá đơn.
-- [LEFT JOIN của bạn đã thành INNER JOIN mà không ai báo](https://tiennhm.io.vn/blog/left-join-thanh-inner-join) — Thêm một điều kiện WHERE lên cột của bảng bên phải là LEFT JOIN âm thầm biến thành INNER JOIN, và những dòng bạn cố tình giữ lại biến mất.
 - Tài liệu PostgreSQL: [Using EXPLAIN](https://www.postgresql.org/docs/16/using-explain.html), [Statistics Used by the Planner](https://www.postgresql.org/docs/16/planner-stats.html).

@@ -2,11 +2,13 @@
 
 ## Câu hỏi ôn tập cuối khóa
 
-Mười câu, mỗi câu chạm vào một nhóm kỹ năng chính. Tự làm trước rồi mới mở đáp án. Mọi đáp án SQL chạy trên dữ liệu gốc của DSC Shop; câu nào có tạo đối tượng hay sửa dữ liệu đều tự dọn hoặc `ROLLBACK` ở cuối.
+Mười câu, mỗi câu chạm vào một nhóm kỹ năng chính. Mọi đáp án SQL chạy trên dữ liệu gốc của DSC Shop; câu nào có tạo đối tượng hay sửa dữ liệu đều tự dọn hoặc `ROLLBACK` ở cuối.
 
 ### Cơ bản
 
 **Câu 1 (Ngày 3-5).** Lấy tất cả đơn hàng trong 3 tháng gần nhất tính đến ngày 17/10/2026, sắp xếp theo thời gian đặt.
+
+> Gợi ý: Viết điều kiện trên chính cột `order_date`, dùng `INTERVAL '3 months'`.
 
 <details>
 <summary>Đáp án</summary>
@@ -62,6 +64,8 @@ Kết quả:
 </details>
 
 **Câu 3 (Ngày 8, 9, 13).** Phân loại các đơn đã thanh toán thành ba nhóm theo giá trị: lớn (từ 20 triệu), vừa (5 đến dưới 20 triệu), nhỏ (dưới 5 triệu). Mỗi nhóm có bao nhiêu đơn và tổng doanh thu bao nhiêu?
+
+> Gợi ý: Tính tổng tiền từng đơn trước (CTE), rồi mới phân nhóm bằng `CASE`.
 
 <details>
 <summary>Đáp án</summary>
@@ -236,6 +240,8 @@ DROP VIEW v_doanh_thu_thang;
 ### Thử thách
 
 **Câu 8 (Ngày 6, 16).** Bán 2 chuột Logitech G102 (`ACC-001`) cho khách 16 tại cửa hàng, nhân viên 4 bán. Việc này gồm ba bước: tạo đơn, thêm dòng hàng, trừ tồn kho. Viết sao cho ba bước thành công cùng nhau hoặc không bước nào có hiệu lực. Để không làm thay đổi dữ liệu mẫu, kết thúc bằng `ROLLBACK` thay cho `COMMIT`.
+
+> Gợi ý: Đặt ba bước giữa `BEGIN` và `ROLLBACK`; lấy id đơn vừa tạo bằng `RETURNING` hoặc `currval`.
 
 <details>
 <summary>Đáp án</summary>

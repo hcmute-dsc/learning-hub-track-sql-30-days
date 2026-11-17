@@ -1,7 +1,7 @@
 ---
 uid: "5e972586-b489-513f-b017-17ea2a430910"
 slug: "index"
-title: "Ngày 15: Chỉ mục (index)"
+title: "Ngày 15: Index"
 objectives:
   - "Tạo, liệt kê và xóa index bằng `CREATE INDEX`, `pg_indexes`, `DROP INDEX`."
   - "Đo một truy vấn trước và sau khi tạo index bằng `EXPLAIN ANALYZE` và nhận ra truy vấn có dùng index hay không."
@@ -18,7 +18,7 @@ authors:
 license: "MIT"
 ---
 
-> **Tóm tắt:** Chỉ mục (index) là cấu trúc dữ liệu phụ giúp PostgreSQL tìm dòng cần mà không phải đọc cả bảng. Bài này đo thật trên bảng 1 triệu đơn hàng để thấy index giúp được bao nhiêu, khi nào nó vô dụng, và cái giá phải trả khi ghi dữ liệu.
+> **Tóm tắt:** Index (chỉ mục) là cấu trúc dữ liệu phụ giúp PostgreSQL tìm dòng cần mà không phải đọc cả bảng. Bài này đo thật trên bảng 1 triệu đơn hàng để thấy index giúp được bao nhiêu, khi nào nó vô dụng, và cái giá phải trả khi ghi dữ liệu.
 
 **Sau bài này bạn có thể:**
 
@@ -518,7 +518,7 @@ DROP TABLE perf.orders_copy;
 | --- | --- |
 | 13 MB | 19 MB |
 
-Chèn chậm đi khoảng 10 lần, và các index còn chiếm nhiều chỗ hơn chính dữ liệu. Vì vậy:
+Chèn chậm đi khoảng 10 lần (tỷ lệ này thay đổi theo máy; bài blog ở mục "Đọc thêm" đo được khoảng 6 lần), và các index còn chiếm nhiều chỗ hơn chính dữ liệu. Vì vậy:
 
 - Chỉ tạo index cho truy vấn thật sự chạy thường xuyên và đang chậm, không tạo "cho chắc".
 - Định kỳ xem index nào không ai dùng (cột `idx_scan` trong view `pg_stat_user_indexes` cho biết số lần mỗi index được dùng) rồi xóa.
@@ -607,7 +607,7 @@ DROP INDEX perf.idx_orders_status;
 
 ## Bài tập
 
-Phần bài tập của bài này nằm ở bài tập **Bài tập: Chỉ mục (index)** ngay sau bài học.
+Phần bài tập của bài này nằm ở bài tập **Bài tập: Index** ngay sau bài học.
 
 ## Tóm tắt
 

@@ -11,6 +11,7 @@ authors:
 license: "MIT"
 spec:
   checklist:
-    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
-    - "Kết quả của mình khớp với kết quả trong đáp án"
-    - "Đọc lại phần lý thuyết của những bài làm sai"
+    - "Các nhánh `WHEN` xếp đúng thứ tự ưu tiên, nhánh `IS NULL` đứng trước khi cần"
+    - "Tổng hợp có điều kiện dùng `FILTER` hoặc `SUM(CASE ... ELSE 0 END)`"
+    - "Câu `UPDATE` được xem trước bằng `SELECT` và chạy trong `BEGIN ... ROLLBACK`"
+    - "Kết quả của mình khớp từng con số với đáp án"

@@ -11,6 +11,7 @@ authors:
 license: "MIT"
 spec:
   checklist:
-    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
-    - "Kết quả của mình khớp với kết quả trong đáp án"
-    - "Đọc lại phần lý thuyết của những bài làm sai"
+    - "Kết quả của mình khớp đáp án về số dòng và giá trị (thứ tự dòng có thể khác vì chưa có `ORDER BY`)"
+    - "Dùng `IS NULL`/`IS NOT NULL` thay cho `= NULL` và nhận ra dòng NULL bị điều kiện phủ định bỏ qua"
+    - "Lọc cột ngày giờ bằng khoảng nửa mở `>= đầu AND < cuối` thay cho `BETWEEN`"
+    - "Đặt ngoặc đúng chỗ khi trộn `AND` với `OR`"

@@ -18,7 +18,7 @@ authors:
 license: "MIT"
 ---
 
-> **Tóm tắt:** NoSQL không phải "SQL kém hơn" hay "SQL đời mới", mà là một nhóm cơ sở dữ liệu có mô hình dữ liệu khác bảng quan hệ: document, key-value, wide-column, graph. Bài đọc này so sánh hai hướng một cách chính xác (transaction, JOIN, mở rộng, CAP), cho thấy cùng một đơn hàng DSC Shop được mô hình hóa thế nào ở mỗi bên, và đưa ra cách chọn cho từng loại bài toán.
+> **Tóm tắt:** NoSQL không phải "SQL kém hơn" hay "SQL đời mới", mà là một nhóm database có mô hình dữ liệu khác bảng quan hệ: document, key-value, wide-column, graph. Bài đọc này so sánh hai hướng một cách chính xác (transaction, JOIN, mở rộng, CAP), cho thấy cùng một đơn hàng DSC Shop được mô hình hóa thế nào ở mỗi bên, và đưa ra cách chọn cho từng loại bài toán.
 
 **Sau bài này bạn có thể:**
 
@@ -32,13 +32,13 @@ license: "MIT"
 
 ## 1. NoSQL là gì?
 
-NoSQL thường được hiểu là "Not only SQL": các cơ sở dữ liệu không tổ chức dữ liệu thành bảng quan hệ. Không có một "NoSQL" duy nhất, mà là bốn họ khá khác nhau:
+NoSQL thường được hiểu là "Not only SQL": các database không tổ chức dữ liệu thành bảng quan hệ. Không có một "NoSQL" duy nhất, mà là bốn họ khá khác nhau:
 
 | Loại | Dữ liệu trông như thế nào | Hệ tiêu biểu | Hợp với |
 | --- | --- | --- | --- |
 | Document | Mỗi bản ghi là một tài liệu JSON (hoặc BSON), có thể lồng mảng, đối tượng | MongoDB, Firestore, Couchbase | Dữ liệu có cấu trúc thay đổi, thường đọc trọn một "cục": hồ sơ người dùng, nội dung CMS, catalog |
 | Key-value | Một khóa trỏ tới một giá trị, hệ thống không cần biết giá trị bên trong | Redis, Amazon DynamoDB, Memcached | Cache, phiên đăng nhập, giỏ hàng, bộ đếm, hàng đợi đơn giản |
-| Wide-column | Dòng được nhóm theo khóa phân vùng, mỗi phân vùng chứa rất nhiều dòng sắp theo một khóa | Apache Cassandra, ScyllaDB, HBase | Ghi cực nhiều theo thời gian: log, dữ liệu cảm biến IoT, tin nhắn |
+| Wide-column | Dòng được nhóm theo partition key, mỗi partition chứa rất nhiều dòng sắp theo một khóa | Apache Cassandra, ScyllaDB, HBase | Ghi cực nhiều theo thời gian: log, dữ liệu cảm biến IoT, tin nhắn |
 | Graph | Đỉnh và cạnh có thuộc tính | Neo4j, Amazon Neptune | Quan hệ nhiều tầng: mạng bạn bè, gợi ý, phát hiện gian lận |
 
 Nhiều hệ ngày nay thuộc nhiều loại cùng lúc (DynamoDB vừa key-value vừa document). Ngược lại, PostgreSQL với kiểu `JSONB` (Ngày 22) cũng làm được phần lớn việc của một document store.
@@ -50,12 +50,14 @@ Bảng dưới so PostgreSQL (đại diện SQL) với MongoDB (hệ NoSQL phổ
 | Tiêu chí | PostgreSQL | MongoDB |
 | --- | --- | --- |
 | Mô hình | Bảng, dòng, cột; quan hệ qua khóa ngoại | Collection chứa document JSON (BSON), có thể lồng nhau |
-| Schema | Khai báo trước (`CREATE TABLE`), CSDL kiểm tra kiểu, `NOT NULL`, `CHECK`, khóa ngoại khi ghi | Linh hoạt theo mặc định, mỗi document có thể khác nhau; có thể bật kiểm tra bằng JSON Schema validation. Ứng dụng phải tự lo phần còn lại |
-| Ngôn ngữ truy vấn | SQL chuẩn, dùng được ở hầu hết hệ quan hệ và nhiều kho dữ liệu | API riêng (`find`, `aggregate`) của từng hệ; Cassandra có CQL trông giống SQL |
+| Schema | Khai báo trước (`CREATE TABLE`), database kiểm tra kiểu, `NOT NULL`, `CHECK`, khóa ngoại khi ghi | Linh hoạt theo mặc định, mỗi document có thể khác nhau; có thể bật kiểm tra bằng JSON Schema validation. Ứng dụng phải tự lo phần còn lại |
+| Ngôn ngữ truy vấn | SQL chuẩn, dùng được ở hầu hết hệ quan hệ và nhiều kho dữ liệu | MongoDB Query API (`find`, `aggregate`), không phải SQL |
 | JOIN | Thế mạnh: JOIN nhiều bảng tùy ý, bộ tối ưu tự chọn cách nối | Có `$lookup` (tương tự LEFT JOIN) trong aggregation pipeline, nhưng thiết kế thường lồng dữ liệu (embed) để khỏi phải nối |
 | Transaction | ACID đầy đủ, nhiều câu lệnh, nhiều bảng | Thao tác trên một document luôn nguyên tử; transaction ACID nhiều document có từ bản 4.0 (replica set) và 4.2 (sharded cluster), nhưng tốn kém hơn và nên dùng ít |
 | Mở rộng | Chủ yếu mở rộng dọc (máy mạnh hơn); mở rộng ngang qua read replica, và sharding bằng công cụ như Citus | Sharding có sẵn, thiết kế để chia dữ liệu ra nhiều máy từ đầu |
-| Ràng buộc toàn vẹn | Khóa ngoại, `UNIQUE`, `CHECK` do CSDL đảm bảo | Có unique index; không có khóa ngoại, ứng dụng tự đảm bảo tham chiếu đúng |
+| Integrity constraint | Khóa ngoại, `UNIQUE`, `CHECK` do database đảm bảo | Có unique index; không có khóa ngoại, ứng dụng tự đảm bảo tham chiếu đúng |
+
+Mỗi hệ NoSQL có ngôn ngữ truy vấn riêng; Cassandra có CQL trông giống SQL nhưng không có JOIN.
 
 Hai điểm hay bị nói sai:
 
@@ -64,7 +66,7 @@ Hai điểm hay bị nói sai:
 
 ## 3. ACID và CAP là hai chuyện khác nhau
 
-**ACID** (Ngày 16) là tính chất của **transaction**: Atomicity, Consistency, Isolation, Durability. Chữ C ở đây nghĩa là transaction đưa dữ liệu từ trạng thái hợp lệ sang trạng thái hợp lệ (không vi phạm ràng buộc).
+**ACID** (Ngày 16) là tính chất của **transaction**: Atomicity, Consistency, Isolation, Durability. Chữ C ở đây nghĩa là transaction đưa dữ liệu từ trạng thái hợp lệ sang trạng thái hợp lệ (không vi phạm constraint).
 
 **CAP** là định lý về **hệ phân tán** (dữ liệu nằm trên nhiều máy nối qua mạng). Ba tính chất:
 
@@ -164,7 +166,7 @@ Quy tắc kinh nghiệm khi thiết kế document:
 
 ```mermaid
 flowchart TD
-    A{"Dữ liệu có quan hệ chặt, cần ràng buộc và transaction?"} -->|"Có"| B["PostgreSQL"]
+    A{"Dữ liệu có quan hệ chặt, cần constraint và transaction?"} -->|"Có"| B["PostgreSQL"]
     A -->|"Một phần có cấu trúc thay đổi"| C["PostgreSQL + JSONB"]
     A -->|"Không, truy cập theo khóa"| D{"Nhu cầu nổi bật?"}
     D -->|"Cache, phiên, bộ đếm"| E["Key-value: Redis"]
@@ -187,7 +189,7 @@ Hệ thống thật thường dùng **nhiều loại cùng lúc** (polyglot pers
 
 **1. "Chọn MongoDB vì dữ liệu của tôi là JSON."** API trả JSON không có nghĩa dữ liệu nên lưu dạng document. Dữ liệu của DSC Shop vẫn có quan hệ chặt dù ứng dụng nhận JSON; PostgreSQL dựng JSON được ngay (mục 4) và có `JSONB` cho phần thật sự linh hoạt.
 
-**2. "NoSQL không có schema."** Schema vẫn tồn tại, chỉ là chuyển từ CSDL sang code ứng dụng (schema-on-read). Ba phiên bản ứng dụng ghi ba dạng document khác nhau thì code đọc phải xử lý cả ba.
+**2. "NoSQL không có schema."** Schema vẫn tồn tại, chỉ là chuyển từ database sang code ứng dụng (schema-on-read). Ba phiên bản ứng dụng ghi ba dạng document khác nhau thì code đọc phải xử lý cả ba.
 
 **3. "NoSQL nhanh hơn SQL."** Nhanh hơn cho đúng kiểu truy cập nó được thiết kế (đọc một document theo khóa). Với câu hỏi không lường trước (báo cáo, lọc theo nhiều tiêu chí, nối dữ liệu) thì thường chậm hơn và khó viết hơn.
 

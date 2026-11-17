@@ -180,6 +180,8 @@ Kết quả:
 
 **Bài 8.** Bộ phận mua hàng muốn rà soát giá nhập: liệt kê sản phẩm có tiền lãi (`price - cost_price`) từ 3 triệu trở lên, **cùng với** những sản phẩm chưa có giá nhập (vì chưa tính được lãi). Hiển thị cả cột tiền lãi với tên `profit`.
 
+> Gợi ý: alias `profit` chưa dùng được trong `WHERE`. Thử nghĩ: với sản phẩm có `cost_price` NULL, điều kiện `price - cost_price >= 3000000` cho kết quả gì?
+
 <details>
 <summary>Đáp án</summary>
 
@@ -209,10 +211,12 @@ Hai điểm cần để ý: không dùng được `WHERE profit >= 3000000` (ali
 
 **Bài 9.** Tìm tất cả khách hàng ở TP. Hồ Chí Minh, bất kể thành phố được viết theo kiểu nào trong dữ liệu.
 
+> Gợi ý: xem trước các cách viết bằng `SELECT DISTINCT city FROM customers;`.
+
 <details>
 <summary>Đáp án</summary>
 
-Bước 1: xem có những cách viết nào bằng `SELECT DISTINCT city FROM customers;` (kết quả ở mục 1): `TP. Hồ Chí Minh`, `Hồ Chí Minh`, `TP.HCM`.
+Bước 1: xem có những cách viết nào bằng `SELECT DISTINCT city FROM customers;` (kết quả ở mục [DISTINCT](../../lessons/03-select-where.md#distinct-các-giá-trị-khác-nhau) của bài học): `TP. Hồ Chí Minh`, `Hồ Chí Minh`, `TP.HCM`.
 
 Bước 2: lọc theo đủ ba cách viết.
 

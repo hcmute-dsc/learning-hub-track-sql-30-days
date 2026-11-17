@@ -2,7 +2,7 @@ uid: "b08f78ff-c326-543b-93c5-389542307eca"
 slug: "import-export-data-exercises"
 title: "Bài tập: Nhập và xuất dữ liệu với CSV"
 type: "self_check"
-difficulty: "hard"
+difficulty: "medium"
 lesson: "import-export-data"
 tags:
   - "sql"
@@ -11,6 +11,7 @@ authors:
 license: "MIT"
 spec:
   checklist:
-    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
-    - "Kết quả của mình khớp với kết quả trong đáp án"
-    - "Đọc lại phần lý thuyết của những bài làm sai"
+    - "Dùng đúng `FORMAT csv`, `HEADER`, `DELIMITER`, `NULL`, `FORCE_QUOTE` và số `COPY n` khớp đáp án (Bài 1-4)"
+    - "Báo cáo kiểm kê chỉ ra đúng 2 dòng lỗi và chỉ cập nhật 3 sản phẩm có chênh lệch (Bài 5)"
+    - "`customers_restore` giống hệt `customers`, kể cả các ô NULL (Bài 6)"
+    - "UPSERT trả về 6 dòng và giải thích được vì sao vẫn phải loại SKU trùng trong file (Bài 7)"

@@ -88,7 +88,7 @@ SELECT 0.1::FLOAT8 + 0.2::FLOAT8 = 0.3::FLOAT8     AS float_bang_0_3,
 | --- | --- |
 | f | t |
 
-Với `FLOAT`, 0,1 + 0,2 không bằng 0,3. Sai số nhỏ, nhưng cộng dồn qua hàng triệu giao dịch thì sổ sách lệch, và phép so sánh bằng cho kết quả sai. Vì vậy **tiền luôn dùng `NUMERIC`**. `FLOAT` hợp với số đo khoa học, tọa độ, nơi sai số nhỏ chấp nhận được.
+Với `FLOAT`, 0,1 + 0,2 không bằng 0,3. Sai số nhỏ, nhưng cộng dồn qua hàng triệu khoản thanh toán thì sổ sách lệch, và phép so sánh bằng cho kết quả sai. Vì vậy **tiền luôn dùng `NUMERIC`**. `FLOAT` hợp với số đo khoa học, tọa độ, nơi sai số nhỏ chấp nhận được.
 
 DSC Shop dùng `NUMERIC(12,0)` cho tiền VNĐ (tối đa 12 chữ số, không có phần lẻ, đủ cho 999 tỷ) và `NUMERIC(3,2)` cho `order_items.discount` (tỷ lệ giảm giá từ 0.00 đến 1.00). Giá trị có nhiều chữ số lẻ hơn `s` sẽ được làm tròn; phần nguyên vượt quá thì báo lỗi:
 
@@ -210,7 +210,7 @@ FROM vouchers;
 | voucher_id | code | discount_percent | min_order | is_active | expires_at |
 | --- | --- | --- | --- | --- | --- |
 | 1 | CHAOTANSV | 10 | 0 | t | 2026-12-31 |
-| 2 | LAPTOP5 | 5 | 15000000 | t | |
+| 2 | LAPTOP5 | 5 | 15000000 | t | NULL |
 
 `voucher_id` tự nhận 1, 2. `is_active` tự nhận `TRUE` nhờ `DEFAULT`. `expires_at` của `LAPTOP5` là NULL vì không truyền và cột không có `DEFAULT`.
 
@@ -397,7 +397,7 @@ SELECT cart_id, customer_id, voucher_id FROM carts;
 
 | cart_id | customer_id | voucher_id |
 | --- | --- | --- |
-| 1 | 16 | |
+| 1 | 16 | NULL |
 
 Còn khóa ngoại `carts.customer_id` dùng hành vi mặc định `NO ACTION`, nên không xóa được khách 16 khi khách còn giỏ hàng:
 
@@ -472,11 +472,11 @@ Referenced by:
 Đọc từng phần:
 
 - **Các cột**: kiểu, `not null`, giá trị mặc định. `employee_id` cho phép NULL vì đơn online không có nhân viên bán.
-- **Indexes**: khóa chính tự tạo một chỉ mục (index) tên `orders_pkey`. `orders_customer_id_idx` là index được tạo thêm cho khóa ngoại, vì PostgreSQL **không** tự tạo index cho khóa ngoại (Ngày 15 giải thích vì sao cần).
+- **Indexes**: khóa chính tự tạo một index tên `orders_pkey`. `orders_customer_id_idx` là index được tạo thêm cho khóa ngoại, vì PostgreSQL **không** tự tạo index cho khóa ngoại (Ngày 15 giải thích vì sao cần).
 - **Check constraints**: PostgreSQL viết lại `status IN (...)` thành dạng `= ANY (ARRAY[...])`, ý nghĩa như nhau.
 - **Foreign-key constraints**: các khóa ngoại của bảng này trỏ đi đâu.
 - **Referenced by**: bảng nào trỏ tới bảng này, kèm hành vi `ON DELETE`.
-- **Tên ràng buộc** tự sinh theo mẫu `bảng_cột_loại` (`pkey`, `key` cho `UNIQUE`, `check`, `fkey`). Thông báo lỗi luôn ghi tên này, nên đọc tên là biết ngay quy tắc nào bị vi phạm. Muốn tự đặt tên thì viết `CONSTRAINT tên_ràng_buộc CHECK (...)`.
+- **Tên ràng buộc** tự sinh theo mẫu `bảng_cột_loại` (`key` cho `UNIQUE`, `check`, `fkey`); riêng khóa chính là `bảng_pkey` (không có tên cột, như `orders_pkey`), và `CHECK` trên nhiều cột là `bảng_check`. Thông báo lỗi luôn ghi tên này, nên đọc tên là biết ngay quy tắc nào bị vi phạm. Muốn tự đặt tên thì viết `CONSTRAINT tên_ràng_buộc CHECK (...)`.
 
 Vài quyết định thiết kế đáng chú ý của DSC Shop:
 
@@ -498,8 +498,8 @@ SELECT code, description, max_uses FROM vouchers;
 
 | code | description | max_uses |
 | --- | --- | --- |
-| LAPTOP5 | | 100 |
-| PHUKIEN15 | | 100 |
+| LAPTOP5 | NULL | 100 |
+| PHUKIEN15 | NULL | 100 |
 
 Cột mới không có `DEFAULT` thì các dòng cũ nhận NULL; có `DEFAULT` thì các dòng cũ nhận giá trị mặc định.
 

@@ -69,7 +69,9 @@ Kết quả:
 
 ### Vận dụng
 
-**Bài 4.** Tính tỉ lệ phần trăm khách hàng có email (làm tròn 1 chữ số), kèm số khách không có email. Chỉ dùng một câu `SELECT`, không dùng `WHERE`.
+**Bài 4.** Tính tỷ lệ phần trăm khách hàng có email (làm tròn 1 chữ số), kèm số khách không có email. Chỉ dùng một câu `SELECT`, không dùng `WHERE`.
+
+> Gợi ý: `COUNT(email)` bỏ qua `NULL`, còn `COUNT(*)` đếm mọi dòng.
 
 <details>
 <summary>Đáp án</summary>
@@ -152,6 +154,8 @@ Mọi đơn online đều có địa chỉ giao; `shipping_city` chỉ NULL ở 
 
 **Bài 7.** Có bao nhiêu dòng hàng được giảm giá, và tổng số tiền cửa hàng đã giảm cho khách trên các dòng đó là bao nhiêu (làm tròn đến đồng)?
 
+> Gợi ý: số tiền giảm của một dòng là `quantity * unit_price * discount`.
+
 <details>
 <summary>Đáp án</summary>
 
@@ -172,6 +176,8 @@ Kết quả:
 ### Thử thách
 
 **Bài 8.** Giám đốc hỏi "giá trị trung bình mỗi lần thanh toán là bao nhiêu" và "trung bình mỗi đơn đã thanh toán trả bao nhiêu tiền". Tính cả hai trên `payments` trong một câu và giải thích vì sao khác nhau.
+
+> Gợi ý: một đơn có thể trả nhiều lần, nên số đơn là `COUNT(DISTINCT order_id)`, không phải `COUNT(*)`.
 
 <details>
 <summary>Đáp án</summary>
@@ -196,6 +202,8 @@ Kết quả:
 
 **Bài 9.** Tính trên toàn bộ `order_items`: tổng giá trị hàng, số đơn, giá trị trung bình mỗi đơn và giá trị trung bình mỗi dòng hàng (làm tròn đến đồng). Vì sao không dùng `AVG(quantity * unit_price * (1 - discount))` làm "trung bình mỗi đơn"?
 
+> Gợi ý: `AVG` chia cho số dòng đang được tổng hợp. Ở đây mỗi dòng là một dòng hàng, không phải một đơn.
+
 <details>
 <summary>Đáp án</summary>
 
@@ -213,5 +221,5 @@ Kết quả:
 | --- | --- | --- | --- |
 | 40 | 579351000 | 14483775 | 9655850 |
 
-`AVG` chia cho số dòng được tổng hợp, ở đây là 60 dòng hàng, nên ra trung bình một dòng (9.655.850). Một đơn có thể có 1 đến 3 dòng, nên trung bình mỗi đơn phải lấy tổng chia số đơn khác nhau (14.483.775). Bài này tính trên mọi đơn, kể cả đơn chờ và đơn hủy, nên `tong_tien` không phải doanh thu theo định nghĩa ở mục 6.
+`AVG` chia cho số dòng được tổng hợp, ở đây là 60 dòng hàng, nên ra trung bình một dòng (9.655.850). Một đơn có thể có 1 đến 3 dòng, nên trung bình mỗi đơn phải lấy tổng chia số đơn khác nhau (14.483.775). Bài này tính trên mọi đơn, kể cả đơn chờ và đơn hủy, nên `tong_tien` không phải doanh thu theo định nghĩa ở mục 6 của [Ngày 8](../../lessons/08-aggregate-functions.md).
 </details>

@@ -2,7 +2,11 @@
 uid: "f70320cf-d8a8-59e3-8da4-659330df2c79"
 slug: "summary"
 title: "Tổng kết và dự án cuối khóa"
-objectives: []
+objectives:
+  - "Tự kiểm tra mình đã nắm từng chặng chưa bằng 10 câu ôn tập có đáp án."
+  - "Thiết kế và xây dựng một database hoàn chỉnh cho một bài toán thật: từ ERD, schema 3NF có ràng buộc, dữ liệu mẫu, đến truy vấn báo cáo, index, API và sao lưu."
+  - "Đọc rubric để biết bài nộp thế nào là đạt, giỏi, và tự chấm trước khi nộp."
+  - "Chọn hướng học tiếp phù hợp (backend, phân tích dữ liệu, data engineering, quản trị database)."
 prerequisites:
   - "sql-30-days/foundations/30-day-sql-learning-roadmap"
 authors:
@@ -10,9 +14,10 @@ authors:
 license: "MIT"
 ---
 
-> **Tóm tắt:** Trang này nhìn lại 30 ngày học SQL theo bốn chặng, nêu các lỗi hay gặp khi làm dự án và gợi ý những gì nên học tiếp sau khóa này. Hai bài tập ngay sau trang này là **Câu hỏi ôn tập cuối khóa** (10 câu có đáp án chạy được trên DSC Shop) và **Dự án cuối khóa** (kèm rubric chấm điểm chi tiết để mentor CLB chấm thống nhất).
+> **Tóm tắt:** Trang này nhìn lại 30 ngày học SQL theo bốn chặng, nêu các lỗi hay gặp khi làm dự án và gợi ý những gì nên học tiếp sau khóa này. Ba bài tập ngay sau trang này là **Câu hỏi ôn tập cuối khóa** (10 câu có đáp án chạy được trên DSC Shop), **Quiz tổng kết 30 ngày SQL** (15 câu tự chấm) và **Dự án cuối khóa** (kèm rubric chấm điểm chi tiết để mentor CLB chấm thống nhất).
 
 **Sau bài này bạn có thể:**
+
 - Tự kiểm tra mình đã nắm từng chặng chưa bằng 10 câu ôn tập có đáp án.
 - Thiết kế và xây dựng một database hoàn chỉnh cho một bài toán thật: từ ERD, schema 3NF có ràng buộc, dữ liệu mẫu, đến truy vấn báo cáo, index, API và sao lưu.
 - Đọc rubric để biết bài nộp thế nào là đạt, giỏi, và tự chấm trước khi nộp.
@@ -39,9 +44,10 @@ Bài tập **Dự án cuối khóa** dùng lại kiến thức của **cả bố
 
 ## Bài tập
 
-Phần bài tập của bài này gồm hai bài ngay sau bài học:
+Phần bài tập của bài này gồm ba bài ngay sau bài học:
 
 - **Câu hỏi ôn tập cuối khóa**: 10 câu, mỗi câu chạm vào một nhóm kỹ năng chính, có đáp án để tự so.
+- **Quiz tổng kết 30 ngày SQL**: 15 câu tự chấm (chọn đáp án hoặc điền số), cần đúng từ 70% để đạt.
 - **Dự án cuối khóa**: xây database cho một bài toán mới, nộp repo, chấm theo rubric 100 điểm.
 
 ## 2. Lỗi thường gặp khi làm dự án

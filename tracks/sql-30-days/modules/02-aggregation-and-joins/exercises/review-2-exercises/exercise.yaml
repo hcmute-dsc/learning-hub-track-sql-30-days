@@ -11,6 +11,7 @@ authors:
 license: "MIT"
 spec:
   checklist:
-    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
-    - "Kết quả của mình khớp với kết quả trong đáp án"
-    - "Đọc lại phần lý thuyết của những bài làm sai"
+    - "Mọi báo cáo doanh thu dùng cùng quy ước `status NOT IN ('pending', 'cancelled')`"
+    - "Tổng hợp về mức đơn hàng trong CTE trước khi tính trung bình hoặc JOIN thêm bảng con"
+    - "Tự chấm theo thang 17 điểm ở mục \"Tự đánh giá\""
+    - "Ôn lại ngày tương ứng với những bài làm sai"

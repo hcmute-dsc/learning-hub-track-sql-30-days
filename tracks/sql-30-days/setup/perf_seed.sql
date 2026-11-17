@@ -1,6 +1,6 @@
 -- =============================================================
--- Dữ liệu lớn cho các bài hiệu năng (Ngày 15, 20, 28): schema perf
--- 100.000 khách, 1.000.000 đơn hàng. Chạy mất khoảng 10-30 giây:
+-- Dữ liệu lớn cho các bài hiệu năng (Ngày 04, 15, 19, 20, 21, 25 và 28): schema perf
+-- 100.000 khách, 1.000.000 đơn hàng. Chạy mất khoảng 10 giây:
 --   docker compose exec -T db psql -U postgres -d sql_challenge < setup/perf_seed.sql
 -- Tách riêng schema perf để không làm đổi kết quả của các bài dùng schema shop.
 -- setseed() giúp mọi người sinh ra cùng một bộ dữ liệu.

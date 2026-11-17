@@ -129,6 +129,8 @@ Chạy lại hai file init ([setup/README.md](../../../../setup/README.md#làm-l
 
 **Bài 5.** Lô hàng mới về: 10 chiếc `LAP-003` (Acer Nitro V 15, đang hết hàng) và 5 chiếc `LAP-007` Lenovo IdeaPad Slim 5 (danh mục 4, giá 17.490.000, giá nhập 15.200.000, chưa có trong hệ thống). Viết một lệnh duy nhất: mã đã có thì cộng tồn kho, mã chưa có thì thêm mới.
 
+> Gợi ý: `INSERT ... ON CONFLICT (sku) DO UPDATE SET ...`; giá trị định chèn nằm trong `EXCLUDED`.
+
 <details>
 <summary>Đáp án</summary>
 
@@ -260,10 +262,12 @@ ERROR:  update or delete on table "customers" violates foreign key constraint "o
 DETAIL:  Key (customer_id)=(2) is still referenced from table "orders".
 ```
 
-Khách 17 chưa mua đơn nào nên xóa được. Khách 2 đã có đơn, khóa ngoại chặn xóa để giữ lịch sử bán hàng. Cách xử lý thường gặp: không xóa dòng mà ẩn danh hóa thông tin cá nhân, ví dụ `UPDATE customers SET email = NULL, phone = NULL, birth_date = NULL WHERE customer_id = 2;`, hoặc thêm một cột trạng thái tài khoản (cần sửa cấu trúc bảng, chỉ làm trên bảng nháp).
+Khách 17 chưa mua đơn nào nên xóa được. Khách 2 đã có đơn, khóa ngoại chặn xóa để giữ lịch sử bán hàng. Cách xử lý thường gặp: không xóa dòng mà ẩn danh hóa thông tin cá nhân, ví dụ `UPDATE customers SET full_name = 'Khách đã xóa #2', email = NULL, phone = NULL, birth_date = NULL, city = NULL WHERE customer_id = 2;` (đổi cả họ tên, vì tên cũng là thông tin cá nhân), hoặc thêm một cột trạng thái tài khoản (cần sửa cấu trúc bảng, chỉ làm trên bảng nháp).
 </details>
 
 **Bài 9.** Khách hủy đơn 39 (đang `paid`). Trong một transaction: (a) đổi `status` thành `cancelled`, ghi `note` là `Khách hủy, chờ hoàn tiền`; (b) cộng trả lại tồn kho cho mọi sản phẩm trong đơn, lấy số lượng từ `order_items` bằng `UPDATE ... FROM` (không gõ tay id sản phẩm). Xem trước đơn và các dòng hàng của nó trước khi sửa.
+
+> Gợi ý: dùng `UPDATE products ... FROM order_items WHERE ...` để lấy số lượng từ dòng hàng của đơn 39; hai lệnh `UPDATE` nằm giữa cùng một cặp `BEGIN`/`COMMIT`.
 
 <details>
 <summary>Đáp án</summary>

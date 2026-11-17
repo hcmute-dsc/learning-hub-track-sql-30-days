@@ -12,5 +12,7 @@ license: "MIT"
 spec:
   checklist:
     - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
-    - "Kết quả của mình khớp với kết quả trong đáp án"
+    - "Khôi phục dữ liệu gốc trước mỗi bài, rồi so tồn kho và số đơn của mình với đáp án"
+    - "Giải thích được vì sao một câu lỗi làm cả transaction bị hủy, và vì sao UPDATE 0 không phải là lỗi"
+    - "Chạy được kịch bản hai phiên (Bài 6) và thấy khác biệt giữa READ COMMITTED và REPEATABLE READ"
     - "Đọc lại phần lý thuyết của những bài làm sai"

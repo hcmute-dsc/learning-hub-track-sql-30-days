@@ -11,6 +11,7 @@ authors:
 license: "MIT"
 spec:
   checklist:
-    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
-    - "Kết quả của mình khớp với kết quả trong đáp án"
-    - "Đọc lại phần lý thuyết của những bài làm sai"
+    - "Hai vế có cùng số cột, cùng thứ tự cột và kiểu tương thích"
+    - "Chọn `UNION ALL` khi không cần loại trùng, `UNION` khi thật sự cần"
+    - "`EXCEPT` đặt đúng vế: \"có ở A mà không có ở B\" thì A đứng trước"
+    - "Kết quả của mình khớp từng con số với đáp án, kể cả thứ tự dòng khi đề yêu cầu"

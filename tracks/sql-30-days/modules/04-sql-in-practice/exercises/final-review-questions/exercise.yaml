@@ -2,7 +2,7 @@ uid: "d2446a9e-83c2-59d5-adb7-303f39addd38"
 slug: "final-review-questions"
 title: "Câu hỏi ôn tập cuối khóa"
 type: "self_check"
-difficulty: "hard"
+difficulty: "medium"
 lesson: "summary"
 tags:
   - "sql"
@@ -11,6 +11,7 @@ authors:
 license: "MIT"
 spec:
   checklist:
-    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
-    - "Kết quả của mình khớp với kết quả trong đáp án"
-    - "Đọc lại phần lý thuyết của những bài làm sai"
+    - "Làm được ít nhất 8/10 câu trước khi mở đáp án"
+    - "Kết quả câu 1-7 và 9 khớp bảng kết quả trong đáp án"
+    - "Câu 8 chạy trong transaction và tồn kho ACC-001 trở về 60 sau ROLLBACK"
+    - "Ghi lại các ngày cần ôn lại từ những câu làm sai"

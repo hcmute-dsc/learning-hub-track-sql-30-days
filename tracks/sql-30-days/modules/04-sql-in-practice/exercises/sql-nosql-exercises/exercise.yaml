@@ -2,7 +2,7 @@ uid: "a05be839-6969-5965-a34d-9d092ba0d11c"
 slug: "sql-nosql-exercises"
 title: "Bài tập: SQL và NoSQL"
 type: "self_check"
-difficulty: "hard"
+difficulty: "medium"
 lesson: "sql-nosql"
 tags:
   - "sql"
@@ -11,6 +11,7 @@ authors:
 license: "MIT"
 spec:
   checklist:
-    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
-    - "Kết quả SQL của mình khớp với đáp án; với câu phân tích, lập luận của mình có đủ các ý chính trong đáp án"
-    - "Đọc lại phần lý thuyết của những bài làm sai"
+    - "Ghép đúng loại NoSQL và giải thích được các câu đúng/sai về transaction, mở rộng, CAP (Bài 1, 2)"
+    - "Các truy vấn SQL dựng JSON, đếm đơn và tìm cặp sản phẩm cho kết quả khớp đáp án (Bài 3, 4, 5)"
+    - "Chỉ ra được thiết kế embed hay reference gặp vấn đề trong từng tình huống (Bài 4)"
+    - "Phương án Bài 6 có đủ các ý trong phần Tự chấm"

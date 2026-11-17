@@ -140,7 +140,7 @@ Hai danh mục con được gắn vào `Thiết bị mạng` (id 13).
 
 ### INSERT ... SELECT: thêm từ kết quả truy vấn
 
-Thay `VALUES` bằng một câu `SELECT`, mỗi dòng kết quả thành một dòng mới. Ví dụ: bộ phận chăm sóc khách muốn danh sách khách có số điện thoại nhưng còn thiếu email, thành phố hoặc ngày sinh để gọi hỏi bổ sung. Ta tạo một bảng nháp riêng (không đụng cấu trúc bảng shop):
+Thay `VALUES` bằng một câu `SELECT`, mỗi dòng kết quả thành một dòng mới. Ví dụ: bộ phận chăm sóc khách muốn danh sách khách có số điện thoại nhưng còn thiếu email, thành phố hoặc ngày sinh để gọi hỏi bổ sung. Ta tạo một bảng nháp riêng để không đụng các bảng có sẵn (bảng mới nằm trong schema `shop` vì `search_path`, nên nhớ `DROP TABLE` ở cuối bài):
 
 ```sql
 DROP TABLE IF EXISTS call_list;
@@ -481,7 +481,7 @@ RETURNING product_id, sku, is_active;
 | 13 | PHN-004 | f |
 | 21 | ACC-006 | f |
 
-`BEGIN` mở một transaction (giao dịch): mọi thay đổi sau đó chỉ là "tạm", chưa ai khác thấy. `UPDATE 3` khớp với 3 dòng ở bước 1.
+`BEGIN` mở một transaction: mọi thay đổi sau đó chỉ là "tạm", chưa ai khác thấy. `UPDATE 3` khớp với 3 dòng ở bước 1.
 
 Bước 3, quyết định:
 

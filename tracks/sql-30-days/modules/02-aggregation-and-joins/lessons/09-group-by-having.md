@@ -51,7 +51,7 @@ Hình dung thế này: database đọc từng đơn hàng và bỏ vào các "x�
 SELECT status, COUNT(*) AS so_don
 FROM orders
 GROUP BY status
-ORDER BY so_don DESC;
+ORDER BY so_don DESC, status;
 ```
 
 | status | so_don |
@@ -61,6 +61,8 @@ ORDER BY so_don DESC;
 | paid | 2 |
 | pending | 1 |
 | shipped | 1 |
+
+`pending` và `shipped` cùng 1 đơn; cột thứ hai `status` trong `ORDER BY` giúp hai dòng hòa nhau luôn ra cùng một thứ tự.
 
 Cú pháp chung:
 
@@ -361,7 +363,37 @@ Cách đúng là lặp lại biểu thức: `HAVING COUNT(*) >= 3`.
 
 > **Ghi chú dialect:** PostgreSQL và MySQL cho phép viết alias trong `GROUP BY` (ví dụ `GROUP BY nam` thay cho `GROUP BY EXTRACT(YEAR FROM order_date)`), đây là phần mở rộng ngoài chuẩn SQL. SQL Server không cho, bạn phải lặp lại biểu thức. Lặp lại biểu thức là cách chạy được ở mọi nơi. MySQL còn cho dùng alias trong `HAVING`, PostgreSQL và SQL Server thì không.
 
-## 9. Nhắc qua: dòng tổng cộng với ROLLUP
+## 9. STRING_AGG: gộp chuỗi trong nhóm
+
+`COUNT`, `SUM` trả về một con số cho mỗi nhóm. Đôi khi bạn muốn thấy luôn **các giá trị** trong nhóm, ví dụ danh mục nào có những sản phẩm nào. `STRING_AGG(cot, dau_phan_cach)` nối các chuỗi của nhóm thành một chuỗi:
+
+```sql
+SELECT category_id,
+       COUNT(*) AS so_sp,
+       STRING_AGG(sku, ', ' ORDER BY sku) AS danh_sach_sku
+FROM products
+GROUP BY category_id
+ORDER BY category_id;
+```
+
+| category_id | so_sp | danh_sach_sku |
+| --- | --- | --- |
+| 3 | 3 | LAP-001, LAP-002, LAP-003 |
+| 4 | 3 | LAP-004, LAP-005, LAP-006 |
+| 5 | 3 | PC-001, PC-002, PC-003 |
+| 7 | 4 | PHN-001, PHN-002, PHN-003, PHN-004 |
+| 8 | 2 | TAB-001, TAB-002 |
+| 10 | 4 | ACC-001, ACC-002, ACC-003, ACC-009 |
+| 11 | 3 | ACC-004, ACC-005, ACC-006 |
+| 12 | 2 | ACC-007, ACC-008 |
+
+- `ORDER BY sku` viết **bên trong** ngoặc của `STRING_AGG` quyết định thứ tự các phần tử trong chuỗi. Không viết thì thứ tự không được đảm bảo.
+- Giống các hàm tổng hợp khác, `STRING_AGG` bỏ qua `NULL`.
+- Đối số phải là chuỗi; cột số thì đổi kiểu trước, ví dụ `STRING_AGG(order_id::text, ', ')`.
+
+> **Ghi chú dialect:** MySQL dùng `GROUP_CONCAT(sku ORDER BY sku SEPARATOR ', ')`. SQL Server từ bản 2017 có `STRING_AGG`, thứ tự viết bằng `WITHIN GROUP (ORDER BY sku)`.
+
+## 10. Nhắc qua: dòng tổng cộng với ROLLUP
 
 Báo cáo thường cần thêm một dòng "tổng cộng" ở cuối. `GROUP BY ROLLUP (...)` làm việc đó:
 
@@ -435,6 +467,7 @@ Phần bài tập của bài này nằm ở bài tập **Bài tập: Nhóm dữ 
 - `WHERE` lọc dòng trước khi nhóm, `HAVING` lọc nhóm sau khi nhóm. Hai mệnh đề thường đi cùng nhau.
 - Thứ tự logic: `FROM` → `WHERE` → `GROUP BY` → `HAVING` → `SELECT` → `DISTINCT` → `ORDER BY` → `LIMIT`. Vì vậy alias dùng được trong `ORDER BY` nhưng không dùng được trong `WHERE`, `HAVING`.
 - `GROUP BY` không đảm bảo thứ tự; cần thứ tự thì viết `ORDER BY`.
+- `STRING_AGG(cot, ', ' ORDER BY ...)` nối các chuỗi trong một nhóm thành một chuỗi.
 - Nhóm theo khóa chính, không nhóm theo tên.
 
 ## Đọc thêm

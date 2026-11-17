@@ -2,11 +2,11 @@
 
 ## Bài tập
 
-Các bài dưới đây giả sử bạn đã chạy các ví dụ ở trên (có `perf.orders_by_year` với 4 phân vùng năm và `orders_default`).
+Các bài dưới đây giả sử bạn đã chạy các ví dụ ở mục 2.2 của [bài học Ngày 25](../../lessons/25-big-data.md) (có `perf.orders_by_year` với 4 partition năm và `orders_default`).
 
 ### Cơ bản
 
-**Bài 1.** Tạo bảng `payments_by_method`, bản sao của `payments` được phân vùng LIST theo `method`: một phân vùng cho `cash`, một cho `card`, một chung cho `momo` và `bank_transfer`. Nạp dữ liệu từ `payments`, rồi in số lần thanh toán và tổng tiền của từng phân vùng.
+**Bài 1.** Tạo bảng `payments_by_method`, bản sao của `payments` được partition LIST theo `method`: một partition cho `cash`, một cho `card`, một chung cho `momo` và `bank_transfer`. Nạp dữ liệu từ `payments`, rồi in số lần thanh toán và tổng tiền của từng partition.
 
 <details>
 <summary>Đáp án</summary>
@@ -45,10 +45,10 @@ Kết quả:
 | payments_card | 7 | 112317500 |
 | payments_transfer | 22 | 324642500 |
 
-Khóa chính phải là `(payment_id, method)` vì chứa cột phân vùng.
+Khóa chính phải là `(payment_id, method)` vì chứa cột partition key.
 </details>
 
-**Bài 2.** Dùng `EXPLAIN` kiểm tra truy vấn `SELECT sum(amount) FROM payments_by_method WHERE method = 'momo';` quét những phân vùng nào, rồi chạy để lấy kết quả.
+**Bài 2.** Dùng `EXPLAIN` kiểm tra truy vấn `SELECT sum(amount) FROM payments_by_method WHERE method = 'momo';` quét những partition nào, rồi chạy để lấy kết quả.
 
 <details>
 <summary>Đáp án</summary>
@@ -72,10 +72,10 @@ Kết quả:
 | --- |
 | 157951000 |
 
-Chỉ quét `payments_transfer`. Vẫn còn dòng `Filter` vì phân vùng này chứa cả `bank_transfer`.
+Chỉ quét `payments_transfer`. Vẫn còn dòng `Filter` vì partition này chứa cả `bank_transfer`.
 </details>
 
-**Bài 3.** Một đơn đặt đúng lúc `2025-01-01 00:00:00` và một đơn lúc `2024-12-31 23:59:59` sẽ rơi vào phân vùng nào của `perf.orders_by_year`? Kiểm chứng bằng `INSERT ... RETURNING tableoid::regclass` trong một transaction rồi `ROLLBACK`.
+**Bài 3.** Một đơn đặt đúng lúc `2025-01-01 00:00:00` và một đơn lúc `2024-12-31 23:59:59` sẽ rơi vào partition nào của `perf.orders_by_year`? Kiểm chứng bằng `INSERT ... RETURNING tableoid::regclass` trong một transaction rồi `ROLLBACK`.
 
 <details>
 <summary>Đáp án</summary>
@@ -107,7 +107,7 @@ Kết quả:
 
 ### Vận dụng
 
-**Bài 4.** Truy vấn sau đếm đơn ngày Giáng sinh 2024 nhưng quét cả 5 phân vùng. Giải thích vì sao và viết lại để chỉ quét một phân vùng, kết quả không đổi.
+**Bài 4.** Truy vấn sau đếm đơn ngày Giáng sinh 2024 nhưng quét cả 5 partition. Giải thích vì sao và viết lại để chỉ quét một partition, kết quả không đổi.
 
 ```sql
 SELECT count(*) FROM perf.orders_by_year WHERE order_date::date = '2024-12-25';
@@ -116,7 +116,7 @@ SELECT count(*) FROM perf.orders_by_year WHERE order_date::date = '2024-12-25';
 <details>
 <summary>Đáp án</summary>
 
-Phép ép kiểu `order_date::date` bọc cột phân vùng, nên PostgreSQL không so được điều kiện với cận của các phân vùng. Viết lại thành khoảng nửa mở trên chính cột `order_date`:
+Phép ép kiểu `order_date::date` bọc cột partition key, nên PostgreSQL không so được điều kiện với cận của các partition. Viết lại thành khoảng nửa mở trên chính cột `order_date`:
 
 ```sql
 EXPLAIN (COSTS OFF)
@@ -140,7 +140,7 @@ Kết quả (giống truy vấn cũ):
 | 685 |
 </details>
 
-**Bài 5.** Đếm số đơn theo `status` trong quý 1/2025 trên `perf.orders_by_year`, sắp giảm dần theo số đơn. Kiểm tra bằng EXPLAIN rằng chỉ phân vùng 2025 bị quét.
+**Bài 5.** Đếm số đơn theo `status` trong quý 1/2025 trên `perf.orders_by_year`, sắp giảm dần theo số đơn. Kiểm tra bằng EXPLAIN rằng chỉ partition 2025 bị quét.
 
 <details>
 <summary>Đáp án</summary>
@@ -189,12 +189,14 @@ INSERT INTO perf.orders_by_year VALUES (1000001, 1, '2027-03-01 09:00', 'pending
 RETURNING tableoid::regclass AS phan_vung;
 ```
 
-Giờ bạn tạo phân vùng `perf.orders_2027` cho năm 2027. Chuyện gì xảy ra? Hãy tạo được phân vùng này và đưa đơn kia về đúng chỗ, trong một transaction.
+Giờ bạn tạo partition `perf.orders_2027` cho năm 2027. Chuyện gì xảy ra? Hãy tạo được partition này và đưa đơn kia về đúng chỗ, trong một transaction.
+
+> Gợi ý: khi tạo partition mới, PostgreSQL kiểm tra partition `DEFAULT` không còn dòng nào thuộc khoảng của nó.
 
 <details>
 <summary>Đáp án</summary>
 
-Tạo thẳng thì lỗi, vì phân vùng `DEFAULT` đang giữ một dòng thuộc khoảng mới:
+Tạo thẳng thì lỗi, vì partition `DEFAULT` đang giữ một dòng thuộc khoảng mới:
 
 ```sql
 CREATE TABLE perf.orders_2027 PARTITION OF perf.orders_by_year
@@ -205,7 +207,7 @@ CREATE TABLE perf.orders_2027 PARTITION OF perf.orders_by_year
 ERROR:  updated partition constraint for default partition "orders_default" would be violated by some row
 ```
 
-Cách làm: chép các dòng 2027 ra bảng tạm, xóa khỏi `orders_default`, tạo phân vùng, rồi chèn lại qua bảng cha.
+Cách làm: chép các dòng 2027 ra bảng tạm, xóa khỏi `orders_default`, tạo partition, rồi chèn lại qua bảng cha.
 
 ```sql
 BEGIN;
@@ -235,25 +237,25 @@ Kết quả:
 | --- | --- | --- |
 | perf.orders_2027 | 1000001 | 2027-03-01 09:00:00+07 |
 
-Bài học: tạo sẵn phân vùng cho kỳ sắp tới (ví dụ bằng một tác vụ định kỳ) thay vì để dữ liệu dồn vào `DEFAULT`. Dọn lại sau bài (xóa phân vùng 2027, xóa luôn đơn thử):
+Bài học: tạo sẵn partition cho kỳ sắp tới (ví dụ bằng một tác vụ định kỳ) thay vì để dữ liệu dồn vào `DEFAULT`. Dọn lại sau bài (xóa partition 2027, xóa luôn đơn thử):
 
 ```sql
 DROP TABLE perf.orders_2027;
 ```
 </details>
 
-**Bài 7.** DSC Shop phát triển lên 50 triệu đơn hàng, 2 triệu khách. Các truy vấn phổ biến: (a) khách xem lịch sử đơn của mình, (b) báo cáo doanh thu theo tháng, (c) xóa đơn cũ hơn 5 năm. Bạn chọn khóa phân vùng nào cho `orders`? Nếu một ngày phải sharding, chọn shard key nào? Giải thích ngắn.
+**Bài 7.** DSC Shop phát triển lên 50 triệu đơn hàng, 2 triệu khách. Các truy vấn phổ biến: (a) khách xem lịch sử đơn của mình, (b) báo cáo doanh thu theo tháng, (c) xóa đơn cũ hơn 5 năm. Bạn chọn partition key nào cho `orders`? Nếu một ngày phải sharding, chọn shard key nào? Giải thích ngắn.
 
 <details>
 <summary>Đáp án</summary>
 
 Không có một đáp án duy nhất, đây là một hướng hợp lý:
 
-- **Phân vùng `orders` theo RANGE `order_date`, mỗi tháng hoặc mỗi quý một phân vùng.** (b) đọc đúng các phân vùng của khoảng thời gian cần báo cáo. (c) trở thành `DETACH` rồi `DROP` các phân vùng cũ, gần như tức thời. (a) không lọc theo ngày nên phải dò mọi phân vùng; giải quyết bằng index `customer_id` trên bảng cha (tự có trên từng phân vùng) và giới hạn lịch sử hiển thị trong vài năm gần nhất để vẫn được cắt tỉa (`AND order_date >= now() - INTERVAL '2 years'`).
+- **Partition `orders` theo RANGE `order_date`, mỗi tháng hoặc mỗi quý một partition.** (b) đọc đúng các partition của khoảng thời gian cần báo cáo. (c) trở thành `DETACH` rồi `DROP` các partition cũ, gần như tức thời. (a) không lọc theo ngày nên phải dò mọi partition; giải quyết bằng index `customer_id` trên bảng cha (tự có trên từng partition) và giới hạn lịch sử hiển thị trong vài năm gần nhất để vẫn được cắt tỉa (`AND order_date >= now() - INTERVAL '2 years'`).
 - **Shard key: `customer_id`.** Đơn, dòng hàng, thanh toán của một khách nằm cùng một shard, nên (a) chỉ hỏi một máy và JOIN vẫn nằm trong một máy. Báo cáo (b) phải hỏi mọi shard rồi gộp, nên thường chuyển sang kho dữ liệu cột. Không chọn `order_date` làm shard key, vì mọi đơn mới sẽ dồn vào shard của tháng hiện tại.
 - Trước khi nghĩ tới sharding, 50 triệu dòng vẫn nằm gọn trong một máy PostgreSQL có partition, index và một replica cho báo cáo.
 
-Tự chấm: câu trả lời của bạn đạt nếu (1) khóa phân vùng giúp được cả (b) và (c), (2) nói rõ (a) không được cắt tỉa và cách bù lại, (3) shard key giữ dữ liệu của một khách trên cùng một máy và tránh dồn ghi vào một shard.
+Tự chấm: câu trả lời của bạn đạt nếu (1) partition key giúp được cả (b) và (c), (2) nói rõ (a) không được cắt tỉa và cách bù lại, (3) shard key giữ dữ liệu của một khách trên cùng một máy và tránh dồn ghi vào một shard.
 </details>
 
 ### Dọn dẹp

@@ -11,6 +11,7 @@ authors:
 license: "MIT"
 spec:
   checklist:
-    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
-    - "Kết quả của mình khớp với kết quả trong đáp án"
-    - "Đọc lại phần lý thuyết của những bài làm sai"
+    - "Mọi cột trong `SELECT` đều nằm trong `GROUP BY` hoặc trong hàm tổng hợp"
+    - "Điều kiện trên từng dòng đặt ở `WHERE`, điều kiện trên hàm tổng hợp đặt ở `HAVING`"
+    - "Nhóm theo tháng bằng `DATE_TRUNC` và lọc năm bằng khoảng `>=` / `<`"
+    - "Kết quả của mình khớp từng con số với đáp án"

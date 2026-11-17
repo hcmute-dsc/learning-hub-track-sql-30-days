@@ -106,6 +106,8 @@ Kết quả:
 
 **Bài 4.** Doanh thu từng tháng trong toàn bộ dữ liệu (01/2025 đến 10/2026), kèm lũy kế **từ đầu mỗi năm** (sang năm mới thì lũy kế bắt đầu lại).
 
+> Gợi ý: Điều gì làm lũy kế "bắt đầu lại"? Nhớ vai trò của `PARTITION BY`.
+
 <details>
 <summary>Đáp án</summary>
 
@@ -144,6 +146,8 @@ Kết quả:
 </details>
 
 **Bài 5.** Với mỗi khách đã mua từ 2 đơn trở lên, tìm khoảng cách ngắn nhất (số ngày) giữa hai đơn liên tiếp. In 3 khách quay lại nhanh nhất.
+
+> Gợi ý: `LAG` theo từng khách cho khoảng cách tới đơn liền trước; lấy `MIN` ở truy vấn bên ngoài.
 
 <details>
 <summary>Đáp án</summary>
@@ -257,6 +261,8 @@ Dùng `RANK` thay vì `ROW_NUMBER` để tháng đồng hạng không bị cắt
 
 **Bài 8.** Tính doanh thu theo **danh mục gốc** (cấp 1), gộp từ toàn bộ cây con của nó, kèm tỷ trọng. Danh mục gốc chưa bán được gì vẫn phải hiện với doanh thu 0.
 
+> Gợi ý: Phần neo của CTE đệ quy có thể mang theo cột `goc_id` và giữ nguyên nó khi đi xuống cây.
+
 <details>
 <summary>Đáp án</summary>
 
@@ -310,6 +316,8 @@ Tổng ba nhóm bằng 536291000, khớp với tổng doanh thu 22 tháng ở B�
 </details>
 
 **Bài 9.** Với mỗi nhân viên có cấp dưới, tính tổng số cấp dưới (mọi cấp) và tổng lương của cả nhóm (gồm chính người đó). Chỉ dùng **một** CTE đệ quy cho tất cả nhân viên.
+
+> Gợi ý: Cho **mọi** nhân viên làm điểm xuất phát ở phần neo, và giữ cột "trưởng nhóm" qua các vòng.
 
 <details>
 <summary>Đáp án</summary>

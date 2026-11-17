@@ -111,6 +111,8 @@ WHERE status = 'cancelled'
 
 Thiết kế một partial index cho báo cáo này, đo trước và sau, cho biết kích thước index.
 
+> Gợi ý: điều kiện `status = 'cancelled'` luôn cố định nên đặt vào `WHERE` của index; cột còn lại dùng để lọc theo khoảng ngày.
+
 <details>
 <summary>Đáp án</summary>
 
@@ -177,6 +179,8 @@ Tên có thể trùng (hai người cùng tên) nên đây là index thường, 
 ### Thử thách
 
 **Bài 6.** Một đồng nghiệp đã tạo cả hai index `(customer_id)` và `(customer_id, order_date)` trên `perf.orders`. Index nào thừa? Chứng minh bằng cách xem kích thước hai index, xóa index thừa, rồi kiểm tra câu `WHERE customer_id = 4242` vẫn dùng index.
+
+> Gợi ý: danh sách index của một bảng có trong `pg_index` (cột `indexrelid`, `indrelid`); kích thước lấy bằng `pg_relation_size`.
 
 <details>
 <summary>Đáp án</summary>

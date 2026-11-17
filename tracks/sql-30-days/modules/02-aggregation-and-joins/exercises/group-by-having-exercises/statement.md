@@ -37,6 +37,8 @@ Danh mục 1, 2, 6, 9 là danh mục cha, 13 chưa có sản phẩm, nên không
 
 **Bài 2.** Đếm số đơn theo từng năm và từng kênh bán (`channel`).
 
+> Gợi ý: nhóm theo hai thứ: `EXTRACT(YEAR FROM order_date)` và `channel`.
+
 <details>
 <summary>Đáp án</summary>
 
@@ -168,6 +170,8 @@ Kết quả:
 
 **Bài 7.** Trong năm 2025, tháng nào có từ 3 đơn trở lên (không tính đơn đã hủy)? Hiển thị tháng dạng ngày đầu tháng (ví dụ `2025-09-01`).
 
+> Gợi ý: `DATE_TRUNC('month', order_date)` giữ cả năm lẫn tháng. Điều kiện về trạng thái đặt ở `WHERE`, điều kiện về số đơn đặt ở `HAVING`.
+
 <details>
 <summary>Đáp án</summary>
 
@@ -193,7 +197,9 @@ Kết quả:
 Lọc năm bằng khoảng `>= '2025-01-01' AND < '2026-01-01'` thay vì `EXTRACT(YEAR ...) = 2025`: kết quả như nhau, nhưng cách so sánh trực tiếp trên cột cho phép database dùng index (Ngày 15, 28).
 </details>
 
-**Bài 8.** Tìm các sản phẩm xuất hiện trong ít nhất 3 đơn hàng khác nhau. Hiển thị `product_id`, số đơn và tổng số lượng đã bán, sắp xếp theo số đơn giảm dần.
+**Bài 8.** Tìm các sản phẩm xuất hiện trong ít nhất 3 đơn hàng khác nhau. Hiển thị `product_id`, số đơn và tổng số lượng đã đặt (tính mọi đơn, kể cả đơn chờ và đơn hủy), sắp xếp theo số đơn giảm dần.
+
+> Gợi ý: một sản phẩm có thể nằm trong nhiều đơn, nên đếm `COUNT(DISTINCT order_id)`.
 
 <details>
 <summary>Đáp án</summary>
@@ -230,7 +236,7 @@ Khóa chính của `order_items` là `(order_id, product_id)`, nên trong một 
 <details>
 <summary>Đáp án</summary>
 
-`GROUP BY customer_id HAVING COUNT(*) >= 3` cho ra 5 dòng (mỗi khách một dòng, xem mục 6). Muốn đếm số dòng đó, bạn phải tổng hợp thêm một lần nữa trên kết quả của truy vấn trước. Việc này cần truy vấn con trong `FROM`, học ở [Ngày 11](../../lessons/11-subquery.md):
+`GROUP BY customer_id HAVING COUNT(*) >= 3` cho ra 5 dòng (mỗi khách một dòng, xem mục 6 của [Ngày 9](../../lessons/09-group-by-having.md)). Muốn đếm số dòng đó, bạn phải tổng hợp thêm một lần nữa trên kết quả của truy vấn trước. Việc này cần truy vấn con trong `FROM`, học ở [Ngày 11](../../lessons/11-subquery.md):
 
 ```sql
 SELECT COUNT(*) AS so_khach

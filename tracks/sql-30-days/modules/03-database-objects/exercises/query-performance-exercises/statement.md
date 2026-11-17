@@ -35,6 +35,8 @@ Seq Scan; ước lượng 10.133 dòng, thực tế 10.046; loại 89.954 dòng;
 
 **Bài 2.** `EXPLAIN SELECT * FROM perf.customers;` cho cost tổng là bao nhiêu? Tự tính lại con số đó từ `relpages`, `reltuples` của bảng. Vì sao cost ở bài 1 (có `WHERE`) lại cao hơn?
 
+> Gợi ý: `relpages`, `reltuples` nằm trong `pg_class`; các hệ số `seq_page_cost`, `cpu_tuple_cost`, `cpu_operator_cost` xem trong `pg_settings` (Ngày 20, mục "EXPLAIN: plan dự kiến").
+
 <details>
 <summary>Đáp án</summary>
 
@@ -140,11 +142,13 @@ Kết quả:
  Execution Time: 238.695 ms
 ```
 
-Ước lượng 333.333 dòng (đúng 1/3 bảng), thực tế 36.473. Planner có thống kê cho cột `total_amount`, nhưng không có thống kê cho biểu thức `total_amount / 1000`, nên dùng tỷ lệ mặc định 1/3 cho phép so sánh `>`. Câu thứ nhất được ước lượng 38.838 dòng, sát hơn nhiều (mục [EXPLAIN ANALYZE](#explain-analyze-chạy-thật-và-đo)). Đây cũng là lý do nên viết điều kiện trên cột "trần", không bọc phép tính quanh cột (Ngày 28).
+Ước lượng 333.333 dòng (đúng 1/3 bảng), thực tế 36.473. Planner có thống kê cho cột `total_amount`, nhưng không có thống kê cho biểu thức `total_amount / 1000`, nên dùng tỷ lệ mặc định 1/3 cho phép so sánh `>`. Câu thứ nhất được ước lượng 38.838 dòng, sát hơn nhiều (Ngày 20, mục [EXPLAIN ANALYZE](../../lessons/20-query-performance.md#explain-analyze-chạy-thật-và-đo)). Đây cũng là lý do nên viết điều kiện trên cột "trần", không bọc phép tính quanh cột (Ngày 28).
 
 </details>
 
 **Bài 5.** Đo câu xóa các đơn `pending` đặt trước ngày 01/02/2023 mà không làm mất dữ liệu. Có bao nhiêu đơn sẽ bị xóa? Plan đọc bảng bằng cách nào?
+
+> Gợi ý: `EXPLAIN ANALYZE` chạy thật câu `DELETE`, nên phải bọc nó trong `BEGIN ... ROLLBACK`.
 
 <details>
 <summary>Đáp án</summary>

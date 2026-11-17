@@ -11,6 +11,7 @@ authors:
 license: "MIT"
 spec:
   checklist:
-    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
-    - "Kết quả của mình khớp với kết quả trong đáp án"
-    - "Đọc lại phần lý thuyết của những bài làm sai"
+    - "Chỉ ra đúng loại quan hệ và vị trí khóa ngoại cho cả 5 cặp bảng ở Bài 1"
+    - "Viết được phụ thuộc hàm và DDL tách bảng đạt 3NF, chạy được trên DSC Shop (Bài 3, 4, 5)"
+    - "Giải thích được vì sao bảng ở Bài 6 đạt 3NF nhưng không đạt BCNF, và tách lên BCNF thì mất gì"
+    - "Cho thấy materialized view ở Bài 7 giữ số cũ tới khi REFRESH"

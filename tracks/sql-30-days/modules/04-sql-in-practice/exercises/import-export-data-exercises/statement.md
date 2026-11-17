@@ -27,6 +27,8 @@ PHN-004,Nokia 105 4G,0
 
 **Bài 2.** File `new_employees.tsv` phân cách bằng tab và ghi `N/A` cho ô không có giá trị. Nạp file vào bảng `employees`, rồi xem các nhân viên mới.
 
+> Gợi ý: dùng tùy chọn `DELIMITER` và `NULL` của `COPY`; ký tự tab viết là `E'\t'`.
+
 ```text
 full_name	title	manager_id	hire_date	salary
 Trương Mỹ Linh	Nhân viên bán hàng	2	2026-10-01	10500000
@@ -178,6 +180,8 @@ COMMIT;
 </details>
 
 **Bài 6.** Sao lưu bảng `customers` ra CSV rồi nạp lại vào bảng mới `customers_restore` có cùng cấu trúc. Chứng minh hai bảng giống hệt nhau, kể cả các giá trị NULL.
+
+> Gợi ý: `CREATE TABLE ... (LIKE customers)` tạo bảng cùng cấu trúc; so hai bảng bằng `EXCEPT` (Ngày 12).
 
 <details>
 <summary>Đáp án</summary>

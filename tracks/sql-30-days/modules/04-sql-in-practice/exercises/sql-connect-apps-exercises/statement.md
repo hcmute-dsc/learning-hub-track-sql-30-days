@@ -155,6 +155,8 @@ Lọc bằng khoảng `>= đầu năm AND < đầu năm sau` thay vì `EXTRACT(Y
 
 **Bài 5.** Viết hàm Python `cancel_order(conn, order_id)` trong một transaction: chỉ hủy được đơn đang `pending` (đổi thành `cancelled`), đồng thời cộng trả số lượng của từng dòng hàng vào `stock_quantity`. Nếu đơn không tồn tại hoặc không ở trạng thái `pending` thì báo lỗi và không đổi gì. Thử với đơn 40 và đơn 1.
 
+> Gợi ý: đặt điều kiện `status = 'pending'` ngay trong câu UPDATE rồi xem nó sửa được mấy dòng; cộng kho bằng `UPDATE ... FROM` (Ngày 6).
+
 <details>
 <summary>Đáp án</summary>
 
@@ -252,7 +254,7 @@ Cả hai hàm in ra cùng một kết quả, nhưng `itemsFast` chỉ chạy 1 t
 
 ### Thử thách
 
-**Bài 7.** Thêm vào API Express ở trên endpoint `POST /orders` nhận body `{"customer_id": 16, "items": [{"product_id": 16, "quantity": 2}]}` và dùng hàm `placeOrder` (bản Node). Trả về:
+**Bài 7.** Thêm vào API Express ở mục "Xử lý lỗi" của [bài học Ngày 23](../../lessons/23-sql-connect-apps.md) endpoint `POST /orders` nhận body `{"customer_id": 16, "items": [{"product_id": 16, "quantity": 2}]}` và dùng hàm `placeOrder` (bản Node, mục "Transaction từ code"). Trả về:
 
 - `201` và `{"order_id": ...}` khi thành công,
 - `409` khi một sản phẩm không đủ hàng,

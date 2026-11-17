@@ -32,13 +32,13 @@ license: "MIT"
 
 ## 1. Thiết kế đi từ đâu?
 
-Thiết kế cơ sở dữ liệu thường qua ba mức:
+Thiết kế database thường qua ba mức:
 
 | Mức | Câu hỏi | Kết quả |
 | --- | --- | --- |
 | Khái niệm | Hệ thống quản lý những "thứ" gì, chúng liên quan với nhau thế nào? | ERD: thực thể, thuộc tính, quan hệ |
 | Logic | Mỗi thực thể thành bảng nào, khóa nào, có dư thừa không? | Lược đồ bảng đã chuẩn hóa |
-| Vật lý | Kiểu dữ liệu, ràng buộc, index, phân vùng cụ thể trên PostgreSQL | Các lệnh `CREATE TABLE`, `CREATE INDEX` |
+| Vật lý | Kiểu dữ liệu, ràng buộc, index, partition cụ thể trên PostgreSQL | Các lệnh `CREATE TABLE`, `CREATE INDEX` |
 
 Thiết kế sai ở mức khái niệm (thiếu một thực thể, gộp hai thực thể làm một) là sai lầm đắt nhất, vì sửa nó nghĩa là sửa bảng, dữ liệu, và mọi truy vấn của ứng dụng.
 
@@ -212,6 +212,7 @@ CREATE TABLE thiet_ke.phieu_ban_hang (
 INSERT INTO thiet_ke.phieu_ban_hang VALUES
     (2,  '2025-01-20', 'Trần Thị Bình', 'Hà Nội', 'LAP-005 MacBook Air M2 13 inch x1'),
     (8,  '2025-04-22', 'Trần Thị Bình', 'Hà Nội', 'PHN-001 iPhone 15 128GB x1; ACC-008 Cáp USB-C to USB-C 1m x1'),
+    (22, '2025-11-11', 'Trần Thị Bình', 'Hà Nội', 'PHN-003 Xiaomi Redmi Note 13 x1; ACC-005 Tai nghe AirPods Pro 2 x1'),
     (34, '2026-06-15', 'Trần Thị Bình', 'Hà Nội', 'ACC-007 Sạc Anker 65W x1; ACC-008 Cáp USB-C to USB-C 1m x5');
 ```
 
@@ -549,7 +550,7 @@ Ngược lại, bảng `perf.orders` có sẵn cột `total_amount`: đọc nhan
 | Cột lưu sẵn + trigger (Ngày 18) | Đọc cực nhiều, cần số mới ngay | Ghi chậm hơn, logic đồng bộ phức tạp |
 | Bảng/kho riêng cho phân tích (OLAP) | Báo cáo nặng trên dữ liệu lớn (Ngày 25) | Hệ thống thứ hai phải đồng bộ |
 
-Nguyên tắc chung: hệ thống giao dịch (OLTP) giữ chuẩn hóa, phần báo cáo (OLAP) có thể phi chuẩn hóa.
+Nguyên tắc chung: hệ thống OLTP (xử lý transaction hằng ngày) giữ chuẩn hóa, phần báo cáo (OLAP) có thể phi chuẩn hóa.
 
 ## 7. Vì sao DSC Shop được thiết kế như vậy
 
@@ -577,7 +578,7 @@ Nguyên tắc chung: hệ thống giao dịch (OLTP) giữ chuẩn hóa, phần 
 
 **Dùng NULL đúng nghĩa.** `NOT NULL` cho cột bắt buộc (tên khách, ngày đặt); cho phép NULL khi giá trị có thể thực sự chưa biết (email, ngày sinh). **Đừng thay NULL bằng giá trị giả** như `0`, `''`, `'1900-01-01'`: `MIN(birth_date)` (ra "khách sinh năm 1900") hay `COUNT(email)` sẽ tính cả giá trị giả và cho kết quả sai. NULL không làm truy vấn chậm, B-tree của PostgreSQL vẫn index được NULL; cái cần nhớ là các bẫy logic của NULL (`= NULL`, `NOT IN` khi có NULL, Ngày 3 và 11). `DEFAULT` dành cho giá trị mặc định có thật (`status DEFAULT 'pending'`, `created_at DEFAULT now()`).
 
-**Để cơ sở dữ liệu giữ quy tắc.** Khóa ngoại, `UNIQUE`, `CHECK`, `NOT NULL` chặn dữ liệu sai bất kể ứng dụng nào ghi vào. Kiểm tra ở ứng dụng là thêm, không phải thay thế.
+**Để database giữ quy tắc.** Khóa ngoại, `UNIQUE`, `CHECK`, `NOT NULL` chặn dữ liệu sai bất kể ứng dụng nào ghi vào. Kiểm tra ở ứng dụng là thêm, không phải thay thế.
 
 **Index có chủ đích.** Index các cột khóa ngoại và cột hay lọc, sắp xếp; mỗi index làm chậm `INSERT`, `UPDATE` (Ngày 15). Bảng rất lớn theo thời gian thì cân nhắc partition (Ngày 25).
 
@@ -607,7 +608,7 @@ Phần bài tập của bài này nằm ở bài tập **Bài tập: Thiết k�
 - 1NF: giá trị nguyên tố. 2NF: không cột không khóa nào phụ thuộc vào một phần khóa ghép. 3NF: không phụ thuộc bắc cầu qua cột không khóa. BCNF: mọi vế trái của phụ thuộc là siêu khóa.
 - Mục tiêu thực tế thường là 3NF; BCNF có thể làm mất khả năng kiểm tra một quy tắc bằng ràng buộc đơn giản.
 - Giá lúc mua (`unit_price`) là sự thật lịch sử, không phải dư thừa. Tổng tiền là dữ liệu dẫn xuất: tính khi đọc, hoặc phi chuẩn hóa có chủ đích kèm cơ chế đồng bộ.
-- NULL dùng cho giá trị chưa biết; không thay bằng giá trị giả. Để cơ sở dữ liệu giữ quy tắc bằng khóa ngoại, `UNIQUE`, `CHECK`, `NOT NULL`.
+- NULL dùng cho giá trị chưa biết; không thay bằng giá trị giả. Để database giữ quy tắc bằng khóa ngoại, `UNIQUE`, `CHECK`, `NOT NULL`.
 
 ## Đọc thêm
 

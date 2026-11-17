@@ -7,7 +7,7 @@ objectives:
   - "Lọc sản phẩm theo thông số bằng `@>` và `?`, và giải thích chúng xử lý NULL thế nào."
   - "Tách mảng JSON thành nhiều dòng bằng `jsonb_array_elements_text` để đếm, nhóm."
   - "Sửa JSONB bằng `jsonb_set`, `||`, `-` mà không làm mất dữ liệu."
-  - "Tạo chỉ mục GIN cho cột JSONB, đo hiệu quả bằng `EXPLAIN ANALYZE`, và quyết định một thuộc tính nên nằm trong JSONB hay thành cột riêng."
+  - "Tạo index GIN cho cột JSONB, đo hiệu quả bằng `EXPLAIN ANALYZE`, và quyết định một thuộc tính nên nằm trong JSONB hay thành cột riêng."
 prerequisites:
   - "sql-30-days/foundations/table-structure-and-data-types"
   - "sql-30-days/aggregation-and-joins/group-by-having"
@@ -18,7 +18,7 @@ authors:
 license: "MIT"
 ---
 
-> **Tóm tắt:** PostgreSQL lưu được dữ liệu JSON ngay trong một cột và truy vấn nó bằng SQL. Bài này dùng cột `products.attributes` (kiểu JSONB) của DSC Shop để học cách đọc giá trị, lọc, tách mảng, sửa JSON, tạo JSON từ bảng, tăng tốc bằng chỉ mục GIN, và quan trọng nhất: khi nào nên dùng JSONB, khi nào nên tách thành cột hoặc bảng riêng.
+> **Tóm tắt:** PostgreSQL lưu được dữ liệu JSON ngay trong một cột và truy vấn nó bằng SQL. Bài này dùng cột `products.attributes` (kiểu JSONB) của DSC Shop để học cách đọc giá trị, lọc, tách mảng, sửa JSON, tạo JSON từ bảng, tăng tốc bằng index GIN, và quan trọng nhất: khi nào nên dùng JSONB, khi nào nên tách thành cột hoặc bảng riêng.
 
 **Sau bài này bạn có thể:**
 
@@ -26,7 +26,7 @@ license: "MIT"
 - Lọc sản phẩm theo thông số bằng `@>` và `?`, và giải thích chúng xử lý NULL thế nào.
 - Tách mảng JSON thành nhiều dòng bằng `jsonb_array_elements_text` để đếm, nhóm.
 - Sửa JSONB bằng `jsonb_set`, `||`, `-` mà không làm mất dữ liệu.
-- Tạo chỉ mục GIN cho cột JSONB, đo hiệu quả bằng `EXPLAIN ANALYZE`, và quyết định một thuộc tính nên nằm trong JSONB hay thành cột riêng.
+- Tạo index GIN cho cột JSONB, đo hiệu quả bằng `EXPLAIN ANALYZE`, và quyết định một thuộc tính nên nằm trong JSONB hay thành cột riêng.
 
 **Cần biết trước:** [Ngày 2](../../01-foundations/lessons/02-table-structure-and-data-types.md) (kiểu dữ liệu), [Ngày 9](../../02-aggregation-and-joins/lessons/09-group-by-having.md) (GROUP BY), [Ngày 15](../../03-database-objects/lessons/15-index.md) (index), [Ngày 20](../../03-database-objects/lessons/20-query-performance.md) (EXPLAIN ANALYZE).
 
@@ -106,7 +106,7 @@ WHERE sku IN ('LAP-001', 'PC-003');
 | sku | brand_json | brand_text | ram_json | kieu_1 | kieu_2 |
 | --- | --- | --- | --- | --- | --- |
 | LAP-001 | "ASUS" | ASUS | 16 | jsonb | text |
-| PC-003 |  |  |  | jsonb | text |
+| PC-003 | NULL | NULL | NULL | jsonb | text |
 
 Khóa không tồn tại (hoặc cả cột là NULL như `PC-003`) thì kết quả là NULL, không báo lỗi.
 
@@ -157,7 +157,7 @@ WHERE attributes ? 'colors';
 
 ### `@>`: "chứa"
 
-`a @> b` đúng khi JSON `a` chứa mọi cặp khóa-giá trị của `b`. Đây là cách lọc gọn nhất, và dùng được chỉ mục GIN (phần sau):
+`a @> b` đúng khi JSON `a` chứa mọi cặp khóa-giá trị của `b`. Đây là cách lọc gọn nhất, và dùng được index GIN (phần sau):
 
 ```sql
 SELECT sku, name, price
@@ -415,7 +415,7 @@ ROLLBACK;
 | LAP-003 | 24 |
 | LAP-004 | 24 |
 | LAP-005 | 24 |
-| LAP-006 |  |
+| LAP-006 | NULL |
 
 Thêm phần tử vào mảng: lấy mảng cũ `||` phần tử mới, rồi `jsonb_set` lại:
 
@@ -480,7 +480,7 @@ WHERE customer_id = 3;
 
 SQL NULL trở thành `null` của JSON.
 
-## Tăng tốc bằng chỉ mục GIN
+## Tăng tốc bằng index GIN
 
 24 sản phẩm thì quét cả bảng cũng nhanh. Để thấy tác dụng của index, ta tạo một bảng tin đăng bán hàng riêng với 300.000 dòng, mỗi dòng có `attributes` gồm mã cửa hàng (`shop_id`, 20.000 giá trị khác nhau), hãng, RAM, không dây, màu:
 
@@ -588,7 +588,7 @@ WHERE (attributes ->> 'shop_id')::INT = 777;
 
 Cùng một câu hỏi, viết bằng `@>` thì dùng được index, viết bằng `->>` thì không. Nếu một khóa nào đó hay được lọc bằng `=`, `<`, `>` hoặc sắp xếp, có hai lựa chọn: tạo expression index B-tree trên đúng biểu thức đó (`CREATE INDEX ... ON listings (((attributes ->> 'shop_id')::INT))`), hoặc tốt hơn là đưa nó ra thành một cột thường.
 
-> **Ghi chú dialect:** MySQL không đánh index trực tiếp trên cột JSON; cách thường dùng là tạo cột sinh (generated column) từ biểu thức JSON rồi đánh index cột đó. SQL Server cũng làm tương tự với computed column.
+> **Ghi chú dialect:** MySQL không có index kiểu GIN cho cả cột JSON; cách thường dùng là tạo cột sinh (generated column) hoặc functional index trên một biểu thức JSON, và từ MySQL 8.0.17 có thêm multi-valued index cho mảng JSON. SQL Server làm tương tự với computed column.
 
 Xóa bảng thử nghiệm khi xong:
 
@@ -598,13 +598,13 @@ DROP TABLE listings;
 
 ## Khi nào dùng JSONB, khi nào tách bảng?
 
-JSONB rất tiện, nên dễ bị lạm dụng thành "nhét mọi thứ vào một cột". Quy tắc chung: **dữ liệu có cấu trúc ổn định, cần ràng buộc, cần JOIN hoặc cần tính toán thường xuyên thì để ở cột và bảng thường**; JSONB dành cho phần thay đổi theo từng dòng mà ứng dụng chủ yếu đọc ra hiển thị.
+JSONB rất tiện, nên dễ bị lạm dụng thành "nhét mọi thứ vào một cột". Quy tắc chung: **dữ liệu có cấu trúc ổn định, cần constraint, cần JOIN hoặc cần tính toán thường xuyên thì để ở cột và bảng thường**; JSONB dành cho phần thay đổi theo từng dòng mà ứng dụng chủ yếu đọc ra hiển thị.
 
 ```mermaid
 flowchart TD
     A["Một thuộc tính mới"] --> B{"Mọi dòng đều có?"}
     B -->|"Có"| C["Cột thường"]
-    B -->|"Không"| D{"Cần JOIN, ràng buộc,<br/>tính tiền, sắp xếp?"}
+    B -->|"Không"| D{"Cần JOIN, constraint,<br/>tính tiền, sắp xếp?"}
     D -->|"Có"| E["Cột thường hoặc bảng riêng"]
     D -->|"Không"| F["JSONB"]
 ```
@@ -614,9 +614,9 @@ flowchart TD
 | Thông số khác nhau theo loại hàng: `cpu`, `gpu`, `watt` | Giá bán, tồn kho: cần `CHECK (price >= 0)`, cần `SUM`, cần chính xác `NUMERIC` |
 | Dữ liệu chỉ để hiển thị, ít lọc | Khóa ngoại: `category_id` phải trỏ tới danh mục có thật (JSONB không có `REFERENCES`) |
 | Dữ liệu thô nhận từ API bên ngoài, lưu lại để tra cứu | Thứ hay lọc bằng khoảng hoặc sắp xếp: `order_date`, `price` |
-| Cài đặt (settings) của người dùng | Danh sách cần đếm, JOIN, ràng buộc trùng: màu sắc tồn kho riêng theo từng màu nên là bảng `product_colors` (bài tập 8) |
+| Cài đặt (settings) của người dùng | Danh sách cần đếm, JOIN, constraint chống trùng: màu sắc tồn kho riêng theo từng màu nên là bảng `product_colors` (bài tập 8) |
 
-Đó cũng là lý do thiết kế của DSC Shop: `price`, `stock_quantity`, `category_id`, `is_active` là cột thường có ràng buộc; chỉ thông số kỹ thuật nằm trong `attributes`. Chủ đề này sẽ được bàn kỹ hơn ở [Ngày 26](26-sql-nosql.md) (SQL và NoSQL) và [Ngày 27](27-database-design-best-practices.md) (thiết kế CSDL).
+Đó cũng là lý do thiết kế của DSC Shop: `price`, `stock_quantity`, `category_id`, `is_active` là cột thường có constraint; chỉ thông số kỹ thuật nằm trong `attributes`. Chủ đề này sẽ được bàn kỹ hơn ở [Ngày 26](26-sql-nosql.md) (SQL và NoSQL) và [Ngày 27](27-database-design-best-practices.md) (thiết kế database).
 
 ## Lỗi thường gặp
 
@@ -658,8 +658,8 @@ ROLLBACK;
 | sku | attributes |
 | --- | --- |
 | ACC-007 | {"watt": 65, "brand": "Anker", "warranty_months": 12} |
-| ACC-008 |  |
-| ACC-009 |  |
+| ACC-008 | NULL |
+| ACC-009 | NULL |
 
 Sửa bằng `COALESCE(attributes, '{}') || '{"warranty_months": 12}'`. `jsonb_set` trên cột NULL cũng trả NULL, cùng cách sửa.
 
@@ -691,14 +691,14 @@ Phần bài tập của bài này nằm ở bài tập **Bài tập: Làm việc
 
 ## Tóm tắt
 
-- Dùng `JSONB` (không phải `JSON`) cho dữ liệu bán cấu trúc: nhỏ gọn hơn khi truy vấn, có toán tử `@>`, `?` và index GIN.
+- Dùng `JSONB` (không phải `JSON`) cho dữ liệu bán cấu trúc: truy vấn nhanh hơn (không phải phân tích lại chuỗi), có toán tử `@>`, `?` và index GIN.
 - `->` trả JSONB, `->>` trả text; `#>>` đi theo đường dẫn lồng nhau. So sánh số phải ép kiểu `(... ->> 'k')::INT`.
 - `@>` lọc theo "chứa cặp khóa-giá trị", `?`/`?|`/`?&` kiểm tra khóa. Cột NULL làm các điều kiện này ra NULL, cẩn thận với `NOT`.
 - `jsonb_array_elements_text` biến mảng thành dòng để đếm, nhóm. `jsonb_object_keys`, `jsonb_each` giúp khám phá cấu trúc.
 - Sửa bằng `jsonb_set` (giá trị phải là JSON, chuỗi cần nháy kép hoặc `to_jsonb`), `||` để gộp, `-` để xóa khóa; nhớ `COALESCE` khi cột có thể NULL.
 - `jsonb_build_object`, `jsonb_agg`, `to_jsonb` dựng JSON từ bảng cho API.
 - Index GIN tăng tốc `@>` và `?` khi điều kiện chọn lọc; không giúp `->> =`.
-- Giá tiền, khóa ngoại, thứ cần ràng buộc hoặc tính toán thường xuyên: để ở cột/bảng thường. JSONB cho phần thay đổi theo từng dòng.
+- Giá tiền, khóa ngoại, thứ cần constraint hoặc tính toán thường xuyên: để ở cột/bảng thường. JSONB cho phần thay đổi theo từng dòng.
 
 ## Đọc thêm
 

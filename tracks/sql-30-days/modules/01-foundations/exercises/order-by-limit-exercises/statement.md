@@ -119,6 +119,8 @@ Kết quả:
 
 **Bài 5.** Trang sản phẩm xếp theo giá giảm dần, mỗi trang 6 sản phẩm. Viết truy vấn lấy **trang 3**, bảo đảm thứ tự ổn định kể cả khi có sản phẩm cùng giá.
 
+> Gợi ý: `OFFSET = (trang - 1) * cỡ_trang`; thêm một cột duy nhất vào cuối `ORDER BY` để phá hòa.
+
 <details>
 <summary>Đáp án</summary>
 
@@ -169,6 +171,8 @@ Kết quả:
 
 **Bài 7.** Top 3 sản phẩm lãi nhiều nhất trên mỗi chiếc (`price - cost_price`). Nếu có sản phẩm đồng hạng 3 thì lấy hết. Sản phẩm chưa có giá nhập không được lọt vào top.
 
+> Gợi ý: nhớ chỗ đứng của NULL khi sắp `DESC`, và cú pháp lấy cả các dòng đồng hạng.
+
 <details>
 <summary>Đáp án</summary>
 
@@ -194,6 +198,8 @@ Ba sản phẩm cùng lãi 2.990.000 đồng hạng 3 nên có 5 dòng. Thiếu 
 </details>
 
 **Bài 8.** Một ứng dụng hiển thị đơn hàng mới nhất theo kiểu cuộn vô hạn, mỗi lần tải 4 đơn. Lần tải trước kết thúc ở đơn có `order_date = '2025-09-05 08:00:00+07'`. Viết truy vấn keyset cho lần tải tiếp theo (giả sử không có hai đơn trùng thời điểm).
+
+> Gợi ý: sắp giảm dần thì "trang sau" là các giá trị **nhỏ hơn** giá trị cuối của lần tải trước.
 
 <details>
 <summary>Đáp án</summary>

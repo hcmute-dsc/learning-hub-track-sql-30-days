@@ -50,7 +50,7 @@ Gợi ý tự chấm: làm đúng 12/16 bài trở lên là sẵn sàng sang ch�
 | 2 | Tiền dùng `NUMERIC`, không dùng `FLOAT`. Khóa chính `GENERATED ALWAYS AS IDENTITY`. Ràng buộc `NOT NULL`, `UNIQUE`, `CHECK`, `DEFAULT`, khóa ngoại `REFERENCES ... ON DELETE` |
 | 3 | `SELECT ... FROM ... WHERE`; `IN`, `BETWEEN`, `LIKE`/`ILIKE`; `IS NULL`, không bao giờ `= NULL`; `NOT` > `AND` > `OR`, nên dùng ngoặc khi trộn `AND`/`OR` |
 | 4 | `ORDER BY` nhiều cột, `ASC`/`DESC`, `NULLS FIRST/LAST`; `LIMIT ... OFFSET ...`; phân trang cần `ORDER BY` xác định duy nhất thứ tự |
-| 5 | `INT / INT` chia nguyên; `||` nối chuỗi; `UPPER`, `TRIM`, `REPLACE`, `SUBSTRING`; `EXTRACT`, `AGE`, `INTERVAL`; `::kieu`; `ROUND`; `COALESCE`, `NULLIF` |
+| 5 | `INT / INT` chia nguyên; `\|\|` nối chuỗi; `UPPER`, `TRIM`, `REPLACE`, `SUBSTRING`; `EXTRACT`, `AGE`, `INTERVAL`; `::kieu`; `ROUND`; `COALESCE`, `NULLIF` |
 | 6 | `INSERT ... RETURNING`, `INSERT ... SELECT`, `ON CONFLICT`; `UPDATE ... FROM`; `DELETE`; `TRUNCATE`. Quy trình an toàn: SELECT xem trước, `BEGIN`, kiểm tra, `COMMIT`/`ROLLBACK` |
 
 ## Lỗi thường gặp (tổng hợp chặng 1)
@@ -61,7 +61,7 @@ Gợi ý tự chấm: làm đúng 12/16 bài trở lên là sẵn sàng sang ch�
 | Quên rằng `<>` bỏ qua NULL | `WHERE city <> 'Hà Nội'` không trả khách chưa có city | thêm `OR city IS NULL` nếu muốn lấy cả họ (Bài 7) |
 | Trộn `AND`/`OR` không ngoặc | `status = 'paid' OR status = 'shipped' AND ...` | `(status = 'paid' OR status = 'shipped') AND ...` (Bài 8) |
 | Chia nguyên khi cả hai vế là số nguyên | `stock_quantity / 200 * 100` ra 0 với Sạc Anker (40 cái) | `stock_quantity * 100.0 / 200` hoặc ép `::NUMERIC` trước khi chia (Ngày 5) |
-| Phân trang không có thứ tự duy nhất | `ORDER BY price LIMIT 5 OFFSET 5` khi nhiều sản phẩm cùng giá | thêm cột khóa: `ORDER BY price DESC, product_id` (Bài 11) |
+| Phân trang không có thứ tự duy nhất | `ORDER BY price DESC LIMIT 5 OFFSET 5` khi nhiều sản phẩm cùng giá | thêm cột khóa: `ORDER BY price DESC, product_id` (Bài 11) |
 | Dùng `FLOAT` cho tiền | `price FLOAT` | `price NUMERIC(12,0)` |
 | `UPDATE`/`DELETE` không xem trước | sửa theo tên, sửa nhầm hai "Nguyễn Văn An" | SELECT trước, lọc theo khóa chính, chạy trong `BEGIN` |
 

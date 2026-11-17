@@ -75,6 +75,8 @@ Nếu cần thông tin khách, viết `JOIN customers c ON c.customer_id = o.cus
 
 **Bài 3.** Trên DSC Shop, tìm sản phẩm bán chạy nhất (theo tổng số lượng, không tính đơn `cancelled`) **của từng danh mục**. Nếu nhiều sản phẩm đồng hạng thì lấy hết. Không dùng window function (sẽ học ở Ngày 29).
 
+> Gợi ý: Tổng hợp số lượng theo sản phẩm trong một CTE, rồi so mỗi sản phẩm với `MAX` của danh mục chứa nó.
+
 <details>
 <summary>Đáp án</summary>
 
@@ -142,6 +144,8 @@ Kết quả (cả hai câu):
 </details>
 
 **Bài 5.** Trang danh sách sản phẩm của DSC Shop sắp theo giá giảm dần, mỗi trang 5 sản phẩm. Trang 1 kết thúc ở `iPhone 15 128GB` (`product_id` 10, giá 19.990.000). Viết câu lấy trang 2 bằng keyset. Chú ý chọn thứ tự sắp xếp sao cho dùng được so sánh hàng.
+
+> Gợi ý: Trang sau gồm các dòng "đứng sau" dòng cuối trang trước theo cả hai cột `(price, product_id)`.
 
 <details>
 <summary>Đáp án</summary>
@@ -222,6 +226,8 @@ REFRESH MATERIALIZED VIEW perf.mv_doanh_thu_thang;
 DROP MATERIALIZED VIEW perf.mv_doanh_thu_thang;
 ```
 
+`\timing` là lệnh của psql. Trên công cụ khác (Adminer, DBeaver), xem thời gian chạy mà công cụ hiển thị.
+
 Kết quả (máy tác giả):
 
 | Thao tác | Thời gian |
@@ -249,6 +255,8 @@ SELECT c.customer_id, c.full_name,
 FROM customers c
 ORDER BY c.customer_id;
 ```
+
+> Gợi ý: So kết quả của hai cách đếm với khách chưa có đơn nào (khách 16, 17).
 
 <details>
 <summary>Đáp án</summary>

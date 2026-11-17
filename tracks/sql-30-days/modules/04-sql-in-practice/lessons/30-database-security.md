@@ -122,6 +122,8 @@ RESET ROLE;
 | 10 | 4 |
 | 3 | 3 |
 
+`report_user` đọc được vì là thành viên của `shop_readonly` (thành viên thừa hưởng quyền của nhóm). Còn ghi, hoặc đọc bảng không được cấp, thì vẫn bị chặn:
+
 ```sql
 SET ROLE report_user;
 UPDATE products SET price = 0 WHERE product_id = 1;
@@ -141,8 +143,6 @@ RESET ROLE;
 ```text
 ERROR:  permission denied for table customers
 ```
-
-`report_user` có quyền vì là thành viên của `shop_readonly` (thành viên thừa hưởng quyền của nhóm).
 
 ### Quyền mặc định của PUBLIC
 
@@ -196,6 +196,8 @@ ROLLBACK;
 | order_id |
 | --- |
 | 41 |
+
+(Số `order_id` chỉ là 41 trên dữ liệu vừa nạp lại. Sequence không quay lui khi `ROLLBACK`, nên nếu bạn đã chạy INSERT trước đó, số sẽ lớn hơn.)
 
 | stock_quantity |
 | --- |
@@ -518,7 +520,7 @@ SELECT md5('matkhau123') AS lan_1, md5('matkhau123') AS lan_2;
 Bảng lưu tài khoản (cột lưu hash, không có cột `password`):
 
 ```sql
-CREATE EXTENSION IF NOT EXISTS pgcrypto;   -- dùng ở cách 2 bên dưới
+CREATE EXTENSION IF NOT EXISTS pgcrypto SCHEMA public;   -- dùng ở cách 2 bên dưới; đặt ở public để không lẫn vào schema shop
 
 DROP TABLE IF EXISTS app_users;
 CREATE TABLE app_users (
@@ -700,6 +702,7 @@ DROP OWNED BY shop_readonly, report_user, app_user, support_staff, sales_staff;
 DROP ROLE report_user, shop_readonly, app_user, support_staff, sales_staff;
 GRANT CONNECT ON DATABASE sql_challenge TO PUBLIC;
 DROP TABLE IF EXISTS app_users;
+DROP EXTENSION IF EXISTS pgcrypto;
 ```
 
 ## Lỗi thường gặp
@@ -712,7 +715,7 @@ DROP TABLE IF EXISTS app_users;
 
 **4. Quên bảng tạo sau.** `GRANT SELECT ON ALL TABLES IN SCHEMA shop` chỉ tác dụng với bảng đang có. Dùng thêm `ALTER DEFAULT PRIVILEGES`.
 
-**5. Nối chuỗi tạo SQL, hoặc tự escape dấu nháy.** Luôn tham số hóa; tên cột/bảng động thì whitelist hoặc `format('%I')`.
+**5. Nối chuỗi tạo SQL, hoặc tự escape nháy đơn.** Luôn tham số hóa; tên cột/bảng động thì whitelist hoặc `format('%I')`.
 
 **6. So sánh mật khẩu dạng rõ, hoặc dùng md5/sha256.** Lưu hash bcrypt/argon2, so bằng hàm của thư viện.
 

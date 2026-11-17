@@ -21,7 +21,7 @@ Bài đọc nên bài tập chủ yếu là phân tích; các bài có SQL chạ
 <details>
 <summary>Đáp án</summary>
 
-(a) Sai: có từ MongoDB 4.0 (replica set) và 4.2 (sharded cluster). (b) Sai: có read replica để chia tải đọc và sharding qua công cụ như Citus, dù phức tạp hơn. (c) Sai: C của ACID là không vi phạm ràng buộc; C của CAP là mọi lần đọc thấy bản ghi mới nhất. (d) Đúng: đó là nội dung định lý CAP.
+(a) Sai: có từ MongoDB 4.0 (replica set) và 4.2 (sharded cluster). (b) Sai: có read replica để chia tải đọc và sharding qua công cụ như Citus, dù phức tạp hơn. (c) Sai: C của ACID là không vi phạm constraint; C của CAP là mọi lần đọc thấy bản ghi mới nhất. (d) Đúng: đó là nội dung định lý CAP.
 </details>
 
 ### Vận dụng
@@ -135,6 +135,8 @@ db.customers.aggregate([
 
 **Bài 5.** DSC Shop muốn hiện mục "Thường được mua cùng". Một bạn đề xuất cài ngay Neo4j. Trước khi quyết định, hãy viết bằng SQL: liệt kê các cặp sản phẩm cùng xuất hiện trong ít nhất 2 đơn. Dựa vào kết quả và quy mô dữ liệu, bạn có đồng ý cài thêm Neo4j không?
 
+> Gợi ý: JOIN bảng `order_items` với chính nó theo `order_id`.
+
 <details>
 <summary>Đáp án</summary>
 
@@ -161,7 +163,7 @@ Kết quả:
 | 16 | Chuột Logitech G102 | 18 | Bàn phím cơ Keychron K2 | 2 |
 | 22 | Sạc Anker 65W | 23 | Cáp USB-C to USB-C 1m | 2 |
 
-Gợi ý "mua cùng" một bước chỉ là một SELF JOIN, PostgreSQL làm tốt kể cả với hàng triệu dòng hàng (có thể tính sẵn định kỳ vào một materialized view, Ngày 19). Thêm một hệ CSDL nghĩa là thêm việc vận hành, đồng bộ dữ liệu, sao lưu. Graph database chỉ đáng cân nhắc khi bài toán chính là duyệt quan hệ nhiều bước, sâu và thay đổi liên tục (ví dụ mạng xã hội, phát hiện vòng gian lận).
+Gợi ý "mua cùng" một bước chỉ là một SELF JOIN, PostgreSQL làm tốt kể cả với hàng triệu dòng hàng (có thể tính sẵn định kỳ vào một materialized view, Ngày 19). Thêm một hệ database nghĩa là thêm việc vận hành, đồng bộ dữ liệu, sao lưu. Graph database chỉ đáng cân nhắc khi bài toán chính là duyệt quan hệ nhiều bước, sâu và thay đổi liên tục (ví dụ mạng xã hội, phát hiện vòng gian lận).
 </details>
 
 **Bài 6.** Thiết kế lưu trữ cho ba tính năng mới của DSC Shop: (a) giỏ hàng của khách chưa đăng nhập, mất sau 7 ngày; (b) lịch sử sản phẩm khách đã xem (rất nhiều lượt ghi, chỉ dùng để gợi ý); (c) đánh giá sản phẩm có ảnh, số sao, và trả lời của cửa hàng. Chọn công nghệ cho mỗi cái và giải thích.
@@ -172,8 +174,8 @@ Gợi ý "mua cùng" một bước chỉ là một SELF JOIN, PostgreSQL làm t�
 Một phương án hợp lý:
 
 - (a) Redis: khóa là mã phiên, giá trị là danh sách sản phẩm, đặt thời gian hết hạn 7 ngày. Mất dữ liệu cũng không nghiêm trọng. Khi khách đặt hàng, đơn được ghi vào PostgreSQL trong một transaction.
-- (b) Ghi vào bảng PostgreSQL phân vùng theo tháng (Ngày 25) là đủ ở quy mô vừa, xóa dữ liệu cũ bằng `DETACH`. Khi lên tới hàng tỷ lượt xem, chuyển sang wide-column (Cassandra) hoặc kho cột.
-- (c) PostgreSQL: bảng `reviews` có khóa ngoại tới `products` và `customers`, `CHECK (rating BETWEEN 1 AND 5)`, bảng con cho ảnh hoặc cột `JSONB` cho danh sách URL ảnh. Đánh giá gắn chặt với sản phẩm, khách, và đơn đã mua, nên cần ràng buộc quan hệ.
+- (b) Ghi vào bảng PostgreSQL partition theo tháng (Ngày 25) là đủ ở quy mô vừa, xóa dữ liệu cũ bằng `DETACH`. Khi lên tới hàng tỷ lượt xem, chuyển sang wide-column (Cassandra) hoặc kho cột.
+- (c) PostgreSQL: bảng `reviews` có khóa ngoại tới `products` và `customers`, `CHECK (rating BETWEEN 1 AND 5)`, bảng con cho ảnh hoặc cột `JSONB` cho danh sách URL ảnh. Đánh giá gắn chặt với sản phẩm, khách, và đơn đã mua, nên cần constraint quan hệ (khóa ngoại, `CHECK`).
 
 Tự chấm: phương án khác vẫn được nếu lập luận nêu đủ các ý sau. (a) dữ liệu tạm, cần tự hết hạn, mất cũng không sao; (b) khối lượng ghi lớn, dữ liệu cũ phải xóa được rẻ, quy mô nào thì cần hệ khác; (c) cần khóa ngoại và `CHECK`, nên giữ trong PostgreSQL.
 </details>

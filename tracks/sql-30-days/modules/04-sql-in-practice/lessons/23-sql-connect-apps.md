@@ -205,7 +205,7 @@ conn.execute(
 )
 ```
 
-Vì sao cách này an toàn? Driver gửi câu SQL (chứa `$1`) và giá trị tham số thành hai phần riêng. PostgreSQL phân tích (parse) câu SQL trước, chốt cấu trúc câu lệnh, rồi mới điền giá trị vào chỗ `$1`. Lúc đó giá trị chỉ còn là một chuỗi dữ liệu, không thể "mọc" thêm `OR`, `UNION` hay `;` vào câu lệnh nữa. Với input `' OR '1'='1`, truy vấn trên trả về 0 dòng vì không khách nào có email như vậy.
+Vì sao cách này an toàn? psycopg 3 tự đổi `%s` thành ký hiệu tham số của PostgreSQL (`$1`, `$2`...), rồi gửi câu SQL và giá trị tham số thành hai phần riêng. PostgreSQL phân tích (parse) câu SQL trước, chốt cấu trúc câu lệnh, rồi mới điền giá trị vào chỗ `$1`. Lúc đó giá trị chỉ còn là một chuỗi dữ liệu, không thể "mọc" thêm `OR`, `UNION` hay `;` vào câu lệnh nữa. Với input `' OR '1'='1`, truy vấn trên trả về 0 dòng vì không khách nào có email như vậy. Một số driver khác (`psycopg2`, `mysql2` khi gọi `query()`) không gửi riêng mà tự escape giá trị ở phía client rồi ghép thành một câu SQL hoàn chỉnh. Cách đó vẫn an toàn, miễn là bạn đưa giá trị cho driver qua tham số chứ không tự nối chuỗi.
 
 > Đừng tự "escape" dấu nháy bằng `replace("'", "''")`. Tự escape dễ sót trường hợp, còn tham số hóa thì đúng trong mọi trường hợp.
 
@@ -470,10 +470,10 @@ Quên `client.release()` thì sau vài request pool hết kết nối và ứng 
 
 | SQLSTATE | Tên | Khi nào |
 | --- | --- | --- |
-| `40001` | serialization_failure | Ở mức `REPEATABLE READ`/`SERIALIZABLE`, transaction định sửa một dòng mà phiên khác vừa sửa và commit |
+| `40001` | serialization_failure | Ở mức `REPEATABLE READ`/`SERIALIZABLE`, transaction định sửa một dòng mà phiên khác vừa sửa và commit; riêng `SERIALIZABLE` còn báo lỗi này khi các transaction đồng thời không thể xếp thành một thứ tự tuần tự, kể cả khi không sửa chung dòng nào |
 | `40P01` | deadlock_detected | Hai transaction chờ khóa của nhau, PostgreSQL hủy một bên |
 
-Hai lỗi này không phải do dữ liệu sai: chạy lại nguyên transaction từ đầu thường sẽ thành công. Vì vậy code nên bắt riêng hai mã này và thử lại, có giới hạn số lần (để không lặp vô tận) và chờ một chút giữa các lần. Các lỗi khác (vi phạm ràng buộc, hết hàng) thì không thử lại, vì chạy lại cũng sai y như cũ.
+Hai lỗi này không phải do dữ liệu sai: chạy lại nguyên transaction từ đầu thường sẽ thành công. Vì vậy code nên bắt riêng hai mã này và thử lại, có giới hạn số lần (để không lặp vô tận) và chờ một chút giữa các lần. Các lỗi khác (vi phạm constraint, hết hàng) thì không thử lại, vì chạy lại cũng sai y như cũ.
 
 ```python
 import os

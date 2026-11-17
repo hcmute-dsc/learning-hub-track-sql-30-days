@@ -108,7 +108,7 @@ Kết quả (vài dòng đầu):
 Có 3 sản phẩm hết hàng: `Acer Nitro V 15`, `Nokia 105 4G`, `Loa JBL Flip 6`. Đếm bằng mắt chỉ ổn với 24 dòng; Ngày 3 bạn sẽ dùng `WHERE stock_quantity = 0` để lọc, Ngày 8 dùng `COUNT` để đếm.
 </details>
 
-**Bài 5.** Dựa vào kết quả `SELECT * FROM categories;` ở trên, vẽ cây danh mục ra giấy. Danh mục nào là gốc (không có cha)? `Laptop gaming` nằm dưới những danh mục nào?
+**Bài 5.** Chạy `SELECT * FROM categories;` (kết quả có ở mục [Câu SELECT đầu tiên](../../lessons/01-intro-to-sql-and-dbms.md#câu-select-đầu-tiên) của bài học), rồi vẽ cây danh mục ra giấy. Danh mục nào là gốc (không có cha)? `Laptop gaming` nằm dưới những danh mục nào?
 
 <details>
 <summary>Đáp án</summary>
@@ -156,7 +156,7 @@ Referenced by:
 Hai bảng `order_items` và `payments` trỏ tới `orders`. Chỉ `order_items` có `ON DELETE CASCADE`: xóa đơn thì các dòng hàng của đơn bị xóa theo. Ngày 2 giải thích vì sao `payments` không được thiết kế như vậy.
 </details>
 
-**Bài 8.** Mở Adminer (<http://localhost:8080>), đăng nhập vào `sql_challenge`, chọn schema `shop` và xem dữ liệu bảng `payments`. Sau đó vào "SQL command", chạy câu lệnh lấy mã đơn, số tiền và phương thức thanh toán của mọi lần thanh toán. So sánh số dòng với bảng ở mục "Khám phá DSC Shop".
+**Bài 8.** Mở Adminer (<http://localhost:8080>), đăng nhập vào `sql_challenge`, chọn schema `shop` và xem dữ liệu bảng `payments`. Sau đó vào "SQL command", chạy câu lệnh lấy mã đơn, số tiền và phương thức thanh toán của mọi lần thanh toán. So sánh số dòng với bảng tổng quan ở mục [Khám phá DSC Shop](../../lessons/01-intro-to-sql-and-dbms.md#khám-phá-dsc-shop) của bài học.
 
 <details>
 <summary>Đáp án</summary>

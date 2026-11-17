@@ -724,7 +724,7 @@ Quy tắc ngắn: cần dùng kết quả **trong một truy vấn** thì viết
 | Sửa thân hàm (giữ nguyên tham số và kiểu trả về) | `CREATE OR REPLACE FUNCTION ...` |
 | Xóa | `DROP FUNCTION IF EXISTS order_total(INT);` / `DROP PROCEDURE IF EXISTS place_order(INT, INT, INT);` |
 
-Ví dụ `\df` sau khi tạo vài đối tượng ở mục 8 và 9:
+Ví dụ `\df` sau khi tạo vài đối tượng ở mục 8 và 9 (trích 3 dòng; làm theo cả bài thì danh sách của bạn dài hơn, gồm cả `order_total`, `place_order`, ...):
 
 ```text
                                           List of functions
@@ -866,7 +866,7 @@ Phần bài tập của bài này nằm ở bài tập **Bài tập: Function v�
 - Function gọi trong câu lệnh và trả về giá trị hoặc bảng; procedure gọi bằng `CALL`, trả kết quả qua `OUT`, và được `COMMIT` bên trong.
 - `LANGUAGE sql` cho logic chỉ gồm câu SQL; `LANGUAGE plpgsql` khi cần biến, `IF`, vòng lặp, báo và bắt lỗi.
 - `RAISE EXCEPTION ... USING ERRCODE = ...` báo lỗi có mã; khối `EXCEPTION WHEN ...` bắt lỗi và hoạt động như một savepoint.
-- `FOUND`, `GET DIAGNOSTICS ... ROW_COUNT`, `INTO STRICT` giúp phát hiện "không có dòng nào", thứ database không tự coi là lỗi.
+- `FOUND`, `INTO STRICT` giúp phát hiện "không có dòng nào", thứ database không tự coi là lỗi.
 - Đưa logic vào procedure không tự làm nó an toàn: vẫn phải trừ kho bằng UPDATE có điều kiện hoặc khóa bằng `FOR UPDATE`.
 - SQL động: `format('%I')` cho tên, `USING` cho giá trị, không bao giờ ghép chuỗi giá trị.
 - Function không tự nhanh hơn; bọc cột trong function ở `WHERE` còn có thể làm mất index.

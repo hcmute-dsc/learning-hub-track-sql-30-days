@@ -86,6 +86,8 @@ Kết quả:
 
 **Bài 4.** Tính số lượng bán và doanh thu (không tính đơn `pending` và `cancelled`) theo **hãng** lấy từ `attributes`. Sản phẩm không có thông tin hãng gom vào nhóm `(không rõ)`.
 
+> Gợi ý: sản phẩm có `attributes` NULL cho `attributes ->> 'brand'` là NULL; dùng `COALESCE`.
+
 <details>
 <summary>Đáp án</summary>
 
@@ -250,7 +252,7 @@ Kết quả:
 ```
 </details>
 
-**Bài 8.** Cửa hàng muốn quản lý tồn kho riêng theo từng màu, nên danh sách màu cần ràng buộc chặt (không trùng màu trong một sản phẩm, sản phẩm phải tồn tại). Tạo bảng `product_colors (product_id, color)` với khóa chính và khóa ngoại phù hợp, đổ dữ liệu từ `attributes -> 'colors'`, rồi dùng nó tìm các sản phẩm có màu `Đen`. Thử chèn một màu trùng và một `product_id` không tồn tại. Cuối bài xóa bảng.
+**Bài 8.** Cửa hàng muốn quản lý tồn kho riêng theo từng màu, nên danh sách màu cần constraint chặt (không trùng màu trong một sản phẩm, sản phẩm phải tồn tại). Tạo bảng `product_colors (product_id, color)` với khóa chính và khóa ngoại phù hợp, đổ dữ liệu từ `attributes -> 'colors'`, rồi dùng nó tìm các sản phẩm có màu `Đen`. Thử chèn một màu trùng và một `product_id` không tồn tại. Cuối bài xóa bảng.
 
 <details>
 <summary>Đáp án</summary>

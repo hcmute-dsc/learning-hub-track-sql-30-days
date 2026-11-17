@@ -96,7 +96,7 @@ SELECT full_name,
        EXTRACT(YEAR FROM AGE(DATE '2026-10-17', birth_date)) AS tuoi
 FROM customers
 WHERE birth_date IS NOT NULL
-ORDER BY tuoi
+ORDER BY birth_date DESC
 LIMIT 5;
 ```
 
@@ -105,12 +105,12 @@ Kết quả:
 | full_name | birth_date | tuoi |
 | --- | --- | --- |
 | Dương Minh Khoa | 2005-02-14 | 21 |
-| Võ Quốc Phong | 2004-05-12 | 22 |
 | Huỳnh Tấn Phát | 2004-08-20 | 22 |
+| Võ Quốc Phong | 2004-05-12 | 22 |
 | Phạm Minh Duy | 2003-01-30 | 23 |
 | Tạ Quang Sơn | 2002-12-12 | 23 |
 
-Thiếu `WHERE birth_date IS NOT NULL` thì sao? `ORDER BY tuoi` tăng dần đặt `NULL` cuối nên kết quả vẫn đúng ở đây, nhưng viết rõ điều kiện giúp truy vấn không phụ thuộc vào chi tiết đó. Sắp theo `birth_date DESC` cũng được và tránh phải tính tuổi để sắp.
+Trẻ nhất là sinh muộn nhất, nên sắp `birth_date DESC`. Đừng sắp theo `tuoi`: Phát và Phong cùng 22 tuổi, nên `ORDER BY tuoi` không quyết định ai đứng trước (thiếu cột phá hòa, như [Ngày 4](../../lessons/04-order-by-limit.md) đã cảnh báo). Thiếu `WHERE birth_date IS NOT NULL` thì `DESC` đặt `NULL` lên đầu, nên điều kiện này là bắt buộc.
 
 </details>
 
@@ -147,6 +147,8 @@ Kết quả:
 
 **Bài 6.** Cũng bảng trên nhưng hiển thị biên lợi nhuận thành chữ, ví dụ `15.8%`; sản phẩm chưa có giá nhập ghi `chưa có giá nhập`. Sắp theo `sku`.
 
+> Gợi ý: `COALESCE` cần các đối số cùng kiểu: ép số sang `TEXT` trước khi nối `'%'`.
+
 <details>
 <summary>Đáp án</summary>
 
@@ -177,6 +179,8 @@ Với `LAP-006`, cả biểu thức `ROUND(...)::TEXT || '%'` là `NULL` (vì `|
 </details>
 
 **Bài 7.** Che số điện thoại khi hiển thị: giữ 4 số đầu và 3 số cuối, giữa là `***` (ví dụ `0901***567`). Khách không có số thì hiện `ẩn`. Làm cho khách id 1 đến 6.
+
+> Gợi ý: `LEFT(s, n)` và `RIGHT(s, n)` lấy n ký tự đầu/cuối; `||` gặp NULL thì cả chuỗi thành NULL.
 
 <details>
 <summary>Đáp án</summary>
@@ -233,6 +237,8 @@ Kết quả:
 </details>
 
 **Bài 9.** Với các đơn chưa giao xong (`pending`, `paid`, `shipped`), cửa hàng cam kết giao trong 3 ngày kể từ lúc đặt. Hiển thị hạn giao (dạng `DD/MM/YYYY`) và số ngày khách đã chờ tính đến ngày 17/10/2026, đơn cũ nhất trước.
+
+> Gợi ý: trừ hai `DATE` ra số ngày nguyên; `order_date::date` bỏ phần giờ.
 
 <details>
 <summary>Đáp án</summary>

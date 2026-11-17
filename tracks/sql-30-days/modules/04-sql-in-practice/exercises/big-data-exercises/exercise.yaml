@@ -11,6 +11,7 @@ authors:
 license: "MIT"
 spec:
   checklist:
-    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
-    - "Kết quả SQL của mình khớp với đáp án; với câu phân tích (Bài 7), lập luận của mình có đủ các ý chính trong đáp án"
-    - "Đọc lại phần lý thuyết của những bài làm sai"
+    - "Bảng LIST có khóa chính chứa partition key và số liệu từng partition khớp đáp án (Bài 1)"
+    - "Dùng EXPLAIN chứng minh truy vấn chỉ quét một partition sau khi viết lại điều kiện (Bài 2, 4, 5)"
+    - "Tạo được partition 2027 trong một transaction khi `DEFAULT` đang giữ dòng thuộc khoảng mới (Bài 6)"
+    - "Lập luận Bài 7 có đủ các ý trong phần Tự chấm"

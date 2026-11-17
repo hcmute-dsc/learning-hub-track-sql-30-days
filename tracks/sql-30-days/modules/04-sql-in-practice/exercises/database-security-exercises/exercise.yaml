@@ -11,6 +11,7 @@ authors:
 license: "MIT"
 spec:
   checklist:
-    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
-    - "Kết quả của mình khớp với kết quả trong đáp án"
-    - "Đọc lại phần lý thuyết của những bài làm sai"
+    - "Kiểm chứng mỗi quyền bằng SET ROLE hoặc has_*_privilege, thấy cả lệnh được phép lẫn lệnh bị từ chối"
+    - "Chỉ ra được input tấn công ở Bài 4 và sửa bằng truy vấn tham số hóa"
+    - "check_login ở Bài 5 trả đúng t, f, f, f cho bốn trường hợp"
+    - "Dọn sạch role, bảng, function và extension đã tạo khi xong"

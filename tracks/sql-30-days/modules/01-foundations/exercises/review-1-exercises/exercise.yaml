@@ -2,7 +2,7 @@ uid: "59354fbe-27c8-5cf4-a270-119928cb9dff"
 slug: "review-1-exercises"
 title: "Bài tập: Ôn tập 1 (Ngày 1 đến 6)"
 type: "self_check"
-difficulty: "easy"
+difficulty: "medium"
 lesson: "review-1"
 tags:
   - "sql"
@@ -11,6 +11,6 @@ authors:
 license: "MIT"
 spec:
   checklist:
-    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
-    - "Kết quả của mình khớp với kết quả trong đáp án"
-    - "Đọc lại phần lý thuyết của những bài làm sai"
+    - "Làm đúng ít nhất 12/16 bài; bài sai thì đọc lại ngày ghi trong ngoặc ở đầu bài"
+    - "Kết quả khớp đáp án cả về số dòng, giá trị và thứ tự (với bài có `ORDER BY`)"
+    - "Các bài sửa dữ liệu kết thúc bằng `ROLLBACK` hoặc làm trên bảng nháp, nên dữ liệu shop vẫn như cũ"

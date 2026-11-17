@@ -11,6 +11,7 @@ authors:
 license: "MIT"
 spec:
   checklist:
-    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
-    - "Kết quả của mình khớp với kết quả trong đáp án"
-    - "Đọc lại phần lý thuyết của những bài làm sai"
+    - "Kết nối được `sql_challenge` bằng `psql` hoặc Adminer và kiểm tra phiên bản PostgreSQL 16"
+    - "Đọc được kết quả `\\d tên_bảng`: cột nào `not null`, cột nào `UNIQUE`, bảng nào trỏ tới qua `Referenced by`"
+    - "Viết được `SELECT cột, ... FROM bảng` và số dòng khớp bảng tổng quan của DSC Shop"
+    - "Xếp đúng mỗi câu lệnh vào nhóm DDL, DML, DCL hoặc TCL"

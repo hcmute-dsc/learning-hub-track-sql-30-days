@@ -85,7 +85,7 @@ WHERE category_id = 12;
 | ACC-007 | Sạc Anker 65W | 40 | 3 | 4 |
 | ACC-008 | Cáp USB-C to USB-C 1m | 200 | 16 | 8 |
 
-Nhưng khi tính **tỉ lệ phần trăm**, chia nguyên là một lỗi âm thầm. Kho chứa tối đa 200 cái mỗi mã, mỗi mã đang lấp bao nhiêu phần trăm?
+Nhưng khi tính **tỷ lệ phần trăm**, chia nguyên là một lỗi âm thầm. Kho chứa tối đa 200 cái mỗi mã, mỗi mã đang lấp bao nhiêu phần trăm?
 
 ```sql
 SELECT sku,

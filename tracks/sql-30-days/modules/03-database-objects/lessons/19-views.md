@@ -448,7 +448,7 @@ SELECT * FROM customer_directory ORDER BY customer_id LIMIT 5;
 | 2 | Trần Thị Bình | Hà Nội | bin*** | 2001 |
 | 3 | Lê Hoàng Cường | Đà Nẵng | cuo*** | 1999 |
 | 4 | Phạm Minh Duy | TP. Hồ Chí Minh | duy*** | 2003 |
-| 5 | Hoàng Thị Em | Cần Thơ |  |  |
+| 5 | Hoàng Thị Em | Cần Thơ | NULL | NULL |
 
 (Khách 5 không có email và ngày sinh, nên hai cột đó là NULL.)
 
@@ -598,7 +598,7 @@ Cả hai truy vấn trả về cùng một dòng:
 | --- | --- | --- |
 | 2025-06-01 | 19955 | 301134916000 |
 
-Thời gian đo trên máy mình (PostgreSQL 16 trong Docker, chạy mỗi câu 5 lần):
+Thời gian đo trên máy tác giả (PostgreSQL 16 trong Docker, chạy mỗi câu 5 lần):
 
 | Câu lệnh | Thời gian |
 | --- | --- |
@@ -607,7 +607,7 @@ Thời gian đo trên máy mình (PostgreSQL 16 trong Docker, chạy mỗi câu 
 | Đọc materialized view `monthly_revenue_mv` (46 dòng) | dưới 1 ms |
 | `REFRESH MATERIALIZED VIEW` | khoảng 340-620 ms |
 
-Số trên máy bạn sẽ khác, nhưng tỉ lệ thì tương tự: view thường tốn ngang truy vấn gốc (phải quét cả triệu đơn), materialized view nhanh hơn hàng trăm lần, còn cái giá phải trả là mỗi lần `REFRESH` tốn công hơn một lần chạy truy vấn gốc.
+Số trên máy bạn sẽ khác, nhưng tỷ lệ thì tương tự: view thường tốn ngang truy vấn gốc (phải quét cả triệu đơn), materialized view nhanh hơn hàng trăm lần, còn cái giá phải trả là mỗi lần `REFRESH` tốn công hơn một lần chạy truy vấn gốc.
 
 Dọn dẹp sau khi đo, để schema `perf` sạch cho các bài sau:
 

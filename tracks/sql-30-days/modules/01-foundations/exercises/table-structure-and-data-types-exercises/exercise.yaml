@@ -2,7 +2,7 @@ uid: "524a1000-ac73-5f64-b7ae-f6ec158d02f4"
 slug: "table-structure-and-data-types-exercises"
 title: "Bài tập: Bảng, kiểu dữ liệu và ràng buộc"
 type: "self_check"
-difficulty: "easy"
+difficulty: "medium"
 lesson: "table-structure-and-data-types"
 tags:
   - "sql"
@@ -11,6 +11,7 @@ authors:
 license: "MIT"
 spec:
   checklist:
-    - "Tự viết và chạy truy vấn cho từng bài trước khi mở \"Đáp án\""
-    - "Kết quả của mình khớp với kết quả trong đáp án"
-    - "Đọc lại phần lý thuyết của những bài làm sai"
+    - "Chọn được kiểu dữ liệu phù hợp (tiền dùng `NUMERIC`, thời điểm dùng `TIMESTAMPTZ`) và giải thích được vì sao"
+    - "Tạo được bảng có khóa chính IDENTITY, `NOT NULL`, `UNIQUE`, `CHECK`, `DEFAULT`, khóa ngoại, và các lệnh sai bị từ chối với đúng tên constraint như đáp án"
+    - "Sửa bảng bằng `ALTER TABLE` và kiểm tra lại bằng `\\d`"
+    - "Giải thích được kết quả khi xóa dòng cha với `NO ACTION` và `ON DELETE CASCADE`"

@@ -38,6 +38,8 @@ Kết quả:
 
 **Bài 2.** Lập danh sách "sản phẩm cần chú ý" gồm sản phẩm hết hàng (`stock_quantity = 0`) và sản phẩm ngừng kinh doanh (`is_active = FALSE`), có cột `ly_do`. Sắp xếp theo `sku`, rồi `ly_do`. Một sản phẩm vừa hết hàng vừa ngừng kinh doanh thì hiện cả hai lý do.
 
+> Gợi ý: hai câu `SELECT`, mỗi câu thêm một cột hằng cho lý do, nối bằng `UNION ALL`.
+
 <details>
 <summary>Đáp án</summary>
 
@@ -103,6 +105,8 @@ Có `customer_id` trong kết quả nên hai khách `Nguyễn Văn An` (1 và 15
 
 **Bài 4.** Tìm khách đã mua (đơn đã thanh toán, như Bài 3) trong năm 2025 nhưng **không quay lại** mua trong năm 2026.
 
+> Gợi ý: giống Bài 3 nhưng thay `INTERSECT` bằng phép toán lấy "có ở A mà không có ở B".
+
 <details>
 <summary>Đáp án</summary>
 
@@ -159,6 +163,8 @@ WHERE NOT EXISTS (SELECT 1 FROM order_items oi WHERE oi.product_id = p.product_i
 </details>
 
 **Bài 6.** Viết một báo cáo doanh thu theo kênh có thêm **dòng tổng cộng** ở cuối. Doanh thu là tổng tiền dòng hàng (`quantity * unit_price * (1 - discount)`) của các đơn đã thanh toán, tức `status` không phải `pending` hay `cancelled` (quy ước chung của khóa, khớp với bảng `payments`).
+
+> Gợi ý: vế thứ nhất `GROUP BY channel`, vế thứ hai không `GROUP BY` nên ra đúng một dòng tổng. Muốn dòng tổng chắc chắn nằm cuối thì cần một cột để sắp xếp.
 
 <details>
 <summary>Đáp án</summary>
@@ -217,11 +223,11 @@ Kết quả: 29 dòng, bằng `SELECT COUNT(*) FROM categories c FULL JOIN produ
 
 | danh_muc | san_pham |
 | --- | --- |
-| Điện thoại & Tablet | *(NULL)* |
-| Laptop | *(NULL)* |
-| Máy tính | *(NULL)* |
-| Phụ kiện | *(NULL)* |
-| Thiết bị mạng | *(NULL)* |
+| Điện thoại & Tablet | NULL |
+| Laptop | NULL |
+| Máy tính | NULL |
+| Phụ kiện | NULL |
+| Thiết bị mạng | NULL |
 
 Cách này dựa vào `UNION` để bỏ các dòng ghép được mà cả hai vế đều trả về. Nó chỉ đúng khi bản thân kết quả JOIN không có hai dòng giống hệt nhau (ở đây đúng, vì mỗi sản phẩm có tên khác nhau). An toàn hơn là vế thứ hai chỉ lấy dòng không ghép được: `RIGHT JOIN ... WHERE c.category_id IS NULL` rồi nối bằng `UNION ALL`.
 

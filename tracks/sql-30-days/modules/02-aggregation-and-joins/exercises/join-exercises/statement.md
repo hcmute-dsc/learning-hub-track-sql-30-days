@@ -55,6 +55,8 @@ Kết quả:
 
 **Bài 3.** Danh mục nào chưa có sản phẩm nào gắn trực tiếp vào nó?
 
+> Gợi ý: đi từ `categories` bằng `LEFT JOIN products`, rồi giữ những dòng không ghép được sản phẩm nào.
+
 <details>
 <summary>Đáp án</summary>
 
@@ -82,6 +84,8 @@ Bốn danh mục đầu là danh mục cha (sản phẩm gắn vào danh mục c
 ### Vận dụng
 
 **Bài 4.** Với mỗi nhân viên (cả người chưa bán đơn nào), tính số đơn đã bán và doanh thu (chỉ tính đơn có `status NOT IN ('pending', 'cancelled')`). Người chưa bán ghi doanh thu 0. Sắp xếp doanh thu giảm dần.
+
+> Gợi ý: điều kiện `status` nằm ở bảng bên phải của `LEFT JOIN`. Đặt nó ở `WHERE` hay ở `ON` cho kết quả khác nhau.
 
 <details>
 <summary>Đáp án</summary>
@@ -113,10 +117,12 @@ Kết quả:
 | 3 | Trần Quốc Bảo | 0 | 0 |
 | 7 | Lâm Gia Huy | 0 | 0 |
 
-Ba điểm: điều kiện `status` đặt ở `ON` để không mất nhân viên chưa bán (mục 9); JOIN thứ hai cũng phải là `LEFT JOIN`, nếu không các dòng NULL từ JOIN thứ nhất sẽ bị loại; `COUNT(DISTINCT o.order_id)` vì mỗi đơn có thể có nhiều dòng hàng. Ở đây chỉ JOIN một bảng con (`order_items`) nên không bị nhân dòng như mục 10.
+Ba điểm: điều kiện `status` đặt ở `ON` để không mất nhân viên chưa bán (mục 9 của [Ngày 10](../../lessons/10-join.md)); JOIN thứ hai cũng phải là `LEFT JOIN`, nếu không các dòng NULL từ JOIN thứ nhất sẽ bị loại; `COUNT(DISTINCT o.order_id)` vì mỗi đơn có thể có nhiều dòng hàng. Ở đây chỉ JOIN một bảng con (`order_items`) nên không bị nhân dòng như mục 10 của Ngày 10.
 </details>
 
 **Bài 5.** Với mỗi người có cấp dưới, cho biết họ quản lý trực tiếp bao nhiêu người.
+
+> Gợi ý: JOIN `employees` với chính nó: một alias cho vai quản lý, một alias cho vai nhân viên.
 
 <details>
 <summary>Đáp án</summary>
@@ -175,11 +181,14 @@ Kết quả:
 
 **Bài 7.** Tìm mọi cặp khách hàng ở cùng thành phố (theo đúng giá trị cột `city`). Mỗi cặp chỉ in một lần, không ghép một khách với chính họ.
 
+> Gợi ý: SELF JOIN `customers` theo `city`. Điều kiện nào trên `customer_id` loại được cả cặp (A, A) lẫn cặp đảo (B, A)?
+
 <details>
 <summary>Đáp án</summary>
 
 ```sql
-SELECT a.full_name AS khach_1, b.full_name AS khach_2, a.city
+SELECT a.customer_id AS id_1, a.full_name AS khach_1,
+       b.customer_id AS id_2, b.full_name AS khach_2, a.city
 FROM customers a
 JOIN customers b
   ON a.city = b.city
@@ -189,24 +198,26 @@ ORDER BY a.city, a.customer_id, b.customer_id;
 
 Kết quả:
 
-| khach_1 | khach_2 | city |
-| --- | --- | --- |
-| Hoàng Thị Em | Tạ Quang Sơn | Cần Thơ |
-| Lê Hoàng Cường | Mai Đức Uy | Đà Nẵng |
-| Trần Thị Bình | Đặng Thu Giang | Hà Nội |
-| Trần Thị Bình | Phan Thị Oanh | Hà Nội |
-| Trần Thị Bình | Nguyễn Văn An | Hà Nội |
-| Đặng Thu Giang | Phan Thị Oanh | Hà Nội |
-| Đặng Thu Giang | Nguyễn Văn An | Hà Nội |
-| Phan Thị Oanh | Nguyễn Văn An | Hà Nội |
-| Nguyễn Văn An | Phạm Minh Duy | TP. Hồ Chí Minh |
-| Nguyễn Văn An | Dương Minh Khoa | TP. Hồ Chí Minh |
-| Phạm Minh Duy | Dương Minh Khoa | TP. Hồ Chí Minh |
+| id_1 | khach_1 | id_2 | khach_2 | city |
+| --- | --- | --- | --- | --- |
+| 5 | Hoàng Thị Em | 16 | Tạ Quang Sơn | Cần Thơ |
+| 3 | Lê Hoàng Cường | 18 | Mai Đức Uy | Đà Nẵng |
+| 2 | Trần Thị Bình | 7 | Đặng Thu Giang | Hà Nội |
+| 2 | Trần Thị Bình | 13 | Phan Thị Oanh | Hà Nội |
+| 2 | Trần Thị Bình | 15 | Nguyễn Văn An | Hà Nội |
+| 7 | Đặng Thu Giang | 13 | Phan Thị Oanh | Hà Nội |
+| 7 | Đặng Thu Giang | 15 | Nguyễn Văn An | Hà Nội |
+| 13 | Phan Thị Oanh | 15 | Nguyễn Văn An | Hà Nội |
+| 1 | Nguyễn Văn An | 4 | Phạm Minh Duy | TP. Hồ Chí Minh |
+| 1 | Nguyễn Văn An | 10 | Dương Minh Khoa | TP. Hồ Chí Minh |
+| 4 | Phạm Minh Duy | 10 | Dương Minh Khoa | TP. Hồ Chí Minh |
 
-`a.customer_id < b.customer_id` vừa loại cặp (A, A) vừa chỉ giữ một trong hai chiều (A, B) và (B, A). Khách có `city` NULL không ghép với ai (`NULL = NULL` không phải TRUE). Dữ liệu bẩn làm sót cặp: `TP.HCM`, `Hồ Chí Minh`, `đà nẵng` không khớp với cách viết chuẩn. Muốn ghép đúng phải làm sạch `city` trước (Ngày 5).
+Có `customer_id` nên phân biệt được hai khách `Nguyễn Văn An` (1 ở TP. Hồ Chí Minh, 15 ở Hà Nội). `a.customer_id < b.customer_id` vừa loại cặp (A, A) vừa chỉ giữ một trong hai chiều (A, B) và (B, A). Khách có `city` NULL không ghép với ai (`NULL = NULL` không phải TRUE). Dữ liệu bẩn làm sót cặp: `TP.HCM`, `Hồ Chí Minh`, `đà nẵng` không khớp với cách viết chuẩn. Muốn ghép đúng phải làm sạch `city` trước (Ngày 5).
 </details>
 
 **Bài 8.** Tính doanh thu (đơn có `status NOT IN ('pending', 'cancelled')`) theo danh mục cha trực tiếp của danh mục sản phẩm. Ví dụ sản phẩm thuộc `Điện thoại` thì tính vào `Điện thoại & Tablet`.
+
+> Gợi ý: JOIN `categories` hai lần với hai alias: một cho danh mục của sản phẩm, một cho danh mục cha (`parent_id`).
 
 <details>
 <summary>Đáp án</summary>

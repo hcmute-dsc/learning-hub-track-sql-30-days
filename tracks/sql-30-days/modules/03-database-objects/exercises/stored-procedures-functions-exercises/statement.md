@@ -2,7 +2,7 @@
 
 ## Bài tập
 
-Nhớ khôi phục dữ liệu gốc trước khi làm (file init cũng xóa các function của bài trước). Bài nào dùng `order_total` thì tạo lại nó theo mục 2.
+Nhớ khôi phục dữ liệu gốc trước khi làm (file init cũng xóa các function của bài trước). Bài nào dùng `order_total` thì tạo lại nó theo [Ngày 17](../../lessons/17-stored-procedures-functions.md) mục 2.
 
 ### Cơ bản
 
@@ -174,6 +174,8 @@ CONTEXT:  PL/pgSQL function shipping_fee(integer) line 10 at RAISE
 
 **Bài 5.** Viết procedure `update_order_status(p_order_id, p_new_status)` chỉ cho phép các bước chuyển: `pending → paid`, `pending → cancelled`, `paid → shipped`, `paid → cancelled`, `shipped → delivered`. Bước chuyển khác thì báo lỗi `check_violation`. Khóa dòng đơn hàng trong lúc kiểm tra để hai người không cùng đổi trạng thái. Thử: đơn 40 sang `paid`, rồi đơn 40 sang `delivered`, rồi đơn 1 sang `pending`.
 
+> Gợi ý: đọc trạng thái cũ bằng `SELECT ... INTO ... FOR UPDATE`, rồi kiểm tra cặp (cũ, mới) có nằm trong danh sách bước chuyển hợp lệ không trước khi `UPDATE`.
+
 <details>
 <summary>Đáp án</summary>
 
@@ -275,6 +277,8 @@ ERROR:  Số lượng nhập phải lớn hơn 0
 ### Thử thách
 
 **Bài 7.** Tạo lại bảng `wallets` của Ngày 16 (1: 1.000.000, 2: 500.000, 3: 0). Viết procedure `transfer(p_from, p_to, p_amount)` chuyển tiền an toàn: số tiền phải dương, không tự chuyển cho mình, cả hai ví phải tồn tại, khóa hai ví theo thứ tự `customer_id` để tránh deadlock, không đủ tiền thì báo lỗi rõ ràng. Thử: 2 → 1 300.000; 2 → 3 300.000; 1 → 99 1.000; 1 → 1 1.000.
+
+> Gợi ý: `PERFORM ... FOR UPDATE` khóa dòng mà không cần lấy kết quả; ngay sau đó `GET DIAGNOSTICS v_n = ROW_COUNT;` cho biết câu vừa chạy đã chạm bao nhiêu dòng, tức đã khóa được mấy ví.
 
 <details>
 <summary>Đáp án</summary>

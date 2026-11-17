@@ -367,7 +367,7 @@ Trong PostgreSQL 16:
 | --- | --- | --- | --- | --- |
 | READ UNCOMMITTED | Không xảy ra (PostgreSQL xử lý như READ COMMITTED) | Có thể | Có thể | Có thể |
 | READ COMMITTED (**mặc định**) | Không | Có thể | Có thể | Có thể |
-| REPEATABLE READ | Không | Không | Không (chặt hơn chuẩn SQL, chuẩn cho phép) | Không: phiên ghi sau bị lỗi |
+| REPEATABLE READ | Không | Không | Không (chuẩn SQL cho phép phantom ở mức này, nhưng PostgreSQL chặn được) | Không: phiên ghi sau bị lỗi |
 | SERIALIZABLE | Không | Không | Không | Không: phiên ghi sau bị lỗi |
 
 > **Ghi chú dialect:** mức mặc định khác nhau giữa các hệ: PostgreSQL và SQL Server là READ COMMITTED, MySQL (InnoDB) là REPEATABLE READ. Cùng một tên mức nhưng mỗi hệ cài đặt hơi khác, nên đừng mang nguyên kinh nghiệm từ hệ này sang hệ khác.
@@ -632,5 +632,4 @@ Phần bài tập của bài này nằm ở bài tập **Bài tập: Transaction
 ## Đọc thêm
 
 - [Hai giao dịch cùng cộng 100, số dư chỉ tăng 100: isolation level qua thí nghiệm thật](https://tiennhm.io.vn/blog/sql-isolation-level-lost-update-phantom-read) — Hai phiên cùng đọc số dư 1000 rồi cùng ghi 1100.
-- [Thêm 4 index làm INSERT chậm 6 lần: cái giá không ai nhắc khi bảo bạn đánh index](https://tiennhm.io.vn/blog/chi-phi-ghi-cua-index) — Mọi hướng dẫn tối ưu đều bảo thêm index, rất ít bài nói về hoá đơn.
 - Tài liệu PostgreSQL: [Transaction Isolation](https://www.postgresql.org/docs/16/transaction-iso.html), [Explicit Locking](https://www.postgresql.org/docs/16/explicit-locking.html).
