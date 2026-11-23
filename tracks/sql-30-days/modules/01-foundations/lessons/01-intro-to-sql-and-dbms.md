@@ -12,6 +12,7 @@ prerequisites: []
 authors:
   - "github:TienNHM"
 license: "MIT"
+terms: [SQL, query, database, DBMS, RDBMS, DDL, DML]
 ---
 
 > **Tóm tắt:** SQL là ngôn ngữ để làm việc với dữ liệu trong database quan hệ. Hôm nay bạn tìm hiểu SQL và hệ quản trị database quan hệ (RDBMS) là gì, dựng PostgreSQL 16 cùng bộ dữ liệu DSC Shop trên máy, rồi chạy những câu lệnh đầu tiên để khám phá dữ liệu.

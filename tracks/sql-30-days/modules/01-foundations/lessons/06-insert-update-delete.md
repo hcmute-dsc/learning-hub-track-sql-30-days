@@ -15,6 +15,7 @@ prerequisites:
 authors:
   - "github:TienNHM"
 license: "MIT"
+terms: [INSERT, UPDATE, DELETE, transaction, COMMIT, ROLLBACK]
 ---
 
 > **Tóm tắt:** Năm ngày trước bạn chỉ đọc dữ liệu. Hôm nay bạn học cách ghi: thêm dòng bằng `INSERT`, sửa bằng `UPDATE`, xóa bằng `DELETE`, gộp "thêm hoặc sửa" bằng `ON CONFLICT`, dọn sạch bảng bằng `TRUNCATE`. Quan trọng hơn cú pháp là một quy trình an toàn: xem trước bằng `SELECT`, chạy thử trong `BEGIN ... ROLLBACK`, rồi mới `COMMIT`.

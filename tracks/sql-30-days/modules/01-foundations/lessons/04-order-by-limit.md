@@ -12,6 +12,7 @@ prerequisites:
 authors:
   - "github:TienNHM"
 license: "MIT"
+terms: [ORDER BY, LIMIT, OFFSET]
 ---
 
 > **Tóm tắt:** Không có `ORDER BY` thì thứ tự dòng trả về là không xác định. Bài này dạy sắp xếp theo một hay nhiều cột, xử lý `NULL` khi sắp xếp, lấy top N bằng `LIMIT`/`FETCH FIRST`, và phân trang bằng `OFFSET` cùng những cái bẫy của nó (trang bị lặp dòng, `OFFSET` lớn chạy chậm).

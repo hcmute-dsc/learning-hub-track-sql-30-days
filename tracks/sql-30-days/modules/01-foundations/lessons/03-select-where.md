@@ -14,6 +14,7 @@ prerequisites:
 authors:
   - "github:TienNHM"
 license: "MIT"
+terms: [SELECT, WHERE, alias]
 ---
 
 > **Tóm tắt:** `SELECT` chọn cột cần xem, `WHERE` chọn dòng cần giữ. Bài này đi từ câu `SELECT` đầu tiên tới các điều kiện lọc (so sánh, `AND`/`OR`/`NOT`, `IN`, `BETWEEN`, `LIKE`/`ILIKE`) và dành hẳn một phần cho `NULL` cùng logic ba trị, nguồn gây lỗi số 1 của người mới học SQL.
