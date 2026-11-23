@@ -1,6 +1,6 @@
 # Track `sql-30-days`: 30 ngày học SQL
 
-Repo nội dung của track **30 ngày học SQL** trên [DSC Learning Hub](https://learn.hcmute-dsc.io.vn): lộ trình 30 ngày với PostgreSQL 16 và bộ dữ liệu DSC Shop, 32 bài học, 32 bài tập và dự án cuối khóa.
+Repo nội dung của track **30 ngày học SQL** trên [HCMUTE DSC Learning Hub](https://learn.hcmute-dsc.io.vn): lộ trình 30 ngày với PostgreSQL 16 và bộ dữ liệu DSC Shop, 32 bài học, 32 bài tập và dự án cuối khóa.
 
 Mỗi track một repo `hcmute-dsc/learning-hub-track-<slug>`, cùng chuẩn với template [`learning-hub-track-template`](https://github.com/hcmute-dsc/learning-hub-track-template) ([ADR-10](https://github.com/hcmute-dsc/learning-hub-docs/blob/main/docs/product/DECISIONS.md#adr-10--mỗi-track-một-repo-learning-hub-content-thành-registry)). Track này trước đây nằm trong [`learning-hub-content`](https://github.com/hcmute-dsc/learning-hub-content); lịch sử commit được giữ nguyên khi tách ra.
 

@@ -185,15 +185,15 @@ WHERE cost_price IS NULL;
 | Lót chuột DSC XXL | 250000 | NULL | NULL |
 
 ```sql
-SELECT NULL + 1          AS cong_null,
-       NULL * 0          AS nhan_khong,
-       'DSC' || NULL     AS noi_null,
-       CONCAT('DSC', NULL) AS concat_null;
+SELECT NULL + 1                AS cong_null,
+       NULL * 0                AS nhan_khong,
+       'HCMUTE DSC' || NULL     AS noi_null,
+       CONCAT('HCMUTE DSC', NULL) AS concat_null;
 ```
 
 | cong_null | nhan_khong | noi_null | concat_null |
 | --- | --- | --- | --- |
-| NULL | NULL | NULL | DSC |
+| NULL | NULL | NULL | HCMUTE DSC |
 
 Kể cả `NULL * 0` cũng là `NULL`. Ngoại lệ đáng nhớ là hàm `CONCAT`: nó bỏ qua các đối số `NULL`. Mục tiếp theo nói rõ hơn.
 
