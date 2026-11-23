@@ -14,6 +14,7 @@ prerequisites:
 authors:
   - "github:TienNHM"
 license: "MIT"
+terms: [CAST, COALESCE, NULLIF]
 ---
 
 > **Tóm tắt:** Truy vấn không chỉ lấy dữ liệu ra mà còn biến đổi nó: tính tiền, ghép chuỗi, tách ngày tháng, đổi kiểu, thay `NULL` bằng giá trị mặc định. Bài này đi qua các toán tử số học (và cái bẫy chia số nguyên), hàm chuỗi, hàm ngày giờ, `CAST`, `ROUND`, `COALESCE`, `NULLIF`, rồi dùng chúng để làm sạch cột `customers.city` đang bị viết lộn xộn.

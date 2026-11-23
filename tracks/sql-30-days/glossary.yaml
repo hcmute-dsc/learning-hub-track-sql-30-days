@@ -1,0 +1,175 @@
+# Từ vựng của track (TEACHING.md T1, CONTENT-SPECIFICATION §3.1c).
+# Mỗi từ: chữ đầy đủ (expansion) nếu là viết tắt, nghĩa đen (literal), nghĩa trong SQL (meaning).
+# Bài nào giới thiệu từ nào thì ghi trong `terms:` ở front matter của bài đó.
+# Thứ tự trong file không quan trọng: site xếp A–Z.
+# Không viết dấu ": " trong giá trị (YAML hiểu sai); chữ NULL, true, false phải để trong ngoặc kép.
+
+# ---- Ngày 1: SQL, database, RDBMS
+
+- term: SQL
+  expansion: Structured Query Language
+  literal: ngôn ngữ truy vấn có cấu trúc
+  meaning: Ngôn ngữ để đọc, thêm, sửa, xoá dữ liệu và tạo bảng trong database quan hệ.
+  example: SELECT full_name FROM customers;
+  see: [query, RDBMS]
+
+- term: query
+  literal: câu hỏi, truy vấn
+  meaning: Một câu lệnh hỏi database để lấy dữ liệu ra, thường bắt đầu bằng SELECT.
+  see: [SQL, SELECT]
+
+- term: database
+  literal: cơ sở dữ liệu (data = dữ liệu, base = nền)
+  meaning: Tập dữ liệu có tổ chức, lưu lâu dài, do một DBMS quản lý.
+  see: [DBMS]
+
+- term: DBMS
+  expansion: Database Management System
+  literal: hệ quản trị cơ sở dữ liệu
+  meaning: Phần mềm lưu, đọc, ghi và bảo vệ database.
+  see: [RDBMS, database]
+
+- term: RDBMS
+  expansion: Relational Database Management System
+  literal: hệ quản trị cơ sở dữ liệu quan hệ
+  meaning: DBMS lưu dữ liệu thành các bảng liên kết với nhau. PostgreSQL là một RDBMS.
+  see: [DBMS]
+
+- term: DDL
+  expansion: Data Definition Language
+  literal: ngôn ngữ định nghĩa dữ liệu
+  meaning: Nhóm lệnh tạo, sửa, xoá cấu trúc như bảng.
+  example: CREATE TABLE, ALTER TABLE, DROP TABLE
+  see: [DML]
+
+- term: DML
+  expansion: Data Manipulation Language
+  literal: ngôn ngữ thao tác dữ liệu
+  meaning: Nhóm lệnh đọc và thay đổi dữ liệu trong bảng. Có tài liệu tách SELECT ra nhóm DQL riêng.
+  example: SELECT, INSERT, UPDATE, DELETE
+  see: [DDL]
+
+# ---- Ngày 2: bảng, kiểu dữ liệu, ràng buộc
+
+- term: schema
+  literal: lược đồ, bản phác
+  meaning: Cấu trúc của database (bảng, cột, kiểu, ràng buộc). Trong PostgreSQL, schema còn là một ngăn chứa bảng bên trong database, như shop hay public.
+  example: CREATE SCHEMA nhap;
+
+- term: constraint
+  literal: ràng buộc
+  meaning: Luật đặt trên cột hoặc bảng để database tự chặn dữ liệu sai.
+  example: NOT NULL, UNIQUE, CHECK, DEFAULT
+  see: [primary key, foreign key]
+
+- term: primary key
+  literal: khoá chính
+  meaning: Cột (hoặc nhóm cột) xác định duy nhất mỗi dòng của bảng. Không được trùng, không được NULL.
+  example: customer_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY
+  see: [foreign key, constraint]
+
+- term: foreign key
+  literal: khoá ngoại
+  meaning: Cột trỏ tới khoá chính của một bảng khác. Database chặn giá trị trỏ tới dòng không có thật.
+  example: category_id INT REFERENCES categories (category_id)
+  see: [primary key]
+
+- term: "NULL"   # có ngoặc: YAML đọc NULL trần là giá trị rỗng
+  literal: không, rỗng (tiếng Latin nullus = không cái nào)
+  meaning: Giá trị "không có hoặc chưa biết", khác với 0 và chuỗi rỗng. So sánh với NULL dùng IS NULL, không dùng =.
+  example: WHERE phone IS NULL
+
+# ---- Ngày 3: SELECT và WHERE
+
+- term: SELECT
+  literal: chọn
+  meaning: Lệnh lấy dữ liệu, chọn những cột muốn xem từ một bảng.
+  example: SELECT full_name, city FROM customers;
+  see: [WHERE, query]
+
+- term: WHERE
+  literal: ở đâu, nơi mà
+  meaning: Điều kiện lọc, chỉ giữ những dòng làm điều kiện đúng.
+  example: SELECT * FROM products WHERE price > 100000;
+  see: [SELECT]
+
+- term: alias
+  literal: bí danh, tên khác
+  meaning: Tên tạm đặt cho cột hoặc bảng trong một câu lệnh, viết sau AS.
+  example: SELECT price - cost_price AS profit FROM products;
+
+# ---- Ngày 4: ORDER BY, LIMIT, OFFSET
+
+- term: ORDER BY
+  literal: sắp xếp theo
+  meaning: Sắp xếp kết quả theo một hay nhiều cột. ASC (ascending) là tăng dần, DESC (descending) là giảm dần.
+  example: ORDER BY price DESC
+  see: [LIMIT]
+
+- term: LIMIT
+  literal: giới hạn
+  meaning: Lấy tối đa bao nhiêu dòng của kết quả.
+  example: LIMIT 10
+  see: [OFFSET, ORDER BY]
+
+- term: OFFSET
+  literal: độ lệch, bỏ qua
+  meaning: Bỏ qua bao nhiêu dòng đầu của kết quả rồi mới lấy. Dùng với LIMIT để phân trang.
+  example: LIMIT 10 OFFSET 20
+  see: [LIMIT]
+
+# ---- Ngày 5: biểu thức và hàm
+
+- term: CAST
+  literal: đúc, ép khuôn
+  meaning: Đổi một giá trị sang kiểu khác (ép kiểu). PostgreSQL còn có cách viết ngắn ::.
+  example: CAST('42' AS integer)
+
+- term: COALESCE
+  literal: hợp lại, liền lại
+  meaning: Trả về giá trị đầu tiên không NULL trong danh sách. Hay dùng để thay NULL bằng một giá trị mặc định.
+  example: COALESCE(city, 'Chưa rõ')
+  see: ["NULL", NULLIF]
+
+- term: NULLIF
+  expansion: null if
+  literal: thành NULL nếu
+  meaning: Trả về NULL khi hai giá trị bằng nhau, ngược lại trả về giá trị đầu.
+  example: NULLIF(city, '')
+  see: [COALESCE, "NULL"]
+
+# ---- Ngày 6: ghi dữ liệu
+
+- term: INSERT
+  literal: chèn vào
+  meaning: Thêm dòng mới vào bảng.
+  example: INSERT INTO customers (full_name) VALUES ('Nguyễn Văn An');
+  see: [UPDATE, DELETE]
+
+- term: UPDATE
+  literal: cập nhật
+  meaning: Sửa giá trị của những dòng đang có. Luôn đi kèm WHERE, nếu không sẽ sửa cả bảng.
+  example: UPDATE products SET price = 120000 WHERE product_id = 1;
+  see: [INSERT, DELETE]
+
+- term: DELETE
+  literal: xoá
+  meaning: Xoá những dòng thoả điều kiện. Thiếu WHERE là xoá hết mọi dòng.
+  example: DELETE FROM orders WHERE order_id = 5;
+  see: [INSERT, UPDATE]
+
+- term: transaction
+  literal: giao dịch
+  meaning: Nhóm lệnh chạy như một khối, bắt đầu bằng BEGIN. COMMIT chốt tất cả, ROLLBACK huỷ tất cả.
+  example: BEGIN; ... ROLLBACK;
+  see: [COMMIT, ROLLBACK]
+
+- term: COMMIT
+  literal: chốt, cam kết
+  meaning: Kết thúc transaction và lưu mọi thay đổi trong đó.
+  see: [ROLLBACK, transaction]
+
+- term: ROLLBACK
+  literal: cuộn lại, quay lui
+  meaning: Kết thúc transaction và huỷ mọi thay đổi trong đó, dữ liệu trở lại như trước BEGIN.
+  see: [COMMIT, transaction]

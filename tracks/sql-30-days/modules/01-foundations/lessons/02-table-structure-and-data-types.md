@@ -13,6 +13,7 @@ prerequisites:
 authors:
   - "github:TienNHM"
 license: "MIT"
+terms: [schema, constraint, primary key, foreign key, "NULL"]
 ---
 
 > **Tóm tắt:** Một bảng tốt không chỉ có cột và dòng: mỗi cột có kiểu dữ liệu đúng, và bảng có các ràng buộc (khóa chính, khóa ngoại, `UNIQUE`, `NOT NULL`, `CHECK`, `DEFAULT`) để database tự chặn dữ liệu sai. Hôm nay bạn đọc hiểu schema DSC Shop, rồi tự tạo, sửa và xóa bảng trên một khu vực nháp riêng.
